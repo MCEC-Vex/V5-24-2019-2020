@@ -125,17 +125,20 @@ void opcontrol()
         rightTopMotor.move((forwardPower - turningPower) * -1);
         rightBottomMotor.move((forwardPower - turningPower) * -1);
 
-        if(master.get_digital(DIGITAL_A))
+        if(master.get_digital(DIGITAL_L2))
         {
-            trayMotor.move_velocity(master.get_digital(DIGITAL_L1) ? 30 : 60);
+            //trayMotor.move_velocity(master.get_digital(DIGITAL_L1) ? 30 : 60);
+            trayMotor.move(127);
         }
-        else if(master.get_digital(DIGITAL_Y))
+        else if(master.get_digital(DIGITAL_L1))
         {
-            trayMotor.move_velocity(master.get_digital(DIGITAL_L1) ? -30 : -60);
+            //trayMotor.move_velocity(master.get_digital(DIGITAL_L1) ? -30 : -60);
+            trayMotor.move(-127);
         }
         else
         {
-            trayMotor.move_velocity(0);
+            //trayMotor.move_velocity(0);
+            trayMotor.move(0);
         }
 
         if(master.get_digital_new_press(DIGITAL_X))
@@ -182,11 +185,13 @@ void opcontrol()
 
         if(master.get_digital(DIGITAL_R1))
         {
-            leftIntake.move(127);
-            rightIntake.move(-127);
+            // Move intake out
+            leftIntake.move(50);
+            rightIntake.move(-50);
         }
         else if(master.get_digital(DIGITAL_R2))
         {
+            // Move intake in
             leftIntake.move(-127);
             rightIntake.move(127);
         }
@@ -196,25 +201,15 @@ void opcontrol()
             rightIntake.move(0);
         }
 
-        if(master.get_digital_new_press(DIGITAL_L2))
+        if(master.get_digital(DIGITAL_B))
         {
-            if(cringe)
-            {
-                master.set_text(0, 0, "            ");
-                pros::delay(50);
-                master.set_text(1, 0, "            ");
-                pros::delay(50);
-                master.set_text(2, 0, "            ");
-            }
-            else
-            {
-                master.set_text(0, 0, "Big cringe 1");
-                pros::delay(50);
-                master.set_text(1, 0, "Big cringe 2");
-                pros::delay(50);
-                master.set_text(2, 0, "Big cringe 3");
-            }
-            cringe = !cringe;
+            leftTopMotor.move(-50);
+            leftBottomMotor.move(-50);
+            rightTopMotor.move(50);
+            rightBottomMotor.move(50);
+
+            leftIntake.move(50);
+            rightIntake.move(-50);
         }
 
         pros::lcd::print(1, "Left Y: %d", forwardPower);
