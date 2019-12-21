@@ -141,6 +141,7 @@ void opcontrol()
             trayMotor.move(0);
         }
 
+        // Flip the robot 180 degrees
         if(master.get_digital_new_press(DIGITAL_X))
         {
             leftTopMotor.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
@@ -169,11 +170,13 @@ void opcontrol()
 
         if(master.get_digital(DIGITAL_UP))
         {
+            // Move the arms up
             leftArmMotor.move_velocity(50);
             rightArmMotor.move_velocity(-50);
         }
         else if(master.get_digital(DIGITAL_DOWN))
         {
+            // Move the arms down
             leftArmMotor.move_velocity(-50);
             rightArmMotor.move_velocity(50);
         }
