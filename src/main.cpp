@@ -88,12 +88,12 @@ void autonomous()
 void opcontrol()
 {
     pros::Controller master(pros::E_CONTROLLER_MASTER);
+
+    // Motors are numbered from left to right
     pros::Motor leftTopMotor(1);
     pros::Motor leftBottomMotor(2);
     pros::Motor rightTopMotor(3);
     pros::Motor rightBottomMotor(4);
-
-    pros::Motor trayMotor(10);
 
     pros::Motor leftIntake(6);
     pros::Motor rightIntake(7);
@@ -101,21 +101,23 @@ void opcontrol()
     pros::Motor leftArmMotor(8);
     pros::Motor rightArmMotor(9);
 
+    pros::Motor trayMotor(10);
+
+    // Set drive motors to coast to avoid straining the connections
     leftTopMotor.set_brake_mode(pros::E_MOTOR_BRAKE_COAST);
     leftBottomMotor.set_brake_mode(pros::E_MOTOR_BRAKE_COAST);
     rightTopMotor.set_brake_mode(pros::E_MOTOR_BRAKE_COAST);
     rightBottomMotor.set_brake_mode(pros::E_MOTOR_BRAKE_COAST);
+    // Set other motors to hold so they don't move when they're not supposed to
     trayMotor.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
     leftIntake.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
     rightIntake.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
-
     leftArmMotor.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
     rightArmMotor.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
 
-    bool cringe = false;
-
     while(true)
     {
+        // Arcade-style driving controls
         int forwardPower = master.get_analog(ANALOG_LEFT_Y);
         int turningPower = master.get_analog(ANALOG_RIGHT_X);
 
@@ -126,41 +128,51 @@ void opcontrol()
 
         if(master.get_digital(DIGITAL_L2))
         {
-            //trayMotor.move_velocity(master.get_digital(DIGITAL_L1) ? 30 : 60);
-            trayMotor.move(127);
+            // Move the tray quickly if A is pressed, slowly if Y is pressed, and regular speed if neither is pressed
+            //TODO clean up this logic
+            trayMotor.move_velocity(master.get_digital(DIGITAL_A) ? 200 :
+                master.get_digital(DIGITAL_Y) ? 50 : 80);
         }
         else if(master.get_digital(DIGITAL_L1))
         {
-            //trayMotor.move_velocity(master.get_digital(DIGITAL_L1) ? -30 : -60);
-            trayMotor.move(-127);
+            trayMotor.move_velocity(master.get_digital(DIGITAL_A) ? -200 :
+                master.get_digital(DIGITAL_Y) ? -50 : -80);
         }
         else
         {
-            //trayMotor.move_velocity(0);
-            trayMotor.move(0);
+            trayMotor.move_velocity(0);
         }
 
         // Flip the robot 180 degrees
         if(master.get_digital_new_press(DIGITAL_X))
         {
+            // Set brake mode to hold so the robot doesn't drift (much) after the spin
             leftTopMotor.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
             leftBottomMotor.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
             rightTopMotor.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
             rightBottomMotor.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
+
+            // Get the initial positions to measure completion condition
             double leftPos = leftTopMotor.get_position();
             double rightPos = rightTopMotor.get_position();
 
+            // Use the built-in PID loops to turn the robot (note: non-blocking)
             leftTopMotor.move_relative(TURN_DEGREES, 200);
             leftBottomMotor.move_relative(TURN_DEGREES, 200);
             rightTopMotor.move_relative(TURN_DEGREES, 200);
             rightBottomMotor.move_relative(TURN_DEGREES, 200);
 
+            // Wait until the robot has completed the turn to +/- 5 rotary encoder units
             while(!((leftTopMotor.get_position() < leftPos + TURN_DEGREES + 5) &&
                     (leftTopMotor.get_position() > leftPos + TURN_DEGREES - 5)))
             {
                 pros::delay(2);
             }
+
+            // Wait 500 milliseconds so the momentum comes to a stop
             pros::delay(500);
+
+            // Restore coast mode on the motors
             leftTopMotor.set_brake_mode(pros::E_MOTOR_BRAKE_COAST);
             leftBottomMotor.set_brake_mode(pros::E_MOTOR_BRAKE_COAST);
             rightTopMotor.set_brake_mode(pros::E_MOTOR_BRAKE_COAST);
@@ -203,6 +215,7 @@ void opcontrol()
             rightIntake.move(0);
         }
 
+        // Back up the robot while spinning the intake out
         if(master.get_digital(DIGITAL_B))
         {
             leftTopMotor.move(-50);
@@ -214,6 +227,7 @@ void opcontrol()
             rightIntake.move(-50);
         }
 
+        // Print debugging data
         pros::lcd::print(1, "Left Y: %d", forwardPower);
         pros::lcd::print(2, "Right X: %d", turningPower);
         pros::lcd::print(3, "L-Voltage: %d", forwardPower + turningPower);
