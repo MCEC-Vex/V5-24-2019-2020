@@ -80,10 +80,16 @@ void autonomous()
  * task, not resume it from where it left off.
  */
 
-// The amount to turn with the 180 spin test function
-// This number has its foundations in mathematical theory and application
-// Read more here: https://www.teachervision.com/mathematics/problem-solving-guess-check
-#define TURN_DEGREES 1300
+// Control definitions
+#define ARMS_UP DIGITAL_UP
+#define ARMS_DOWN DIGITAL_DOWN
+
+#define BACKWARDS_OUT DIGITAL_B
+#define ROLLER_OUTTAKE DIGITAL_R2
+#define ROLLER_INTAKE DIGITAL_R1
+
+#define TRAY_OUT DIGITAL_L2
+#define TRAY_IN DIGITAL_L1
 
 void opcontrol()
 {
@@ -126,14 +132,14 @@ void opcontrol()
         rightTopMotor.move((forwardPower - turningPower) * -1);
         rightBottomMotor.move((forwardPower - turningPower) * -1);
 
-        if(master.get_digital(DIGITAL_L2))
+        if(master.get_digital(TRAY_OUT))
         {
             // Move the tray quickly if A is pressed, slowly if Y is pressed, and regular speed if neither is pressed
             //TODO clean up this logic
             trayMotor.move_velocity(master.get_digital(DIGITAL_A) ? 200 :
                 master.get_digital(DIGITAL_Y) ? 50 : 80);
         }
-        else if(master.get_digital(DIGITAL_L1))
+        else if(master.get_digital(TRAY_IN))
         {
             trayMotor.move_velocity(master.get_digital(DIGITAL_A) ? -200 :
                 master.get_digital(DIGITAL_Y) ? -50 : -80);
@@ -143,49 +149,13 @@ void opcontrol()
             trayMotor.move_velocity(0);
         }
 
-        // Flip the robot 180 degrees
-        if(master.get_digital_new_press(DIGITAL_X))
-        {
-            // Set brake mode to hold so the robot doesn't drift (much) after the spin
-            leftTopMotor.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
-            leftBottomMotor.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
-            rightTopMotor.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
-            rightBottomMotor.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
-
-            // Get the initial positions to measure completion condition
-            double leftPos = leftTopMotor.get_position();
-            double rightPos = rightTopMotor.get_position();
-
-            // Use the built-in PID loops to turn the robot (note: non-blocking)
-            leftTopMotor.move_relative(TURN_DEGREES, 200);
-            leftBottomMotor.move_relative(TURN_DEGREES, 200);
-            rightTopMotor.move_relative(TURN_DEGREES, 200);
-            rightBottomMotor.move_relative(TURN_DEGREES, 200);
-
-            // Wait until the robot has completed the turn to +/- 5 rotary encoder units
-            while(!((leftTopMotor.get_position() < leftPos + TURN_DEGREES + 5) &&
-                    (leftTopMotor.get_position() > leftPos + TURN_DEGREES - 5)))
-            {
-                pros::delay(2);
-            }
-
-            // Wait 500 milliseconds so the momentum comes to a stop
-            pros::delay(500);
-
-            // Restore coast mode on the motors
-            leftTopMotor.set_brake_mode(pros::E_MOTOR_BRAKE_COAST);
-            leftBottomMotor.set_brake_mode(pros::E_MOTOR_BRAKE_COAST);
-            rightTopMotor.set_brake_mode(pros::E_MOTOR_BRAKE_COAST);
-            rightBottomMotor.set_brake_mode(pros::E_MOTOR_BRAKE_COAST);
-        }
-
-        if(master.get_digital(DIGITAL_UP))
+        if(master.get_digital(ARMS_UP))
         {
             // Move the arms up
             leftArmMotor.move_velocity(50);
             rightArmMotor.move_velocity(-50);
         }
-        else if(master.get_digital(DIGITAL_DOWN))
+        else if(master.get_digital(ARMS_DOWN))
         {
             // Move the arms down
             leftArmMotor.move_velocity(-50);
@@ -197,13 +167,13 @@ void opcontrol()
             rightArmMotor.move_velocity(0);
         }
 
-        if(master.get_digital(DIGITAL_R1))
+        if(master.get_digital(ROLLER_OUTTAKE))
         {
             // Move intake out
             leftIntake.move(50);
             rightIntake.move(-50);
         }
-        else if(master.get_digital(DIGITAL_R2))
+        else if(master.get_digital(ROLLER_INTAKE))
         {
             // Move intake in
             leftIntake.move(-127);
@@ -216,7 +186,7 @@ void opcontrol()
         }
 
         // Back up the robot while spinning the intake out
-        if(master.get_digital(DIGITAL_B))
+        if(master.get_digital(BACKWARDS_OUT))
         {
             leftTopMotor.move(-50);
             leftBottomMotor.move(-50);
