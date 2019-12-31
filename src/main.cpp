@@ -80,6 +80,16 @@ void autonomous()
  * task, not resume it from where it left off.
  */
 
+// Motor positions
+#define LEFT_ARM_LOW_SAFE 216
+#define RIGHT_ARM_LOW_SAFE -211
+#define TRAY_LOWEST 133
+#define TRAY_ARM_SAFE -192
+#define ARM_TOWER_LOW_LEFT 694
+#define ARM_TOWER_LOW_RIGHT -668
+#define ARM_TOWER_HIGH_LEFT 938
+#define ARM_TOWER_HIGH_RIGHT -948
+
 // Control definitions
 #define ARMS_UP DIGITAL_UP
 #define ARMS_DOWN DIGITAL_DOWN
@@ -90,6 +100,8 @@ void autonomous()
 
 #define TRAY_OUT DIGITAL_L2
 #define TRAY_IN DIGITAL_L1
+
+#define ARM_MACRO DIGITAL_X
 
 void opcontrol()
 {
@@ -110,16 +122,23 @@ void opcontrol()
     pros::Motor trayMotor(10);
 
     // Set drive motors to coast to avoid straining the connections
-    leftTopMotor.set_brake_mode(pros::E_MOTOR_BRAKE_COAST);
-    leftBottomMotor.set_brake_mode(pros::E_MOTOR_BRAKE_COAST);
-    rightTopMotor.set_brake_mode(pros::E_MOTOR_BRAKE_COAST);
-    rightBottomMotor.set_brake_mode(pros::E_MOTOR_BRAKE_COAST);
+    leftTopMotor.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
+    leftBottomMotor.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
+    rightTopMotor.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
+    rightBottomMotor.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
     // Set other motors to hold so they don't move when they're not supposed to
     trayMotor.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
     leftIntake.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
     rightIntake.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
     leftArmMotor.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
     rightArmMotor.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
+
+    // Flags for setting 0 velocity
+    bool trayWasMoving = false;
+    bool armsWereMoving = false;
+
+    // Arm macro flag
+    int armMacroPos = 0;
 
     while(true)
     {
@@ -137,16 +156,19 @@ void opcontrol()
             // Move the tray quickly if A is pressed, slowly if Y is pressed, and regular speed if neither is pressed
             //TODO clean up this logic
             trayMotor.move_velocity(master.get_digital(DIGITAL_A) ? 200 :
-                master.get_digital(DIGITAL_Y) ? 50 : 80);
+                                    master.get_digital(DIGITAL_Y) ? 50 : 80);
+            trayWasMoving = true;
         }
         else if(master.get_digital(TRAY_IN))
         {
             trayMotor.move_velocity(master.get_digital(DIGITAL_A) ? -200 :
                 master.get_digital(DIGITAL_Y) ? -50 : -80);
+            trayWasMoving = true;
         }
-        else
+        else if(trayWasMoving)
         {
             trayMotor.move_velocity(0);
+            trayWasMoving = false;
         }
 
         if(master.get_digital(ARMS_UP))
@@ -154,24 +176,69 @@ void opcontrol()
             // Move the arms up
             leftArmMotor.move_velocity(50);
             rightArmMotor.move_velocity(-50);
+            armsWereMoving = true;
+
+            trayMotor.move_absolute(TRAY_ARM_SAFE, 200);
         }
         else if(master.get_digital(ARMS_DOWN))
         {
             // Move the arms down
             leftArmMotor.move_velocity(-50);
             rightArmMotor.move_velocity(50);
+            armsWereMoving = true;
+
+            if(leftArmMotor.get_position() < LEFT_ARM_LOW_SAFE && rightArmMotor.get_position() > RIGHT_ARM_LOW_SAFE)
+            {
+                trayMotor.move_absolute(TRAY_LOWEST, 200);
+            }
         }
-        else
+        else if(armsWereMoving)
         {
+            armsWereMoving = false;
             leftArmMotor.move_velocity(0);
             rightArmMotor.move_velocity(0);
+        }
+
+        // Arm macros
+        if(master.get_digital_new_press(ARM_MACRO))
+        {
+            if(armMacroPos == 0)
+            {
+                armMacroPos = 1;
+                master.set_text(0, 0, "Low Tower ");
+                trayMotor.move_absolute(TRAY_ARM_SAFE, 200);
+
+                leftArmMotor.move_absolute(ARM_TOWER_LOW_LEFT, 50);
+                rightArmMotor.move_absolute(-1 * ARM_TOWER_LOW_LEFT, 50);
+            }
+            else if(armMacroPos == 1)
+            {
+                armMacroPos = 2;
+                master.set_text(0, 0, "High Tower");
+                trayMotor.move_absolute(TRAY_ARM_SAFE, 200);
+
+                leftArmMotor.move_absolute(ARM_TOWER_HIGH_LEFT, 50);
+                rightArmMotor.move_absolute(-1 * ARM_TOWER_HIGH_LEFT, 50);
+            }
+            else
+            {
+                armMacroPos = 0;
+                master.set_text(0, 0, "No Tower  ");
+                if(leftArmMotor.get_position() < LEFT_ARM_LOW_SAFE && rightArmMotor.get_position() > RIGHT_ARM_LOW_SAFE)
+                {
+                    trayMotor.move_absolute(TRAY_LOWEST, 200);
+                }
+
+                rightArmMotor.move_absolute(34, 50);
+                leftArmMotor.move_absolute(-34, 50);
+            }
         }
 
         if(master.get_digital(ROLLER_OUTTAKE))
         {
             // Move intake out
-            leftIntake.move(50);
-            rightIntake.move(-50);
+            leftIntake.move(127);
+            rightIntake.move(-127);
         }
         else if(master.get_digital(ROLLER_INTAKE))
         {
