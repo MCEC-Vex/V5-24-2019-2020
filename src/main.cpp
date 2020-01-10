@@ -83,8 +83,9 @@ void autonomous()
 // Motor positions
 #define LEFT_ARM_LOW_SAFE 216
 #define RIGHT_ARM_LOW_SAFE -211
-#define TRAY_LOWEST 133
-#define TRAY_ARM_SAFE -192
+#define TRAY_LOWEST 200
+#define TRAY_HIGHEST -2270
+#define TRAY_ARM_SAFE -392
 #define ARM_TOWER_LOW_LEFT 694
 #define ARM_TOWER_LOW_RIGHT -668
 #define ARM_TOWER_HIGH_LEFT 938
@@ -98,8 +99,8 @@ void autonomous()
 #define ROLLER_OUTTAKE DIGITAL_R2
 #define ROLLER_INTAKE DIGITAL_R1
 
-#define TRAY_OUT DIGITAL_L2
-#define TRAY_IN DIGITAL_L1
+#define TRAY_OUT DIGITAL_L1
+#define TRAY_IN DIGITAL_L2
 
 #define ARM_MACRO DIGITAL_X
 
@@ -119,15 +120,17 @@ void opcontrol()
     pros::Motor leftArmMotor(8);
     pros::Motor rightArmMotor(9);
 
-    pros::Motor trayMotor(10);
+    pros::Motor trayMotorBack(11);
+    pros::Motor trayMotorFront(12);
 
-    // Set drive motors to coast to avoid straining the connections
+    // Set motors to hold so they don't move when they're not supposed to
     leftTopMotor.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
     leftBottomMotor.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
     rightTopMotor.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
     rightBottomMotor.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
-    // Set other motors to hold so they don't move when they're not supposed to
-    trayMotor.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
+
+    trayMotorBack.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
+    trayMotorFront.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
     leftIntake.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
     rightIntake.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
     leftArmMotor.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
@@ -139,6 +142,9 @@ void opcontrol()
 
     // Arm macro flag
     int armMacroPos = 0;
+
+    // Rumble timing flag
+    uint32_t lastRumble = 0;
 
     while(true)
     {
@@ -153,21 +159,54 @@ void opcontrol()
 
         if(master.get_digital(TRAY_OUT))
         {
-            // Move the tray quickly if A is pressed, slowly if Y is pressed, and regular speed if neither is pressed
-            //TODO clean up this logic
-            trayMotor.move_velocity(master.get_digital(DIGITAL_A) ? 200 :
-                                    master.get_digital(DIGITAL_Y) ? 50 : 80);
-            trayWasMoving = true;
+            if(trayMotorBack.get_position() <= TRAY_HIGHEST)
+            {
+                // Refuse to move the tray above its lowest safe point
+                if(lastRumble <= pros::millis() - 50)
+                {
+                    master.rumble(". . . .");
+                    lastRumble = pros::millis();
+                }
+                trayMotorBack.move_velocity(0);
+                trayMotorFront.move_velocity(0);
+            }
+            else
+            {
+                trayMotorBack.move_velocity(master.get_digital(DIGITAL_A) ? -200 :
+                                            master.get_digital(DIGITAL_Y) ? -50 : -80);
+                trayMotorFront.move_velocity(master.get_digital(DIGITAL_A) ? -200 :
+                                             master.get_digital(DIGITAL_Y) ? -50 : -80);
+                trayWasMoving = true;
+            }
         }
         else if(master.get_digital(TRAY_IN))
         {
-            trayMotor.move_velocity(master.get_digital(DIGITAL_A) ? -200 :
-                master.get_digital(DIGITAL_Y) ? -50 : -80);
-            trayWasMoving = true;
+            if(trayMotorBack.get_position() >= TRAY_LOWEST)
+            {
+                // Refuse to move the tray below its lowest safe point
+                if(lastRumble <= pros::millis() - 50)
+                {
+                    master.rumble(". . . .");
+                    lastRumble = pros::millis();
+                }
+                trayMotorBack.move_velocity(0);
+                trayMotorFront.move_velocity(0);
+            }
+            else
+            {
+                // Move the tray quickly if A is pressed, slowly if Y is pressed, and regular speed if neither is pressed
+                //TODO clean up this logic
+                trayMotorBack.move_velocity(master.get_digital(DIGITAL_A) ? 200 :
+                                            master.get_digital(DIGITAL_Y) ? 50 : 80);
+                trayMotorFront.move_velocity(master.get_digital(DIGITAL_A) ? 200 :
+                                             master.get_digital(DIGITAL_Y) ? 50 : 80);
+                trayWasMoving = true;
+            }
         }
         else if(trayWasMoving)
         {
-            trayMotor.move_velocity(0);
+            trayMotorBack.move_velocity(0);
+            trayMotorFront.move_velocity(0);
             trayWasMoving = false;
         }
 
@@ -178,7 +217,8 @@ void opcontrol()
             rightArmMotor.move_velocity(-50);
             armsWereMoving = true;
 
-            trayMotor.move_absolute(TRAY_ARM_SAFE, 200);
+            trayMotorBack.move_absolute(TRAY_ARM_SAFE, 200);
+            trayMotorFront.move_absolute(TRAY_ARM_SAFE, 200);
         }
         else if(master.get_digital(ARMS_DOWN))
         {
@@ -189,7 +229,8 @@ void opcontrol()
 
             if(leftArmMotor.get_position() < LEFT_ARM_LOW_SAFE && rightArmMotor.get_position() > RIGHT_ARM_LOW_SAFE)
             {
-                trayMotor.move_absolute(TRAY_LOWEST, 200);
+                trayMotorFront.move_absolute(TRAY_LOWEST, 200);
+                trayMotorBack.move_absolute(TRAY_LOWEST, 200);
             }
         }
         else if(armsWereMoving)
@@ -206,7 +247,8 @@ void opcontrol()
             {
                 armMacroPos = 1;
                 master.set_text(0, 0, "Low Tower ");
-                trayMotor.move_absolute(TRAY_ARM_SAFE, 200);
+                trayMotorFront.move_absolute(TRAY_ARM_SAFE, 200);
+                trayMotorBack.move_absolute(TRAY_ARM_SAFE, 200);
 
                 leftArmMotor.move_absolute(ARM_TOWER_LOW_LEFT, 50);
                 rightArmMotor.move_absolute(-1 * ARM_TOWER_LOW_LEFT, 50);
@@ -215,7 +257,8 @@ void opcontrol()
             {
                 armMacroPos = 2;
                 master.set_text(0, 0, "High Tower");
-                trayMotor.move_absolute(TRAY_ARM_SAFE, 200);
+                trayMotorFront.move_absolute(TRAY_ARM_SAFE, 200);
+                trayMotorBack.move_absolute(TRAY_ARM_SAFE, 200);
 
                 leftArmMotor.move_absolute(ARM_TOWER_HIGH_LEFT, 50);
                 rightArmMotor.move_absolute(-1 * ARM_TOWER_HIGH_LEFT, 50);
@@ -224,13 +267,13 @@ void opcontrol()
             {
                 armMacroPos = 0;
                 master.set_text(0, 0, "No Tower  ");
-                if(leftArmMotor.get_position() < LEFT_ARM_LOW_SAFE && rightArmMotor.get_position() > RIGHT_ARM_LOW_SAFE)
-                {
-                    trayMotor.move_absolute(TRAY_LOWEST, 200);
-                }
 
-                rightArmMotor.move_absolute(34, 50);
-                leftArmMotor.move_absolute(-34, 50);
+                rightArmMotor.move_absolute(34, 80);
+                leftArmMotor.move_absolute(-34, 80);
+
+                pros::delay(200);
+                trayMotorFront.move_absolute(TRAY_LOWEST, 20);
+                trayMotorBack.move_absolute(TRAY_LOWEST, 20);
             }
         }
 
@@ -271,7 +314,7 @@ void opcontrol()
         pros::lcd::print(4, "R-Voltage: %d", forwardPower - turningPower);
         pros::lcd::print(5, "Left Arm Pos: %f", leftArmMotor.get_position());
         pros::lcd::print(6, "Right Arm Pos: %f", rightArmMotor.get_position());
-        pros::lcd::print(7, "Tray Pos: %f", trayMotor.get_position());
+        pros::lcd::print(7, "Tray Pos (b): %f", trayMotorBack.get_position());
 
         pros::delay(10);
     }
