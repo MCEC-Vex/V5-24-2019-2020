@@ -81,11 +81,14 @@ void autonomous()
  */
 
 // Motor positions
+//TODO fix arm motors (went from regular to torque)
+//TODO document the process for obtaining these values
 #define LEFT_ARM_LOW_SAFE 216
 #define RIGHT_ARM_LOW_SAFE -211
-#define TRAY_LOWEST 200
-#define TRAY_HIGHEST -2270
-#define TRAY_ARM_SAFE -392
+#define TRAY_LOWEST 0
+//#define TRAY_HIGHEST -2270
+#define TRAY_HIGHEST -1980
+#define TRAY_ARM_SAFE -650
 #define ARM_TOWER_LOW_LEFT 694
 #define ARM_TOWER_LOW_RIGHT -668
 #define ARM_TOWER_HIGH_LEFT 938
@@ -103,6 +106,9 @@ void autonomous()
 #define TRAY_IN DIGITAL_L2
 
 #define ARM_MACRO DIGITAL_X
+
+#define LINE_FLAG_LEFT true
+#define LINE_FLAG_RIGHT false
 
 void opcontrol()
 {
@@ -143,8 +149,10 @@ void opcontrol()
     // Arm macro flag
     int armMacroPos = 0;
 
-    // Rumble timing flag
-    uint32_t lastRumble = 0;
+    // Display timing flag
+    int lastDisplay = 0;
+    bool lineFlag = LINE_FLAG_LEFT;
+    int lastRumble = 0;
 
     while(true)
     {
@@ -164,7 +172,7 @@ void opcontrol()
                 // Refuse to move the tray above its lowest safe point
                 if(lastRumble <= pros::millis() - 50)
                 {
-                    master.rumble(". . . .");
+                    master.rumble(".");
                     lastRumble = pros::millis();
                 }
                 trayMotorBack.move_velocity(0);
@@ -181,12 +189,14 @@ void opcontrol()
         }
         else if(master.get_digital(TRAY_IN))
         {
+            //TODO add failsafe in case tray position reporting fails
+            //     For example: holding "a" bypasses tray soft restrictions
             if(trayMotorBack.get_position() >= TRAY_LOWEST)
             {
                 // Refuse to move the tray below its lowest safe point
                 if(lastRumble <= pros::millis() - 50)
                 {
-                    master.rumble(". . . .");
+                    master.rumble(".");
                     lastRumble = pros::millis();
                 }
                 trayMotorBack.move_velocity(0);
@@ -213,8 +223,17 @@ void opcontrol()
         if(master.get_digital(ARMS_UP))
         {
             // Move the arms up
-            leftArmMotor.move_velocity(50);
-            rightArmMotor.move_velocity(-50);
+            if(master.get_digital(DIGITAL_A))
+            {
+                leftArmMotor.move(127);
+                rightArmMotor.move(-127);
+            }
+            else
+            {
+                leftArmMotor.move_velocity(100);
+                rightArmMotor.move_velocity(-100);
+            }
+
             armsWereMoving = true;
 
             trayMotorBack.move_absolute(TRAY_ARM_SAFE, 200);
@@ -303,8 +322,8 @@ void opcontrol()
             rightTopMotor.move(50);
             rightBottomMotor.move(50);
 
-            leftIntake.move(50);
-            rightIntake.move(-50);
+            leftIntake.move(-50);
+            rightIntake.move(50);
         }
 
         // Print debugging data
@@ -315,6 +334,27 @@ void opcontrol()
         pros::lcd::print(5, "Left Arm Pos: %f", leftArmMotor.get_position());
         pros::lcd::print(6, "Right Arm Pos: %f", rightArmMotor.get_position());
         pros::lcd::print(7, "Tray Pos (b): %f", trayMotorBack.get_position());
+
+        // Run this block every 51 ms (for display code)
+        if(pros::millis() -51 > lastDisplay)
+        {
+            lastDisplay = pros::millis();
+
+            if(lineFlag == LINE_FLAG_LEFT)
+            {
+                std::string temp = std::to_string(leftArmMotor.get_temperature());
+                temp.insert(0, 10 - temp.length(), ' ');
+                master.set_text(1, 0, temp.c_str());
+            }
+            else
+            {
+                std::string temp = std::to_string(rightArmMotor.get_temperature());
+                temp.insert(0, 10 - temp.length(), ' ');
+                master.set_text(2, 0, temp.c_str());
+            }
+
+            lineFlag = !lineFlag;
+        }
 
         pros::delay(10);
     }
