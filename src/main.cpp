@@ -1,4 +1,5 @@
 #include "main.h"
+using namespace okapi;
 /**
  * A callback function for LLEMU's center button.
  *
@@ -130,8 +131,48 @@ pros::Motor trayMotorFront(12);
 
 pros::Controller master(pros::E_CONTROLLER_MASTER);
 
-// Debuggig string
+auto chassis = okapi::ChassisControllerBuilder()
+        // Left side is 1,2 right side is -3,-4 (negative indicates reversed)
+        .withMotors({1, 2}, {-3, -4})
+        .withDimensions(okapi::AbstractMotor::gearset::green, {{4_in, 12.5_in}, okapi::imev5GreenTPR})
+        .build();
+
+// Debugging string
 std::string topLine = "";
+
+void runAuto()
+{
+    chassis->setMaxVelocity(25);
+    leftIntake.move_velocity(100);
+    rightIntake.move_velocity(-100);
+    chassis->moveDistance(2.5_ft);
+    leftIntake.move_velocity(0);
+    rightIntake.move_velocity(0);
+    chassis->moveDistance(-1.5_ft);
+
+    // Turn to face scoring zone
+    chassis->turnAngle(105_deg);
+    chassis->moveDistance(0.5_ft);
+
+    // Slightly outtake cubes
+    leftIntake.move_velocity(-50);
+    rightIntake.move_velocity(50);
+    pros::delay(400);
+    leftIntake.move_velocity(0);
+    rightIntake.move_velocity(-0);
+
+    // Move the tray up
+    trayMotorFront.move_absolute(TRAY_HIGHEST, 50);
+    trayMotorBack.move_absolute(TRAY_HIGHEST, 50);
+    pros::delay(3000);
+    trayMotorFront.move_absolute(TRAY_HIGHEST, 0);
+    trayMotorBack.move_absolute(TRAY_HIGHEST, 0);
+
+    pros::delay(500);
+
+    // Back the robot up
+    chassis->moveDistance(-2_ft);
+}
 
 void setupMotors()
 {
@@ -221,6 +262,11 @@ void opcontrol()
         leftBottomMotor.move(forwardPower + turningPower);
         rightTopMotor.move((forwardPower - turningPower) * -1);
         rightBottomMotor.move((forwardPower - turningPower) * -1);
+
+        if(master.get_digital_new_press(DIGITAL_Y))
+        {
+            runAuto();
+        }
 
         if(master.get_digital(TRAY_OUT))
         {
