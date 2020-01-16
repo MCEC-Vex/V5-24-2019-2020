@@ -1,24 +1,7 @@
 #include "main.h"
-using namespace okapi;
-/**
- * A callback function for LLEMU's center button.
- *
- * When this callback is fired, it will toggle line 2 of the LCD text between
- * "I was pressed!" and nothing.
- */
-void on_center_button()
-{
-    static bool pressed = false;
-    pressed = !pressed;
-    if(pressed)
-    {
-        pros::lcd::set_text(2, "I was pressed!");
-    }
-    else
-    {
-        pros::lcd::clear_line(2);
-    }
-}
+#include "DisplayController.h"
+
+using namespace okapi::literals;
 
 /**
  * Runs initialization code. This occurs as soon as the program is started.
@@ -29,8 +12,6 @@ void on_center_button()
 void initialize()
 {
     pros::lcd::initialize();
-
-    pros::lcd::register_btn1_cb(on_center_button);
 }
 
 /**
@@ -131,6 +112,23 @@ pros::Motor trayMotorFront(12);
 
 pros::Controller master(pros::E_CONTROLLER_MASTER);
 
+DisplayController displayController(master);
+
+void displayTimerTask(void* unused)
+{
+    while(true)
+    {
+        displayController.sendNext();
+
+        pros::delay(50);
+    }
+}
+
+int getSimpleRandomInt()
+{
+    return (random() * 10);
+}
+
 auto chassis = okapi::ChassisControllerBuilder()
         // Left side is 1,2 right side is -3,-4 (negative indicates reversed)
         .withMotors({1, 2}, {-3, -4})
@@ -142,6 +140,7 @@ std::string topLine = "";
 
 void runAuto()
 {
+    // Move forward and intake cube stack
     chassis->setMaxVelocity(25);
     leftIntake.move_velocity(100);
     rightIntake.move_velocity(-100);
@@ -205,22 +204,22 @@ void checkTrayArmsPos()
 {
     if(leftArmMotor.get_position() < 100)
     {
-        topLine = "0";
+        displayController.setLine(1, "Arm pos 0");
         setTrayPosition(0, TRAY_SHIFT_SPEED);
     }
     else if(leftArmMotor.get_position() < 200)
     {
-        topLine = "1";
+        displayController.setLine(1, "Arm pos 1");
         setTrayPosition(-250, TRAY_SHIFT_SPEED);
     }
     else if(leftArmMotor.get_position() < 350)
     {
-        topLine = "2";
+        displayController.setLine(1, "Arm pos 2");
         setTrayPosition(-600, TRAY_SHIFT_SPEED);
     }
     else if(leftArmMotor.get_position() < 1500)
     {
-        topLine = "3";
+        displayController.setLine(1, "Arm pos 3");
         setTrayPosition(-1000, TRAY_SHIFT_SPEED);
     }
 }
@@ -228,7 +227,7 @@ void checkTrayArmsPos()
 void opcontrol()
 {
     setupMotors();
-
+    pros::Task displayTask(displayTimerTask, (void*)"", TASK_PRIORITY_DEFAULT, TASK_STACK_DEPTH_DEFAULT);
     // Motors are numbered from left to right
 
 
@@ -273,11 +272,7 @@ void opcontrol()
             if(trayMotorBack.get_position() <= TRAY_HIGHEST)
             {
                 // Refuse to move the tray above its lowest safe point
-                if(lastRumble <= pros::millis() - 50)
-                {
-                    master.rumble(".");
-                    lastRumble = pros::millis();
-                }
+                displayController.rumble(".");
                 trayMotorBack.move_velocity(0);
                 trayMotorFront.move_velocity(0);
             }
@@ -295,11 +290,6 @@ void opcontrol()
                     speed = -20 - ((60.0 / 1000.0) * (1000 - abs(trayMotorFront.get_position() + 900)));
                 }
 
-                /*trayMotorBack.move_velocity(master.get_digital(DIGITAL_A) ? -200 :
-                                            master.get_digital(DIGITAL_Y) ? -50 : -80);
-                trayMotorFront.move_velocity(master.get_digital(DIGITAL_A) ? -200 :
-                                             master.get_digital(DIGITAL_Y) ? -50 : -80);
-                */
                 trayMotorBack.move_velocity(speed);
                 trayMotorFront.move_velocity(speed);
 
@@ -313,11 +303,8 @@ void opcontrol()
             if(trayMotorBack.get_position() >= TRAY_LOWEST)
             {
                 // Refuse to move the tray below its lowest safe point
-                if(lastRumble <= pros::millis() - 50)
-                {
-                    master.rumble(".");
-                    lastRumble = pros::millis();
-                }
+                displayController.rumble(".");
+
                 trayMotorBack.move_velocity(0);
                 trayMotorFront.move_velocity(0);
             }
@@ -344,11 +331,7 @@ void opcontrol()
             if(leftArmMotor.get_position() >= ARMS_HIGHEST)
             {
                 // Refuse to move the tray above its lowest safe point
-                if(lastRumble <= pros::millis() - 50)
-                {
-                    master.rumble(".");
-                    lastRumble = pros::millis();
-                }
+                displayController.rumble(".");
                 leftArmMotor.move_velocity(0);
                 rightArmMotor.move_velocity(0);
             }
@@ -360,26 +343,7 @@ void opcontrol()
 
                 armsWereMoving = true;
 
-                // Only set tray and arms proportional until the arms are clear
-                /*if(trayMotorFront.get_position() > -200)
-                {
-                    trayMotorBack.move_absolute(-450, 200);
-                    trayMotorFront.move_absolute(-450, 200);
-                }*/
                 checkTrayArmsPos();
-                /*else if(trayMotorFront.get_position() > ARMS_TRAY_PROPORTIONAL_UNTIL)
-                {
-                    int averageArmPos = ((leftArmMotor.get_position() + (rightArmMotor.get_position() * -1)) / 2);
-                    int proportionalTrayPos = averageArmPos * ARMS_TRAY_PROPORTIONAL_CONSTANT * -1;
-                    proportionalTrayPos -= 130;
-
-
-
-                    trayMotorFront.move_absolute(proportionalTrayPos, 200);
-                    trayMotorBack.move_absolute(proportionalTrayPos, 200);
-                }*/
-                //trayMotorBack.move_absolute(TRAY_ARM_SAFE, 200);
-                //trayMotorFront.move_absolute(TRAY_ARM_SAFE, 200);
             }
         }
         else if(master.get_digital(ARMS_DOWN))
@@ -387,11 +351,7 @@ void opcontrol()
             if(leftArmMotor.get_position() <= ARMS_LOWEST)
             {
                 // Refuse to move the tray above its lowest safe point
-                if(lastRumble <= pros::millis() - 50)
-                {
-                    master.rumble(".");
-                    lastRumble = pros::millis();
-                }
+                displayController.rumble(".");
                 leftArmMotor.move_velocity(0);
                 rightArmMotor.move_velocity(0);
             }
@@ -423,7 +383,7 @@ void opcontrol()
             if(armMacroPos == 0)
             {
                 armMacroPos = 1;
-                master.set_text(0, 0, "Low Tower ");
+                displayController.setLine(0, "Low Tower");
                 trayMotorFront.move_absolute(TRAY_ARM_SAFE, 200);
                 trayMotorBack.move_absolute(TRAY_ARM_SAFE, 200);
 
@@ -433,7 +393,7 @@ void opcontrol()
             else if(armMacroPos == 1)
             {
                 armMacroPos = 2;
-                master.set_text(0, 0, "High Tower");
+                displayController.setLine(0, "High Tower");
                 trayMotorFront.move_absolute(TRAY_ARM_SAFE, 200);
                 trayMotorBack.move_absolute(TRAY_ARM_SAFE, 200);
 
@@ -443,7 +403,7 @@ void opcontrol()
             else
             {
                 armMacroPos = 0;
-                master.set_text(0, 0, "No Tower  ");
+                displayController.setLine(0, "No Tower");
 
                 rightArmMotor.move_absolute(34, 80);
                 leftArmMotor.move_absolute(-34, 80);
@@ -521,28 +481,6 @@ void opcontrol()
         pros::lcd::print(5, "Left Arm Pos: %f", leftArmMotor.get_position());
         pros::lcd::print(6, "Right Arm Pos: %f", rightArmMotor.get_position());
         pros::lcd::print(7, "Tray Pos (b): %f", trayMotorBack.get_position());
-
-        // Run this block every 51 ms (for display code)
-        if(pros::millis() -51 > lastDisplay)
-        {
-            lastDisplay = pros::millis();
-
-            if(lineFlag == LINE_FLAG_LEFT)
-            {
-                /*std::string temp = std::to_string(leftIntake.get_temperature());
-                temp.insert(0, 10 - temp.length(), ' ');
-                master.set_text(1, 0, temp.c_str());*/
-                master.set_text(1, 0, topLine.c_str());
-            }
-            else
-            {
-                std::string temp = std::to_string(rightIntake.get_temperature());
-                temp.insert(0, 10 - temp.length(), ' ');
-                master.set_text(2, 0, temp.c_str());
-            }
-
-            lineFlag = !lineFlag;
-        }
 
         pros::delay(10);
     }
