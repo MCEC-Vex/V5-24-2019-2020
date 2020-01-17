@@ -71,10 +71,8 @@ void autonomous()
 //#define TRAY_HIGHEST -2270
 #define TRAY_HIGHEST -1980
 #define TRAY_ARM_SAFE -750
-#define ARM_TOWER_LOW_LEFT 694
-#define ARM_TOWER_LOW_RIGHT -668
-#define ARM_TOWER_HIGH_LEFT 938
-#define ARM_TOWER_HIGH_RIGHT -948
+#define ARM_TOWER_LOW_LEFT 1500
+#define ARM_TOWER_HIGH_LEFT 1910
 
 // Arm software limits for bot safety
 #define ARMS_LOWEST 0
@@ -93,9 +91,7 @@ void autonomous()
 
 #define ARM_MACRO DIGITAL_X
 
-#define LINE_FLAG_LEFT true
-#define LINE_FLAG_RIGHT false
-
+// Motors are numbered from left to right
 pros::Motor leftTopMotor(1);
 pros::Motor leftBottomMotor(2);
 pros::Motor rightTopMotor(3);
@@ -124,19 +120,11 @@ void displayTimerTask(void* unused)
     }
 }
 
-int getSimpleRandomInt()
-{
-    return (random() * 10);
-}
-
 auto chassis = okapi::ChassisControllerBuilder()
         // Left side is 1,2 right side is -3,-4 (negative indicates reversed)
         .withMotors({1, 2}, {-3, -4})
         .withDimensions(okapi::AbstractMotor::gearset::green, {{4_in, 12.5_in}, okapi::imev5GreenTPR})
         .build();
-
-// Debugging string
-std::string topLine = "";
 
 void runAuto()
 {
@@ -202,6 +190,11 @@ void setTrayPosition(int trayPos, int speed)
 #define TRAY_SHIFT_SPEED 200
 void checkTrayArmsPos()
 {
+    if(leftArmMotor.get_position() < 20)
+    {
+        return;
+    }
+
     if(leftArmMotor.get_position() < 100)
     {
         displayController.setLine(1, "Arm pos 0");
@@ -228,21 +221,13 @@ void opcontrol()
 {
     setupMotors();
     pros::Task displayTask(displayTimerTask, (void*)"", TASK_PRIORITY_DEFAULT, TASK_STACK_DEPTH_DEFAULT);
-    // Motors are numbered from left to right
-
 
     // Flags for setting 0 velocity
     bool trayWasMoving = false;
     bool armsWereMoving = false;
-    bool intakeWasMoving = false;
 
     // Arm macro flag
     int armMacroPos = 0;
-
-    // Display timing flag
-    int lastDisplay = 0;
-    bool lineFlag = LINE_FLAG_LEFT;
-    int lastRumble = 0;
 
     while(true)
     {
@@ -286,7 +271,8 @@ void opcontrol()
                 }
                 else if(trayMotorFront.get_position() < -900)
                 {
-                    // 1980
+                    //TODO clean up math
+                    // Reduces tray speed as it reaches the apex
                     speed = -20 - ((60.0 / 1000.0) * (1000 - abs(trayMotorFront.get_position() + 900)));
                 }
 
@@ -342,8 +328,6 @@ void opcontrol()
                 rightArmMotor.move_velocity(-80);
 
                 armsWereMoving = true;
-
-                checkTrayArmsPos();
             }
         }
         else if(master.get_digital(ARMS_DOWN))
@@ -360,15 +344,9 @@ void opcontrol()
                 // Move the arms down
                 leftArmMotor.move_velocity(-50);
                 rightArmMotor.move_velocity(50);
-                checkTrayArmsPos();
 
                 armsWereMoving = true;
             }
-            /*if(leftArmMotor.get_position() < LEFT_ARM_LOW_SAFE && rightArmMotor.get_position() > RIGHT_ARM_LOW_SAFE)
-            {
-                trayMotorFront.move_absolute(TRAY_LOWEST, 200);
-                trayMotorBack.move_absolute(TRAY_LOWEST, 200);
-            }*/
         }
         else if(armsWereMoving)
         {
@@ -383,9 +361,7 @@ void opcontrol()
             if(armMacroPos == 0)
             {
                 armMacroPos = 1;
-                displayController.setLine(0, "Low Tower");
-                trayMotorFront.move_absolute(TRAY_ARM_SAFE, 200);
-                trayMotorBack.move_absolute(TRAY_ARM_SAFE, 200);
+                displayController.setLine(0, "Low Tower ");
 
                 leftArmMotor.move_absolute(ARM_TOWER_LOW_LEFT, 50);
                 rightArmMotor.move_absolute(-1 * ARM_TOWER_LOW_LEFT, 50);
@@ -394,8 +370,6 @@ void opcontrol()
             {
                 armMacroPos = 2;
                 displayController.setLine(0, "High Tower");
-                trayMotorFront.move_absolute(TRAY_ARM_SAFE, 200);
-                trayMotorBack.move_absolute(TRAY_ARM_SAFE, 200);
 
                 leftArmMotor.move_absolute(ARM_TOWER_HIGH_LEFT, 50);
                 rightArmMotor.move_absolute(-1 * ARM_TOWER_HIGH_LEFT, 50);
@@ -403,16 +377,13 @@ void opcontrol()
             else
             {
                 armMacroPos = 0;
-                displayController.setLine(0, "No Tower");
+                displayController.setLine(0, "No Tower  ");
 
-                rightArmMotor.move_absolute(34, 80);
-                leftArmMotor.move_absolute(-34, 80);
-
-                pros::delay(200);
-                trayMotorFront.move_absolute(TRAY_LOWEST, 20);
-                trayMotorBack.move_absolute(TRAY_LOWEST, 20);
+                rightArmMotor.move_absolute(0, 50);
+                leftArmMotor.move_absolute(0, 50);
             }
         }
+        checkTrayArmsPos();
 
         if(master.get_digital(ROLLER_OUTTAKE))
         {
@@ -428,19 +399,11 @@ void opcontrol()
                 leftIntake.move_velocity(-100);
                 rightIntake.move_velocity(100);
             }
-            //int speed = () ? 100 :200;
-            //leftIntake.move_velocity(speed);
-            //rightIntake.move_velocity(speed * -1);
-            intakeWasMoving = true;
         }
         else if(master.get_digital(ROLLER_INTAKE))
         {
             // Move intake in
             // Move slowly if A is pressed
-            /*int speed = (master.get_digital(DIGITAL_A)) ? 100 : 200;
-            leftIntake.move_velocity(speed * -1);
-            rightIntake.move_velocity(speed);*/
-
             if(!master.get_digital(DIGITAL_A))
             {
                 leftIntake.move(127);
@@ -451,14 +414,11 @@ void opcontrol()
                 leftIntake.move_velocity(100);
                 rightIntake.move_velocity(-100);
             }
-
-            intakeWasMoving = true;
         }
         else
         {
             leftIntake.move(0);
             rightIntake.move(0);
-            intakeWasMoving = false;
         }
 
         // Back up the robot while spinning the intake out
@@ -481,6 +441,9 @@ void opcontrol()
         pros::lcd::print(5, "Left Arm Pos: %f", leftArmMotor.get_position());
         pros::lcd::print(6, "Right Arm Pos: %f", rightArmMotor.get_position());
         pros::lcd::print(7, "Tray Pos (b): %f", trayMotorBack.get_position());
+
+        displayController.setLine(1, "Left Temp: " + std::to_string(leftIntake.get_temperature()));
+        displayController.setLine(2, "Right Temp: " + std::to_string(rightIntake.get_temperature()));
 
         pros::delay(10);
     }
