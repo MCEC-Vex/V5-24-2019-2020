@@ -3,65 +3,6 @@
 
 using namespace okapi::literals;
 
-/**
- * Runs initialization code. This occurs as soon as the program is started.
- *
- * All other competition modes are blocked by initialize; it is recommended
- * to keep execution time for this mode under a few seconds.
- */
-void initialize()
-{
-    pros::lcd::initialize();
-}
-
-/**
- * Runs while the robot is in the disabled state of Field Management System or
- * the VEX Competition Switch, following either autonomous or opcontrol. When
- * the robot is enabled, this task will exit.
- */
-void disabled()
-{}
-
-/**
- * Runs after initialize(), and before autonomous when connected to the Field
- * Management System or the VEX Competition Switch. This is intended for
- * competition-specific initialization routines, such as an autonomous selector
- * on the LCD.
- *
- * This task will exit when the robot is enabled and autonomous or opcontrol
- * starts.
- */
-void competition_initialize()
-{}
-
-/**
- * Runs the user autonomous code. This function will be started in its own task
- * with the default priority and stack size whenever the robot is enabled via
- * the Field Management System or the VEX Competition Switch in the autonomous
- * mode. Alternatively, this function may be called in initialize or opcontrol
- * for non-competition testing purposes.
- *
- * If the robot is disabled or communications is lost, the autonomous task
- * will be stopped. Re-enabling the robot will restart the task, not re-start it
- * from where it left off.
- */
-void autonomous()
-{}
-
-/**
- * Runs the operator control code. This function will be started in its own task
- * with the default priority and stack size whenever the robot is enabled via
- * the Field Management System or the VEX Competition Switch in the operator
- * control mode.
- *
- * If no competition control is connected, this function will run immediately
- * following initialize().
- *
- * If the robot is disabled or communications is lost, the
- * operator control task will be stopped. Re-enabling the robot will restart the
- * task, not resume it from where it left off.
- */
-
 // Motor positions
 //TODO fix arm motors (went from regular to torque)
 //TODO document the process for obtaining these values
@@ -97,14 +38,21 @@ pros::Motor leftBottomMotor(2);
 pros::Motor rightTopMotor(3);
 pros::Motor rightBottomMotor(4);
 
-pros::Motor leftIntake(6);
-pros::Motor rightIntake(7);
+pros::Motor leftIntake(11);
+pros::Motor rightIntake(12);
 
 pros::Motor leftArmMotor(8);
 pros::Motor rightArmMotor(9);
 
-pros::Motor trayMotorBack(11);
-pros::Motor trayMotorFront(12);
+pros::Motor trayMotorBack(13);
+pros::Motor trayMotorFront(14);
+
+pros::ADIPort autoRedSmall(1);
+pros::ADIPort autoRedBig(2);
+pros::ADIPort autoBlueSmall(3);
+pros::ADIPort autoBlueBig(4);
+pros::ADIPort autoSafe(5);
+pros::ADIPort autoTesting(6);
 
 pros::Controller master(pros::E_CONTROLLER_MASTER);
 
@@ -126,8 +74,29 @@ auto chassis = okapi::ChassisControllerBuilder()
         .withDimensions(okapi::AbstractMotor::gearset::green, {{4_in, 12.5_in}, okapi::imev5GreenTPR})
         .build();
 
-void runAuto()
+void flipTray()
 {
+    leftArmMotor.move_absolute(350, 200);
+    rightArmMotor.move_absolute(-350, 200);
+    trayMotorBack.move_absolute(-1200, 200);
+    trayMotorFront.move_absolute(-1200, 200);
+    pros::delay(500);
+    trayMotorFront.move_absolute(0, 200);
+    trayMotorBack.move_absolute(0, 200);
+    leftArmMotor.move_absolute(0, 200);
+    rightArmMotor.move_absolute(0, 200);
+}
+
+/**
+ * Autonomous to gather the four cubes on the far right (for red)
+ */
+void runAutoSmall(bool red)
+{
+    int sign = red ? 1 : -1;
+
+    flipTray();
+    pros::delay(1500);
+
     // Move forward and intake cube stack
     chassis->setMaxVelocity(25);
     leftIntake.move_velocity(100);
@@ -138,7 +107,7 @@ void runAuto()
     chassis->moveDistance(-1.5_ft);
 
     // Turn to face scoring zone
-    chassis->turnAngle(105_deg);
+    chassis->turnAngle(105_deg * sign);
     chassis->moveDistance(0.5_ft);
 
     // Slightly outtake cubes
@@ -157,8 +126,80 @@ void runAuto()
 
     pros::delay(500);
 
+    // "Bump" the robot forward a bit
+    chassis->moveDistance(1_in);
+
     // Back the robot up
-    chassis->moveDistance(-2_ft);
+    chassis->moveDistance(-1.6_ft);
+
+    // Move the tray back down
+    trayMotorFront.move_absolute(0, 50);
+    trayMotorBack.move_absolute(0, 50);
+
+    if(autoTesting.get_value())
+    {
+        // Go back to starting pos
+        chassis->turnAngle(-105_deg * sign);
+        chassis->moveDistance(-0.5_ft);
+    }
+}
+
+/**
+ * Run auto for the sideways "L" of cubes near the left of red
+ */
+void runAutoBig(bool red)
+{
+    // 250 for arms
+    int sign = red ? 1 : -1;
+
+    flipTray();
+    pros::delay(1500);
+
+    chassis->setMaxVelocity(25);
+
+    leftIntake.move_velocity(200);
+    rightIntake.move_velocity(-200);
+
+    chassis->moveDistance(1.75_ft);
+
+    pros::delay(1000);
+
+    //leftIntake.move_velocity(0);
+    //rightIntake.move_velocity(0);
+    /*pros::delay(100);
+    leftIntake.move_velocity(-50);
+    rightIntake.move_velocity(-50);
+    pros::delay(900);
+    leftIntake.move_velocity(0);
+    rightIntake.move_velocity(0);
+    pros::delay(100);*/
+
+    leftIntake.move_velocity(0);
+    rightIntake.move_velocity(0);
+    chassis->moveDistance(-0.2_ft);
+    pros::delay(1000);
+    leftArmMotor.move_absolute(350, 100);
+    rightArmMotor.move_absolute(-350, 100);
+    trayMotorBack.move_absolute(-500, 100);
+    trayMotorFront.move_absolute(-500, 100);
+    pros::delay(1000);
+
+    //leftIntake.move_velocity(200);
+    //rightIntake.move_velocity(-200);
+    chassis->moveDistance(0.4_ft);
+    leftIntake.move_velocity(200);
+    rightIntake.move_velocity(-200);
+    chassis->moveDistance(0.5_ft);
+
+    //chassis->moveDistance(-0.5_ft);
+    leftArmMotor.move_absolute(0, 200);
+    rightArmMotor.move_absolute(0, 200);
+    trayMotorBack.move_absolute(0, 100);
+    trayMotorFront.move_absolute(0, 100);
+
+    pros::delay(1500);
+    leftIntake.move_velocity(0);
+    rightIntake.move_velocity(0);
 }
 
 void setupMotors()
@@ -217,11 +258,90 @@ void checkTrayArmsPos()
     }
 }
 
-void opcontrol()
+/**
+ * Runs initialization code. This occurs as soon as the program is started.
+ *
+ * All other competition modes are blocked by initialize; it is recommended
+ * to keep execution time for this mode under a few seconds.
+ */
+void initialize()
 {
+    pros::lcd::initialize();
     setupMotors();
     pros::Task displayTask(displayTimerTask, (void*)"", TASK_PRIORITY_DEFAULT, TASK_STACK_DEPTH_DEFAULT);
+}
 
+/**
+ * Runs while the robot is in the disabled state of Field Management System or
+ * the VEX Competition Switch, following either autonomous or opcontrol. When
+ * the robot is enabled, this task will exit.
+ */
+void disabled()
+{}
+
+/**
+ * Runs after initialize(), and before autonomous when connected to the Field
+ * Management System or the VEX Competition Switch. This is intended for
+ * competition-specific initialization routines, such as an autonomous selector
+ * on the LCD.
+ *
+ * This task will exit when the robot is enabled and autonomous or opcontrol
+ * starts.
+ */
+void competition_initialize()
+{}
+
+/**
+ * Runs the user autonomous code. This function will be started in its own task
+ * with the default priority and stack size whenever the robot is enabled via
+ * the Field Management System or the VEX Competition Switch in the autonomous
+ * mode. Alternatively, this function may be called in initialize or opcontrol
+ * for non-competition testing purposes.
+ *
+ * If the robot is disabled or communications is lost, the autonomous task
+ * will be stopped. Re-enabling the robot will restart the task, not re-start it
+ * from where it left off.
+ */
+void autonomous()
+{
+    if(autoRedSmall.get_value())
+    {
+        runAutoSmall(true);
+    }
+    else if(autoBlueSmall.get_value())
+    {
+        runAutoSmall(false);
+    }
+    else if(autoRedBig.get_value())
+    {
+        runAutoBig(true);
+    }
+    else if(autoBlueBig.get_value())
+    {
+        runAutoBig(false);
+    }
+    else if(autoSafe.get_value())
+    {
+        chassis->setMaxVelocity(75);
+        chassis->moveDistance(3_ft);
+    }
+}
+
+/**
+ * Runs the operator control code. This function will be started in its own task
+ * with the default priority and stack size whenever the robot is enabled via
+ * the Field Management System or the VEX Competition Switch in the operator
+ * control mode.
+ *
+ * If no competition control is connected, this function will run immediately
+ * following initialize().
+ *
+ * If the robot is disabled or communications is lost, the
+ * operator control task will be stopped. Re-enabling the robot will restart the
+ * task, not resume it from where it left off.
+ */
+void opcontrol()
+{
     // Flags for setting 0 velocity
     bool trayWasMoving = false;
     bool armsWereMoving = false;
@@ -247,9 +367,14 @@ void opcontrol()
         rightTopMotor.move((forwardPower - turningPower) * -1);
         rightBottomMotor.move((forwardPower - turningPower) * -1);
 
+        if(master.get_digital_new_press(DIGITAL_X))
+        {
+            flipTray();
+        }
+
         if(master.get_digital_new_press(DIGITAL_Y))
         {
-            runAuto();
+            autonomous();
         }
 
         if(master.get_digital(TRAY_OUT))
@@ -328,6 +453,7 @@ void opcontrol()
                 rightArmMotor.move_velocity(-80);
 
                 armsWereMoving = true;
+                checkTrayArmsPos();
             }
         }
         else if(master.get_digital(ARMS_DOWN))
@@ -346,6 +472,7 @@ void opcontrol()
                 rightArmMotor.move_velocity(50);
 
                 armsWereMoving = true;
+                checkTrayArmsPos();
             }
         }
         else if(armsWereMoving)
@@ -356,12 +483,12 @@ void opcontrol()
         }
 
         // Arm macros
-        if(master.get_digital_new_press(ARM_MACRO))
+        /*if(master.get_digital_new_press(ARM_MACRO))
         {
             if(armMacroPos == 0)
             {
                 armMacroPos = 1;
-                displayController.setLine(0, "Low Tower ");
+                displayController.setLine(0, "Low Tower");
 
                 leftArmMotor.move_absolute(ARM_TOWER_LOW_LEFT, 50);
                 rightArmMotor.move_absolute(-1 * ARM_TOWER_LOW_LEFT, 50);
@@ -377,13 +504,13 @@ void opcontrol()
             else
             {
                 armMacroPos = 0;
-                displayController.setLine(0, "No Tower  ");
+                displayController.setLine(0, "No Tower");
 
                 rightArmMotor.move_absolute(0, 50);
                 leftArmMotor.move_absolute(0, 50);
             }
-        }
-        checkTrayArmsPos();
+        }*/
+        //checkTrayArmsPos();
 
         if(master.get_digital(ROLLER_OUTTAKE))
         {
