@@ -2,18 +2,16 @@
 
 DisplayController::DisplayController(pros::Controller controller1) : controller(controller1)
 {
-    //pros::Task testingTask(this->runTask, (void*)"", TASK_PRIORITY_DEFAULT, TASK_STACK_DEPTH_DEFAULT);
+    
 }
 
 void DisplayController::sendNext()
 {
-    //double rand = random();
-    //controller.set_text(0, 0, std::to_string(rand).c_str());
-
     mutex.take(1000);
 
+    // Do a cycle that ends at the item most recently updated
+    // This gives all the lines (and rumble) a chance to be updated in a timely manner regardles of write frequency
     bool didUpdate = false;
-
     int current = lastUpdatedLine;
     for(int i = 0; i < 4; i++)
     {
@@ -23,9 +21,10 @@ void DisplayController::sendNext()
             current = -1;
         }
 
+        // Check if the rumble line is set
         if(current == -1 && !rumbleLine.empty())
         {
-            // Send rumble
+            // Send rumble (line -1)
             controller.rumble(rumbleLine.c_str());
             rumbleLine = "";
             lastUpdatedLine = -1;
@@ -35,6 +34,7 @@ void DisplayController::sendNext()
         {
             if(modified[current])
             {
+                // Send the new line and switch the modified flag off
                 controller.set_text(current, 0, lines[current].c_str());
                 modified[current] = false;
                 lastUpdatedLine = current;
@@ -42,36 +42,6 @@ void DisplayController::sendNext()
             }
         }
     }
-
-    /*if(!rumbleLine.empty() && lastUpdatedLine != -1)
-    {
-        controller.rumble(rumbleLine.c_str());
-        rumbleLine = "";
-        lastUpdatedLine = -1;
-        didUpdate = true;
-    }
-    else
-    {
-        // Go through the lines
-        for(int i = 0; i < 3; i++)
-        {
-            if(modified[i] && lastUpdatedLine != i)
-            {
-                controller.set_text(i, 0, lines[i].c_str());
-
-                modified[i] = false;
-                lastUpdatedLine = i;
-                didUpdate = true;
-                break;
-            }
-        }
-    }
-
-    if(!didUpdate)
-    {
-        lastUpdatedLine = -2;
-    }*/
-
     mutex.give();
 }
 
@@ -93,7 +63,6 @@ void DisplayController::setLine(int line, std::string data)
 
     //lines[line] = data.insert(data.length(), 16 - data.length(), ' ');
     lines[line] = data;
-
     modified[line] = true;
 
     mutex.give();
@@ -101,8 +70,8 @@ void DisplayController::setLine(int line, std::string data)
 
 void DisplayController::clearLine(int line)
 {
-    // 10 spaces for character limit
-    setLine(line, "          ");
+    // 16 spaces for character limit
+    setLine(line, "                ");
 }
 
 void DisplayController::rumble(std::string pattern)
