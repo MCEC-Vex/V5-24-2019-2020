@@ -74,9 +74,49 @@ auto chassis = okapi::ChassisControllerBuilder()
         .withDimensions(okapi::AbstractMotor::gearset::green, {{4_in, 12.5_in}, okapi::imev5GreenTPR})
         .build();
 
+void setTrayPosition(int trayPos, int speed)
+{
+    trayMotorFront.move_absolute(trayPos, speed);
+    trayMotorBack.move_absolute(trayPos, speed);
+}
+
+/**
+ * Used when moving the arms
+ * Checks the arm position against a list of bounds to set the tray position accordingly
+ */
+#define TRAY_SHIFT_SPEED 200
+void checkTrayArmsPos()
+{
+    if(leftArmMotor.get_position() < 20)
+    {
+        return;
+    }
+
+    if(leftArmMotor.get_position() < 100)
+    {
+        displayController.setLine(1, "Arm pos 0");
+        setTrayPosition(0, TRAY_SHIFT_SPEED);
+    }
+    else if(leftArmMotor.get_position() < 200)
+    {
+        displayController.setLine(1, "Arm pos 1");
+        setTrayPosition(-250, TRAY_SHIFT_SPEED);
+    }
+    else if(leftArmMotor.get_position() < 350)
+    {
+        displayController.setLine(1, "Arm pos 2");
+        setTrayPosition(-600, TRAY_SHIFT_SPEED);
+    }
+    else if(leftArmMotor.get_position() < 1500)
+    {
+        displayController.setLine(1, "Arm pos 3");
+        setTrayPosition(-1000, TRAY_SHIFT_SPEED);
+    }
+}
+
 void flipTray()
 {
-    leftArmMotor.move_absolute(350, 200);
+    /*leftArmMotor.move_absolute(350, 200);
     rightArmMotor.move_absolute(-350, 200);
     trayMotorBack.move_absolute(-1200, 200);
     trayMotorFront.move_absolute(-1200, 200);
@@ -84,7 +124,22 @@ void flipTray()
     trayMotorFront.move_absolute(0, 200);
     trayMotorBack.move_absolute(0, 200);
     leftArmMotor.move_absolute(0, 200);
+    rightArmMotor.move_absolute(0, 200);*/
+
+    leftArmMotor.move_absolute(500, 200);
+    rightArmMotor.move_absolute(-500, 200);
+    for(int i = 0; i < 100; i++)
+    {
+        checkTrayArmsPos();
+        pros::delay(10);
+    }
+    leftArmMotor.move_absolute(0, 200);
     rightArmMotor.move_absolute(0, 200);
+    for(int i = 0; i < 100; i++)
+    {
+        checkTrayArmsPos();
+        pros::delay(10);
+    }
 }
 
 /**
@@ -216,46 +271,6 @@ void setupMotors()
     rightIntake.set_brake_mode(pros::E_MOTOR_BRAKE_COAST);
     leftArmMotor.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
     rightArmMotor.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
-}
-
-void setTrayPosition(int trayPos, int speed)
-{
-    trayMotorFront.move_absolute(trayPos, speed);
-    trayMotorBack.move_absolute(trayPos, speed);
-}
-
-/**
- * Used when moving the arms
- * Checks the arm position against a list of bounds to set the tray position accordingly
- */
-#define TRAY_SHIFT_SPEED 200
-void checkTrayArmsPos()
-{
-    if(leftArmMotor.get_position() < 20)
-    {
-        return;
-    }
-
-    if(leftArmMotor.get_position() < 100)
-    {
-        displayController.setLine(1, "Arm pos 0");
-        setTrayPosition(0, TRAY_SHIFT_SPEED);
-    }
-    else if(leftArmMotor.get_position() < 200)
-    {
-        displayController.setLine(1, "Arm pos 1");
-        setTrayPosition(-250, TRAY_SHIFT_SPEED);
-    }
-    else if(leftArmMotor.get_position() < 350)
-    {
-        displayController.setLine(1, "Arm pos 2");
-        setTrayPosition(-600, TRAY_SHIFT_SPEED);
-    }
-    else if(leftArmMotor.get_position() < 1500)
-    {
-        displayController.setLine(1, "Arm pos 3");
-        setTrayPosition(-1000, TRAY_SHIFT_SPEED);
-    }
 }
 
 /**
