@@ -54,6 +54,9 @@ pros::Controller master(pros::E_CONTROLLER_MASTER);
 
 DisplayController displayController(master);
 
+/**
+ * Task to run the controller display cycle
+ */
 void displayTimerTask(void* unused)
 {
     while(true)
@@ -70,6 +73,12 @@ auto chassis = okapi::ChassisControllerBuilder()
         .withDimensions(okapi::AbstractMotor::gearset::green, {{4_in, 12.5_in}, okapi::imev5GreenTPR})
         .build();
 
+/**
+ * Set the tray position to a particular point with specified speed
+ * 
+ * @param trayPos The position to set the tray. With the current bot setup, this goes from 0 to negative as the tray goes out
+ * @param speed The speed from 0-200 to move the tray
+ */
 void setTrayPosition(int trayPos, int speed)
 {
     trayMotorFront.move_absolute(trayPos, speed);
@@ -106,8 +115,12 @@ void checkTrayArmsPos()
     }
 }
 
+/**
+ * Flip the tray out by moving the arms and tray violently
+ */
 void flipTray()
 {
+    // Move the arms up and use the pre-made tray movement function to adjust the tray in response
     leftArmMotor.move_absolute(500, 200);
     rightArmMotor.move_absolute(-500, 200);
     for(int i = 0; i < 100; i++)
@@ -115,6 +128,8 @@ void flipTray()
         checkTrayArmsPos();
         pros::delay(10);
     }
+
+    // Move the arms back down in the same way
     leftArmMotor.move_absolute(0, 200);
     rightArmMotor.move_absolute(0, 200);
     for(int i = 0; i < 100; i++)
@@ -125,7 +140,9 @@ void flipTray()
 }
 
 /**
- * Autonomous to gather the four cubes on the far right (for red)
+ * Autonomous to gather the four cubes on the far right and stack them in the right corner
+ * 
+ * @param red True if the bot is on the red alliance, false if on blue
  */
 void runAutoSmall(bool red)
 {
@@ -182,7 +199,9 @@ void runAutoSmall(bool red)
 }
 
 /**
- * Run auto for the sideways "L" of cubes near the left of red
+ * Run auto for the sideways "L" of cubes near the right
+ * 
+ * @param red True if the bot is on the red alliance, false if on blue
  */
 void runAutoBig(bool red)
 {
@@ -228,6 +247,9 @@ void runAutoBig(bool red)
     rightIntake.move_velocity(0);
 }
 
+/**
+ * Sets up the motor brake modes
+ */
 void setupMotors()
 {
     // Set motors to hold so they don't move when they're not supposed to
@@ -238,10 +260,13 @@ void setupMotors()
 
     trayMotorBack.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
     trayMotorFront.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
-    leftIntake.set_brake_mode(pros::E_MOTOR_BRAKE_COAST);
-    rightIntake.set_brake_mode(pros::E_MOTOR_BRAKE_COAST);
+
     leftArmMotor.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
     rightArmMotor.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
+
+    // Set the intake motors to "coast" as no significant difference was found between "hold" and "coast"
+    leftIntake.set_brake_mode(pros::E_MOTOR_BRAKE_COAST);
+    rightIntake.set_brake_mode(pros::E_MOTOR_BRAKE_COAST);
 }
 
 /**
