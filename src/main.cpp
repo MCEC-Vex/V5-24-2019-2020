@@ -1,15 +1,11 @@
 #include "main.h"
 #include "DisplayController.h"
 
-using namespace okapi::literals;
-
 // Motor positions
-//TODO fix arm motors (went from regular to torque)
 //TODO document the process for obtaining these values
 #define LEFT_ARM_LOW_SAFE 216
 #define RIGHT_ARM_LOW_SAFE -211
 #define TRAY_LOWEST 0
-//#define TRAY_HIGHEST -2270
 #define TRAY_HIGHEST -1980
 #define TRAY_ARM_SAFE -750
 #define ARM_TOWER_LOW_LEFT 1500
@@ -94,38 +90,24 @@ void checkTrayArmsPos()
 
     if(leftArmMotor.get_position() < 100)
     {
-        displayController.setLine(1, "Arm pos 0");
         setTrayPosition(0, TRAY_SHIFT_SPEED);
     }
     else if(leftArmMotor.get_position() < 200)
     {
-        displayController.setLine(1, "Arm pos 1");
         setTrayPosition(-250, TRAY_SHIFT_SPEED);
     }
     else if(leftArmMotor.get_position() < 350)
     {
-        displayController.setLine(1, "Arm pos 2");
         setTrayPosition(-600, TRAY_SHIFT_SPEED);
     }
     else if(leftArmMotor.get_position() < 1500)
     {
-        displayController.setLine(1, "Arm pos 3");
         setTrayPosition(-1000, TRAY_SHIFT_SPEED);
     }
 }
 
 void flipTray()
 {
-    /*leftArmMotor.move_absolute(350, 200);
-    rightArmMotor.move_absolute(-350, 200);
-    trayMotorBack.move_absolute(-1200, 200);
-    trayMotorFront.move_absolute(-1200, 200);
-    pros::delay(500);
-    trayMotorFront.move_absolute(0, 200);
-    trayMotorBack.move_absolute(0, 200);
-    leftArmMotor.move_absolute(0, 200);
-    rightArmMotor.move_absolute(0, 200);*/
-
     leftArmMotor.move_absolute(500, 200);
     rightArmMotor.move_absolute(-500, 200);
     for(int i = 0; i < 100; i++)
@@ -204,6 +186,7 @@ void runAutoSmall(bool red)
  */
 void runAutoBig(bool red)
 {
+    //TODO fully document big auto process
     // 250 for arms
     int sign = red ? 1 : -1;
 
@@ -219,16 +202,6 @@ void runAutoBig(bool red)
 
     pros::delay(1000);
 
-    //leftIntake.move_velocity(0);
-    //rightIntake.move_velocity(0);
-    /*pros::delay(100);
-    leftIntake.move_velocity(-50);
-    rightIntake.move_velocity(-50);
-    pros::delay(900);
-    leftIntake.move_velocity(0);
-    rightIntake.move_velocity(0);
-    pros::delay(100);*/
-
     leftIntake.move_velocity(0);
     rightIntake.move_velocity(0);
     chassis->moveDistance(-0.2_ft);
@@ -239,8 +212,6 @@ void runAutoBig(bool red)
     trayMotorFront.move_absolute(-500, 100);
     pros::delay(1000);
 
-    //leftIntake.move_velocity(200);
-    //rightIntake.move_velocity(-200);
     chassis->moveDistance(0.4_ft);
     leftIntake.move_velocity(200);
     rightIntake.move_velocity(-200);
@@ -496,36 +467,6 @@ void opcontrol()
             leftArmMotor.move_velocity(0);
             rightArmMotor.move_velocity(0);
         }
-
-        // Arm macros
-        /*if(master.get_digital_new_press(ARM_MACRO))
-        {
-            if(armMacroPos == 0)
-            {
-                armMacroPos = 1;
-                displayController.setLine(0, "Low Tower");
-
-                leftArmMotor.move_absolute(ARM_TOWER_LOW_LEFT, 50);
-                rightArmMotor.move_absolute(-1 * ARM_TOWER_LOW_LEFT, 50);
-            }
-            else if(armMacroPos == 1)
-            {
-                armMacroPos = 2;
-                displayController.setLine(0, "High Tower");
-
-                leftArmMotor.move_absolute(ARM_TOWER_HIGH_LEFT, 50);
-                rightArmMotor.move_absolute(-1 * ARM_TOWER_HIGH_LEFT, 50);
-            }
-            else
-            {
-                armMacroPos = 0;
-                displayController.setLine(0, "No Tower");
-
-                rightArmMotor.move_absolute(0, 50);
-                leftArmMotor.move_absolute(0, 50);
-            }
-        }*/
-        //checkTrayArmsPos();
 
         if(master.get_digital(ROLLER_OUTTAKE))
         {
