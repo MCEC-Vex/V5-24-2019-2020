@@ -285,6 +285,8 @@
                 "version": "4.0.2"
             }
         },
-        "upload_options": {}
+        "upload_options": {
+            "description": "Primary program for the large Moorpark College Engineering Club bot"
+        }
     }
 }
