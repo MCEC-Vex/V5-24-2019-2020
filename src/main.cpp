@@ -1,5 +1,4 @@
 #include "main.h"
-#include "DisplayController.h"
 
 // Motor positions
 //TODO document the process for obtaining these values
@@ -269,6 +268,42 @@ void setupMotors()
     rightIntake.set_brake_mode(pros::E_MOTOR_BRAKE_COAST);
 }
 
+void displayTesting()
+{
+    //displayController.setLine(0, "Testing Mode");
+    displayController.clearLine(0);
+    displayController.clearLine(1);
+    displayController.clearLine(2);
+    pros::delay(150);
+    DisplayCore core(&displayController, master);
+    ScrollingScreenDemo demo(&core);
+    core.pushScreen(&demo);
+
+    while(true)
+    {
+        core.checkInput();
+        /*if(master.get_digital_new_press(DIGITAL_UP))
+        {
+            displayController.setLine(2, "WWWWWWWWWWWWWWWW");
+        }
+        if(master.get_digital_new_press(DIGITAL_DOWN))
+        {
+            displayController.setLine(2, "               ");
+        }
+        if(master.get_digital_new_press(DIGITAL_LEFT))
+        {
+            //displayController.setLine(1, "()..Testing");
+            displayController.setLine(2, "0123456789123456789");
+        }*/
+
+        if(master.get_digital_new_press(DIGITAL_B))
+        {
+            break;
+        }
+        pros::delay(10);
+    }
+}
+
 /**
  * Runs initialization code. This occurs as soon as the program is started.
  *
@@ -380,7 +415,8 @@ void opcontrol()
 
         if(master.get_digital_new_press(DIGITAL_X))
         {
-            flipTray();
+            //flipTray();
+            displayTesting();
         }
 
         if(master.get_digital_new_press(DIGITAL_Y))
@@ -542,13 +578,13 @@ void opcontrol()
         }
 
         // Print debugging data
-        pros::lcd::print(1, "Left Y: %d", forwardPower);
+        /*pros::lcd::print(1, "Left Y: %d", forwardPower);
         pros::lcd::print(2, "Right X: %d", turningPower);
         pros::lcd::print(3, "L-Voltage: %d", forwardPower + turningPower);
         pros::lcd::print(4, "R-Voltage: %d", forwardPower - turningPower);
         pros::lcd::print(5, "Left Arm Pos: %f", leftArmMotor.get_position());
         pros::lcd::print(6, "Right Arm Pos: %f", rightArmMotor.get_position());
-        pros::lcd::print(7, "Tray Pos (b): %f", trayMotorBack.get_position());
+        pros::lcd::print(7, "Tray Pos (b): %f", trayMotorBack.get_position());*/
 
         displayController.setLine(1, "Left Temp: " + std::to_string(leftIntake.get_temperature()));
         displayController.setLine(2, "Right Temp: " + std::to_string(rightIntake.get_temperature()));

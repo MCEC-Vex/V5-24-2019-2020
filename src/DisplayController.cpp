@@ -53,15 +53,15 @@ void DisplayController::setLine(int line, std::string data)
         return;
     }
 
-    /*if(data.size() > 16)
+    if(data.size() > 16)
     {
         data.substr(0, 16);
-    }*/
+    }
 
     // Take the mutex to ensure thread safety
     mutex.take(1000);
 
-    //lines[line] = data.insert(data.length(), 16 - data.length(), ' ');
+    lines[line] = data.insert(data.length(), 16 - data.length(), ' ');
     lines[line] = data;
     modified[line] = true;
 

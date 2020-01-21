@@ -1,0 +1,22 @@
+[
+	{
+		"path": "$ROOTPATH$\\src\\main.cpp",
+		"bookmarks": [
+			{
+				"line": 145,
+				"column": 27,
+				"label": "small auto"
+			},
+			{
+				"line": 204,
+				"column": 25,
+				"label": "big auto"
+			},
+			{
+				"line": 388,
+				"column": 16,
+				"label": "opcontrol"
+			}
+		]
+	}
+]

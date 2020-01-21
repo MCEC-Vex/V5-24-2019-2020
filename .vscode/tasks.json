@@ -19,6 +19,20 @@
                 "showReuseMessage": false,
                 "clear": true
             }
+        },
+        {
+            "label": "Pros V5 Make",
+            "type": "shell",
+            "command": "prosv5 make",
+            "presentation": {
+                "echo": false,
+                "reveal": "always",
+                "focus": false,
+                "panel": "shared",
+                "showReuseMessage": false,
+                "clear": true
+            },
+            "problemMatcher": []
         }
     ]
 }
