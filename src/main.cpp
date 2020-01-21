@@ -251,7 +251,7 @@ void runAutoBig(bool red)
     chassis->turnAngle(60_deg * sign);
 
     //backup against the wall
-    chassis->moveDistance(-0.5_ft);
+    chassis->moveDistance(-0.3_ft);
 
     // Move forward and intake cube stack... copied from runAutoSmall
 
