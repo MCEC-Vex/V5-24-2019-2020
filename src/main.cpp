@@ -74,7 +74,7 @@ auto chassis = okapi::ChassisControllerBuilder()
 
 /**
  * Set the tray position to a particular point with specified speed
- * 
+ *
  * @param trayPos The position to set the tray. With the current bot setup, this goes from 0 to negative as the tray goes out
  * @param speed The speed from 0-200 to move the tray
  */
@@ -140,7 +140,7 @@ void flipTray()
 
 /**
  * Autonomous to gather the four cubes on the far right and stack them in the right corner
- * 
+ *
  * @param red True if the bot is on the red alliance, false if on blue
  */
 void runAutoSmall(bool red)
@@ -199,7 +199,7 @@ void runAutoSmall(bool red)
 
 /**
  * Run auto for the sideways "L" of cubes near the right
- * 
+ *
  * @param red True if the bot is on the red alliance, false if on blue
  */
 void runAutoBig(bool red)
@@ -208,18 +208,19 @@ void runAutoBig(bool red)
     // 250 for arms
     int sign = red ? 1 : -1;
 
-    flipTray();
+    //flipTray();
     pros::delay(1500);
 
     chassis->setMaxVelocity(25);
 
+    //move forward and intake "2nd row"
     leftIntake.move_velocity(200);
     rightIntake.move_velocity(-200);
-
     chassis->moveDistance(1.75_ft);
 
     pros::delay(1000);
 
+    //arm movement to intake the stacked cubes at end of "2nd row"
     leftIntake.move_velocity(0);
     rightIntake.move_velocity(0);
     chassis->moveDistance(-0.2_ft);
@@ -235,7 +236,6 @@ void runAutoBig(bool red)
     rightIntake.move_velocity(-200);
     chassis->moveDistance(0.5_ft);
 
-    //chassis->moveDistance(-0.5_ft);
     leftArmMotor.move_absolute(0, 200);
     rightArmMotor.move_absolute(0, 200);
     trayMotorBack.move_absolute(0, 100);
@@ -244,6 +244,53 @@ void runAutoBig(bool red)
     pros::delay(1500);
     leftIntake.move_velocity(0);
     rightIntake.move_velocity(0);
+
+    chassis->moveDistance(-1.0_ft);
+    chassis->turnAngle(-60_deg * sign);
+    chassis->moveDistance(-2.1_ft);
+    chassis->turnAngle(60_deg * sign);
+
+    //backup against the wall
+    chassis->moveDistance(-0.5_ft);
+
+    // Move forward and intake cube stack... copied from runAutoSmall
+
+    leftIntake.move_velocity(200);
+    rightIntake.move_velocity(-200);
+    chassis->moveDistance(2.5_ft);
+    leftIntake.move_velocity(0);
+    rightIntake.move_velocity(0);
+    chassis->moveDistance(-1.5_ft);
+
+    // Turn to face scoring zone
+    chassis->turnAngle(105_deg * sign);
+    chassis->moveDistance(0.5_ft);
+
+    // Slightly outtake cubes
+    leftIntake.move_velocity(-50);
+    rightIntake.move_velocity(50);
+    pros::delay(400);
+    leftIntake.move_velocity(0);
+    rightIntake.move_velocity(-0);
+
+    // Move the tray up
+    trayMotorFront.move_absolute(TRAY_HIGHEST, 50);
+    trayMotorBack.move_absolute(TRAY_HIGHEST, 50);
+    pros::delay(3000);
+    trayMotorFront.move_absolute(TRAY_HIGHEST, 0);
+    trayMotorBack.move_absolute(TRAY_HIGHEST, 0);
+
+    pros::delay(500);
+
+    // "Bump" the robot forward a bit
+    chassis->moveDistance(1_in);
+
+    // Back the robot up
+    chassis->moveDistance(-1.6_ft);
+
+    // Move the tray back down
+    trayMotorFront.move_absolute(0, 50);
+    trayMotorBack.move_absolute(0, 50);
 }
 
 /**
@@ -559,8 +606,8 @@ void opcontrol()
             rightTopMotor.move(50);
             rightBottomMotor.move(50);
 
-            leftIntake.move(-50);
-            rightIntake.move(50);
+            leftIntake.move(-80);
+            rightIntake.move(80);
         }
 
         // Print debugging data
