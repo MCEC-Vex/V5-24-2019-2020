@@ -55,7 +55,7 @@ void DisplayController::setLine(int line, std::string data)
 
     if(data.size() > 16)
     {
-        data.substr(0, 16);
+        data.erase(16, std::string::npos);
     }
 
     // Take the mutex to ensure thread safety

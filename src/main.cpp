@@ -282,20 +282,6 @@ void displayTesting()
     while(true)
     {
         core.checkInput();
-        /*if(master.get_digital_new_press(DIGITAL_UP))
-        {
-            displayController.setLine(2, "WWWWWWWWWWWWWWWW");
-        }
-        if(master.get_digital_new_press(DIGITAL_DOWN))
-        {
-            displayController.setLine(2, "               ");
-        }
-        if(master.get_digital_new_press(DIGITAL_LEFT))
-        {
-            //displayController.setLine(1, "()..Testing");
-            displayController.setLine(2, "0123456789123456789");
-        }*/
-
         if(master.get_digital_new_press(DIGITAL_B))
         {
             break;
