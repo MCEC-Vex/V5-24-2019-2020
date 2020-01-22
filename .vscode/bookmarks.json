@@ -3,17 +3,17 @@
 		"path": "$ROOTPATH$\\src\\main.cpp",
 		"bookmarks": [
 			{
-				"line": 145,
+				"line": 245,
 				"column": 27,
 				"label": "small auto"
 			},
 			{
-				"line": 204,
+				"line": 304,
 				"column": 25,
 				"label": "big auto"
 			},
 			{
-				"line": 374,
+				"line": 477,
 				"column": 16,
 				"label": "opcontrol"
 			}

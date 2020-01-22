@@ -32,6 +32,7 @@ pros::Motor leftTopMotor(1);
 pros::Motor leftBottomMotor(2);
 pros::Motor rightTopMotor(3);
 pros::Motor rightBottomMotor(4);
+pros::Motor centerWheel(15);
 
 pros::Motor leftIntake(11);
 pros::Motor rightIntake(12);
@@ -46,8 +47,12 @@ pros::ADIPort autoRedSmall(1);
 pros::ADIPort autoRedBig(2);
 pros::ADIPort autoBlueSmall(3);
 pros::ADIPort autoBlueBig(4);
-pros::ADIPort autoSafe(5);
-pros::ADIPort autoTesting(6);
+//pros::ADIPort autoSafe(5);
+//pros::ADIPort autoTesting(6);
+pros::ADIUltrasonic frontUltrasonic(7, 8);
+pros::ADIUltrasonic backUltrasonic(5, 6);
+okapi::MedianFilter<5> frontUltrasonicFilter;
+okapi::MedianFilter<5> backUltrasonicFilter;
 
 pros::Controller master(pros::E_CONTROLLER_MASTER);
 
@@ -139,6 +144,59 @@ void flipTray()
 }
 
 /**
+ * Center the bot against the right wall
+ */
+void centerBot(int tolerance, float speedMod)
+{
+    /*int averagePos = (frontUltrasonicFilter.filter(frontUltrasonic.get_value())
+                    + backUltrasonicFilter.filter(backUltrasonic.get_value())) / 2;*/
+    int leftDeviance, rightDeviance, error;
+    int integral = 0;
+
+    do
+    {
+        //leftDeviance = abs(averagePos - frontUltrasonic.get_value);
+        error = (frontUltrasonic.get_value() - backUltrasonic.get_value());
+        integral += error;
+        if(integral > 10)
+        {
+            integral = 10;
+        }
+        else if(integral < -10)
+        {
+            integral = -10;
+        }
+
+        int speed = (abs(error) * 0.2) + integral;
+        if(error > 0)
+        {
+            // Turn clockwise if front is larger than back
+            rightTopMotor.move_velocity(speed);
+            rightBottomMotor.move_velocity(speed);
+
+            leftTopMotor.move_velocity(speed);
+            leftBottomMotor.move_velocity(speed);
+
+            displayController.setLine(0, "Clockwise");
+        }
+        else
+        {
+            rightTopMotor.move_velocity(speed * -1);
+            rightBottomMotor.move_velocity(speed * -1);
+
+            leftTopMotor.move_velocity(speed * -1);
+            leftBottomMotor.move_velocity(speed * -1);
+
+            displayController.setLine(0, "Counter");
+        }
+        displayController.setLine(1, std::to_string(error));
+
+        pros::delay(20);
+    }
+    while(abs(error) > tolerance);
+}
+
+/**
  * Autonomous to gather the four cubes on the far right and stack them in the right corner
  *
  * @param red True if the bot is on the red alliance, false if on blue
@@ -189,12 +247,12 @@ void runAutoSmall(bool red)
     trayMotorFront.move_absolute(0, 50);
     trayMotorBack.move_absolute(0, 50);
 
-    if(autoTesting.get_value())
+    /*if(autoTesting.get_value())
     {
         // Go back to starting pos
         chassis->turnAngle(-105_deg * sign);
         chassis->moveDistance(-0.5_ft);
-    }
+    }*/
 }
 
 /**
@@ -304,6 +362,8 @@ void setupMotors()
     rightTopMotor.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
     rightBottomMotor.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
 
+    centerWheel.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
+
     trayMotorBack.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
     trayMotorFront.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
 
@@ -399,11 +459,11 @@ void autonomous()
     {
         runAutoBig(false);
     }
-    else if(autoSafe.get_value())
+    /*else if(autoSafe.get_value())
     {
         chassis->setMaxVelocity(75);
         chassis->moveDistance(3_ft);
-    }
+    }*/
 }
 
 /**
@@ -449,7 +509,9 @@ void opcontrol()
         if(master.get_digital_new_press(DIGITAL_X))
         {
             //flipTray();
-            displayTesting();
+            //displayTesting();
+            //shuffle(5_deg, 2_in, 20);
+            centerBot(5, 0.2);
         }
 
         if(master.get_digital_new_press(DIGITAL_Y))
@@ -529,8 +591,9 @@ void opcontrol()
             else
             {
                 // Move the arms up
-                leftArmMotor.move_velocity(80);
-                rightArmMotor.move_velocity(-80);
+                // Slow speed is 80
+                leftArmMotor.move_velocity(150);
+                rightArmMotor.move_velocity(-150);
 
                 armsWereMoving = true;
                 checkTrayArmsPos();
@@ -548,8 +611,8 @@ void opcontrol()
             else
             {
                 // Move the arms down
-                leftArmMotor.move_velocity(-50);
-                rightArmMotor.move_velocity(50);
+                leftArmMotor.move_velocity(-150);
+                rightArmMotor.move_velocity(150);
 
                 armsWereMoving = true;
                 checkTrayArmsPos();
@@ -610,6 +673,19 @@ void opcontrol()
             rightIntake.move(80);
         }
 
+        if(master.get_digital(DIGITAL_LEFT))
+        {
+            centerWheel.move(127);
+        }
+        else if(master.get_digital(DIGITAL_RIGHT))
+        {
+            centerWheel.move(-127);
+        }
+        else
+        {
+            centerWheel.move(0);
+        }
+
         // Print debugging data
         /*pros::lcd::print(1, "Left Y: %d", forwardPower);
         pros::lcd::print(2, "Right X: %d", turningPower);
@@ -619,8 +695,11 @@ void opcontrol()
         pros::lcd::print(6, "Right Arm Pos: %f", rightArmMotor.get_position());
         pros::lcd::print(7, "Tray Pos (b): %f", trayMotorBack.get_position());*/
 
-        displayController.setLine(1, "Left Temp: " + std::to_string(leftIntake.get_temperature()));
-        displayController.setLine(2, "Right Temp: " + std::to_string(rightIntake.get_temperature()));
+        //pros::lcd::print(1, "Front: %d", frontUltrasonic.get());
+        //pros::lcd::print(2, "Back: %d", backUltrasonic.get());
+
+        displayController.setLine(1, "F: " + std::to_string(frontUltrasonicFilter.filter(frontUltrasonic.get_value())));
+        displayController.setLine(2, "B: " + std::to_string(backUltrasonicFilter.filter(backUltrasonic.get_value())));
 
         pros::delay(10);
     }
