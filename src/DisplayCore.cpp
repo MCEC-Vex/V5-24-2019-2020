@@ -35,61 +35,78 @@ void DisplayCore::checkInput()
     unsigned long timeSince = pros::millis() - lastChecked;
     lastChecked = pros::millis();
 
+    ScreenInputType input;
+    int count = 0;
+
     if(controller.get_digital_new_press(DIGITAL_LEFT))
     {
-        screens.top()->onInput(ScreenInputType::LEFT);
+        input = ScreenInputType::LEFT;
+        count++;
     }
     else if(controller.get_digital_new_press(DIGITAL_RIGHT))
     {
-        screens.top()->onInput(ScreenInputType::RIGHT);
+        input = ScreenInputType::RIGHT;
+        count++;
     }
     else if(controller.get_digital_new_press(DIGITAL_UP))
     {
-        screens.top()->onInput(ScreenInputType::UP);
+        input = ScreenInputType::UP;
+        count++;
     }
     else if(controller.get_digital_new_press(DIGITAL_DOWN))
     {
-        screens.top()->onInput(ScreenInputType::DOWN);
-    }
-
-    int significantX = controller.get_analog(ANALOG_LEFT_X);
-    int significantY = controller.get_analog(ANALOG_LEFT_Y);
-    if(abs(significantX) > abs(significantY))
-    {
-        significantY = 0;
+        input = ScreenInputType::DOWN;
+        count++;
     }
     else
     {
-        significantX = 0;
-    }
-    lastTimedInput += abs(significantX + significantY) * timeSince;
-    
-    int count = 0;
-    while(lastTimedInput > TIMED_INPUT_CUTOFF)
-    {
-        lastTimedInput -= TIMED_INPUT_CUTOFF;
-        count++;
+        int significantX = controller.get_analog(ANALOG_LEFT_X) + controller.get_analog(ANALOG_RIGHT_X);
+        int significantY = controller.get_analog(ANALOG_LEFT_Y) + controller.get_analog(ANALOG_RIGHT_Y);
 
+        // Handle mild joystick drift
+        if(abs(significantY) < 10)
+        {
+            significantY = 0;
+        }
+        if(abs(significantX) < 10)
+        {
+            significantX = 0;
+        }
+        
+        bool horizontal = abs(significantX) > abs(significantY);
+        lastTimedInput += abs(horizontal ? significantX : significantY) * timeSince;
+        
+        while(lastTimedInput > TIMED_INPUT_CUTOFF)
+        {
+            lastTimedInput -= TIMED_INPUT_CUTOFF;
+            count++;
+
+            if(horizontal)
+            {
+                input = (significantX > 0) ? ScreenInputType::RIGHT : ScreenInputType::LEFT;
+            }
+            else
+            {
+                input = (significantY > 0) ? ScreenInputType::UP : ScreenInputType::DOWN;
+            }
+        }
+    }
+
+    if(count > 0)
+    {
         // Trigger buttons increase selection speed
-        if(controller.get_digital(DIGITAL_L1))
+        if(controller.get_digital(DIGITAL_L1) || controller.get_digital(DIGITAL_R1))
         {
             count += 4;
         }
-        if(controller.get_digital(DIGITAL_L2))
+        if(controller.get_digital(DIGITAL_L2) || controller.get_digital(DIGITAL_R2))
         {
             count += 19;
         }
-    }
 
-    for(int i = 0; i < count; i++)
-    {
-        if(significantY == 0)
+        for(int i = 0; i < count; i++)
         {
-            screens.top()->onInput((significantX > 0) ? ScreenInputType::RIGHT : ScreenInputType::LEFT);
-        }
-        else
-        {
-            screens.top()->onInput((significantY > 0) ? ScreenInputType::UP : ScreenInputType::DOWN);
+            screens.top()->onInput(input);
         }
     }
 }
