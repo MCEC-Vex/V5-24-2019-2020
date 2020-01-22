@@ -73,6 +73,11 @@ void DisplayCore::checkInput()
             significantX = 0;
         }
         
+        if(significantY == 0 && significantX == 0)
+        {
+            lastTimedInput = 0;
+        }
+
         bool horizontal = abs(significantX) > abs(significantY);
         lastTimedInput += abs(horizontal ? significantX : significantY) * timeSince;
         
