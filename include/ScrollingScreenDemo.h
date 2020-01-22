@@ -5,6 +5,8 @@
 
 class ScrollingScreenDemo : public ScrollingScreen
 {
+private:
+    int state[100];
 protected:
     void onExit() override;
     void cycleOption(int line, bool forwards) override;

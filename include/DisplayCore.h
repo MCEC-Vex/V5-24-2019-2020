@@ -9,12 +9,16 @@
 
 class DisplayScreen;
 
+#define TIMED_INPUT_CUTOFF 20000
+
 class DisplayCore
 {
 private:
     std::stack<DisplayScreen*> screens;
     DisplayController* displayController;
     pros::Controller controller;
+    unsigned long lastChecked = 0;
+    unsigned long lastTimedInput = 0;
 public:
     DisplayCore(DisplayController* displayController, pros::Controller controller);
 
