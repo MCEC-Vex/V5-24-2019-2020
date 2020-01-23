@@ -1,4 +1,4 @@
-#include "../include/ScrollingScreenDemo.h"
+#include "displayLib/ScrollingScreenDemo.h"
 
 ScrollingScreenDemo::ScrollingScreenDemo(DisplayCore *core) : ScrollingScreen(core, 100, false, true)
 {

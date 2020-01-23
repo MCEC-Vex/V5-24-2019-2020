@@ -1,4 +1,4 @@
-#include "../include/DisplayCore.h"
+#include "displayLib/DisplayCore.h"
 
 DisplayCore::DisplayCore(DisplayController* displayController, pros::Controller controller) :
                                                     displayController(displayController), controller(controller)

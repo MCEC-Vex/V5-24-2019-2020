@@ -1,4 +1,4 @@
-#include "../include/TextDisplayScreen.h"
+#include "displayLib/TextDisplayScreen.h"
 
 TextDisplayScreen::TextDisplayScreen(DisplayCore *core, std::string* strArr, int count) :
         ScrollingScreen(core, count, false, true), strArr(strArr)

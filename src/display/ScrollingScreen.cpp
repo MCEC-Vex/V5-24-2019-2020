@@ -1,4 +1,4 @@
-#include "../include/ScrollingScreen.h"
+#include "displayLib/ScrollingScreen.h"
 
 void ScrollingScreen::onPop()
 {

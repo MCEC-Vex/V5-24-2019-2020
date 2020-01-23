@@ -41,10 +41,10 @@
  */
 #include "okapi/api.hpp"
 //#include "pros/api_legacy.h"
-#include "DisplayController.h"
-#include "DisplayCore.h"
-#include "ScrollingScreenDemo.h"
-#include "TextDisplayScreen.h"
+#include "displayLib/DisplayController.h"
+#include "displayLib/DisplayCore.h"
+#include "displayLib/ScrollingScreenDemo.h"
+#include "displayLib/TextDisplayScreen.h"
 
 /**
  * If you find doing pros::Motor() to be tedious and you'd prefer just to do
