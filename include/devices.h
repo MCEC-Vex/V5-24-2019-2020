@@ -4,42 +4,40 @@
 #include "api.h"
 #include "okapi/api.hpp"
 #include "displayLib/DisplayController.h"
+using namespace okapi::literals;
 
 // Motors are numbered from left to right
-pros::Motor leftTopMotor(1);
-pros::Motor leftBottomMotor(2);
-pros::Motor rightTopMotor(3);
-pros::Motor rightBottomMotor(4);
-pros::Motor centerWheel(15);
+extern pros::Motor leftTopMotor;
 
-pros::Motor leftIntake(11);
-pros::Motor rightIntake(12);
+extern pros::Motor leftBottomMotor;
+extern pros::Motor rightTopMotor;
+extern pros::Motor rightBottomMotor;
+extern pros::Motor centerWheel;
 
-pros::Motor leftArmMotor(8);
-pros::Motor rightArmMotor(9);
+extern pros::Motor leftIntake;
+extern pros::Motor rightIntake;
 
-pros::Motor trayMotorBack(13);
-pros::Motor trayMotorFront(14);
+extern pros::Motor leftArmMotor;
+extern pros::Motor rightArmMotor;
 
-pros::ADIPort autoRedSmall(1);
-pros::ADIPort autoRedBig(2);
-pros::ADIPort autoBlueSmall(3);
-pros::ADIPort autoBlueBig(4);
+extern pros::Motor trayMotorBack;
+extern pros::Motor trayMotorFront;
+
+extern pros::ADIPort autoRedSmall;
+extern pros::ADIPort autoRedBig;
+extern pros::ADIPort autoBlueSmall;
+extern pros::ADIPort autoBlueBig;
 //pros::ADIPort autoSafe(5);
 //pros::ADIPort autoTesting(6);
-pros::ADIUltrasonic frontUltrasonic(7, 8);
-pros::ADIUltrasonic backUltrasonic(5, 6);
-okapi::MedianFilter<5> frontUltrasonicFilter;
-okapi::MedianFilter<5> backUltrasonicFilter;
+extern pros::ADIUltrasonic frontUltrasonic;
+extern pros::ADIUltrasonic backUltrasonic;
+extern okapi::MedianFilter<5> frontUltrasonicFilter;
+extern okapi::MedianFilter<5> backUltrasonicFilter;
 
-pros::Controller master(pros::E_CONTROLLER_MASTER);
+extern pros::Controller master;
 
-DisplayController displayController(master);
+extern DisplayController displayController;
 
-auto chassis = okapi::ChassisControllerBuilder()
-        // Left side is 1,2 right side is -3,-4 (negative indicates reversed)
-        .withMotors({1, 2}, {-3, -4})
-        .withDimensions(okapi::AbstractMotor::gearset::green, {{4_in, 12.5_in}, okapi::imev5GreenTPR})
-        .build();
+extern std::shared_ptr<okapi::ChassisController> chassis;
 
 #endif //MCEC_V5_DEVICES_H

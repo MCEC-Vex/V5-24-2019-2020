@@ -37,10 +37,10 @@
 #include "api.h"
 #include "okapi/api.hpp"
 
-#include "devices.h";
+#include "devices.h"
 #include "constants.h"
 #include "util.h"
-#include "autonomous.h";
+#include "autonomous.h"
 
 #include "displayLib/DisplayController.h"
 #include "displayLib/DisplayCore.h"
