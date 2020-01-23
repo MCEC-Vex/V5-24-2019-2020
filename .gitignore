@@ -12,6 +12,7 @@ temp.log
 temp.errors
 *.ini
 .d/
+compile_commands.json
 
 # CLion
 .idea

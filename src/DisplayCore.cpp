@@ -9,7 +9,6 @@ DisplayCore::DisplayCore(DisplayController* displayController, pros::Controller 
 
 void DisplayCore::pushScreen(DisplayScreen* screen)
 {
-    pros::lcd::print(1, "Pushed screen");
     screens.push(screen);
     screen->onPush();
 }
@@ -32,12 +31,17 @@ DisplayController* DisplayCore::getDisplayController()
 
 void DisplayCore::checkInput()
 {
+    // "lastChecked" used to determine the polling interval of checkInput
+    // this value is for determining the speed the joysticks should move the options
     unsigned long timeSince = pros::millis() - lastChecked;
     lastChecked = pros::millis();
 
+    // Only can send one type of input per polling interval
     ScreenInputType input;
+    // The amount of that input to send. Used by the trigger buttons to multiply the speed
     int count = 0;
 
+    // The single-press up,down,left,right buttons
     if(controller.get_digital_new_press(DIGITAL_LEFT))
     {
         input = ScreenInputType::LEFT;
@@ -60,6 +64,8 @@ void DisplayCore::checkInput()
     }
     else
     {
+        // Get the "most significant" axis of the joystick based on which of (x, y) is larger
+        // Add the two sides to combine them and support left and right-handed methods
         int significantX = controller.get_analog(ANALOG_LEFT_X) + controller.get_analog(ANALOG_RIGHT_X);
         int significantY = controller.get_analog(ANALOG_LEFT_Y) + controller.get_analog(ANALOG_RIGHT_Y);
 
@@ -73,14 +79,17 @@ void DisplayCore::checkInput()
             significantX = 0;
         }
         
+        // Remove the input counter progress if there's no partial input
         if(significantY == 0 && significantX == 0)
         {
             lastTimedInput = 0;
         }
 
+        // Add to the input counter
         bool horizontal = abs(significantX) > abs(significantY);
         lastTimedInput += abs(horizontal ? significantX : significantY) * timeSince;
         
+        // Set input counts
         while(lastTimedInput > TIMED_INPUT_CUTOFF)
         {
             lastTimedInput -= TIMED_INPUT_CUTOFF;
@@ -102,11 +111,11 @@ void DisplayCore::checkInput()
         // Trigger buttons increase selection speed
         if(controller.get_digital(DIGITAL_L1) || controller.get_digital(DIGITAL_R1))
         {
-            count += 4;
+            count *= 5;
         }
         if(controller.get_digital(DIGITAL_L2) || controller.get_digital(DIGITAL_R2))
         {
-            count += 19;
+            count *= 20;
         }
 
         for(int i = 0; i < count; i++)

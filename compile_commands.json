@@ -317,11 +317,11 @@
             "-funwind-tables",
             "--std=gnu++17",
             "-o",
-            "bin/ScrollingScreenDemo.cpp.o",
-            "src\\ScrollingScreenDemo.cpp"
+            "bin/DisplayCore.cpp.o",
+            "src\\DisplayCore.cpp"
         ],
         "directory": "c:\\Users\\Techdoodle\\Documents\\c\\PROS\\mcec-v5",
-        "file": "src\\ScrollingScreenDemo.cpp"
+        "file": "src\\DisplayCore.cpp"
     },
     {
         "arguments": [
@@ -353,10 +353,10 @@
             "-funwind-tables",
             "--std=gnu++17",
             "-o",
-            "bin/DisplayCore.cpp.o",
-            "src\\DisplayCore.cpp"
+            "bin/ScrollingScreenDemo.cpp.o",
+            "src\\ScrollingScreenDemo.cpp"
         ],
         "directory": "c:\\Users\\Techdoodle\\Documents\\c\\PROS\\mcec-v5",
-        "file": "src\\DisplayCore.cpp"
+        "file": "src\\ScrollingScreenDemo.cpp"
     }
 ]
