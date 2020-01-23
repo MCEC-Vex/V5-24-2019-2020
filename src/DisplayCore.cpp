@@ -6,7 +6,6 @@ DisplayCore::DisplayCore(DisplayController* displayController, pros::Controller 
     
 }
 
-
 void DisplayCore::pushScreen(DisplayScreen* screen)
 {
     screens.push(screen);

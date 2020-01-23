@@ -51,7 +51,7 @@ void ScrollingScreen::onInput(ScreenInputType input)
             }
             refreshAll();
         }
-        else
+        else if(!alwaysCenter)
         {
             if(from == 0)
             {
@@ -72,6 +72,10 @@ void ScrollingScreen::onInput(ScreenInputType input)
                 refreshAll();
             }
         }
+        else
+        {
+            refreshAll();
+        }
     }
 }
 
@@ -85,7 +89,7 @@ void ScrollingScreen::refreshAll()
             current = count - 1;
         }
     }
-    else
+    else if(!alwaysCenter)
     {
         if(line == 0)
         {
@@ -99,20 +103,21 @@ void ScrollingScreen::refreshAll()
 
     for(int i = 0; i < 3; i++)
     {
-        core->getDisplayController()->setLine(i, getLine(current, current == line));
-        pros::lcd::print(i + 2, getLine(current, current == line).c_str());
+        if(current < 0 || current >= count)
+        {
+            core->getDisplayController()->clearLine(i);
+            pros::lcd::print(i + 2, "                ");
+        }
+        else
+        {
+            core->getDisplayController()->setLine(i, getLine(current, current == line));
+            pros::lcd::print(i + 2, getLine(current, current == line).c_str());
+        }
 
         current++;
-        if(current == count)
+        if(current == count && continuous)
         {
-            if(continuous)
-            {
-                current = 0;
-            }
-            else
-            {
-                break;
-            }
+            current = 0;
         }
     }
 }
@@ -121,5 +126,4 @@ void ScrollingScreen::onPush()
 {
     // Render all visible lines
     refreshAll();
-    pros::lcd::print(1, "Refreshing all");
 }
