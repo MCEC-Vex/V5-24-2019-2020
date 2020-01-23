@@ -1,6 +1,6 @@
 #include "displayLib/ScrollingScreenDemo.h"
 
-ScrollingScreenDemo::ScrollingScreenDemo(DisplayCore *core) : ScrollingScreen(core, 100, false, true)
+ScrollingScreenDemo::ScrollingScreenDemo(DisplayCore *core) : ScrollingScreen(core, 100, true, true)
 {
     for(int i = 0; i < 100; i++)
     {

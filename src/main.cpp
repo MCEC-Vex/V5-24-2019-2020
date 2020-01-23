@@ -21,7 +21,7 @@ void displayTesting()
     pros::delay(150);
     DisplayCore core(&displayController, master);
 
-    std::string lines[6] = {
+    /*std::string lines[6] = {
         "Hello 1",
         "Hello 2",
         "Hello A",
@@ -31,9 +31,9 @@ void displayTesting()
     };
 
     TextDisplayScreen textDisplay(&core, lines, 6);
-    core.pushScreen(&textDisplay);
-    //ScrollingScreenDemo demo(&core);
-    //core.pushScreen(&demo);
+    core.pushScreen(&textDisplay);*/
+    ScrollingScreenDemo demo(&core);
+    core.pushScreen(&demo);
 
     while(true)
     {
