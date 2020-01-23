@@ -35,12 +35,13 @@
 #define PROS_USE_LITERALS
 
 #include "api.h"
-
-/**
- * You should add more #includes here
- */
 #include "okapi/api.hpp"
-//#include "pros/api_legacy.h"
+
+#include "devices.h";
+#include "constants.h"
+#include "util.h"
+#include "autonomous.h";
+
 #include "displayLib/DisplayController.h"
 #include "displayLib/DisplayCore.h"
 #include "displayLib/ScrollingScreenDemo.h"
@@ -67,11 +68,13 @@ using namespace okapi::literals;
 #ifdef __cplusplus
 extern "C" {
 #endif
+
 void autonomous(void);
 void initialize(void);
 void disabled(void);
 void competition_initialize(void);
 void opcontrol(void);
+
 #ifdef __cplusplus
 }
 #endif
