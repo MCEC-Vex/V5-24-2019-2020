@@ -383,8 +383,20 @@ void displayTesting()
     displayController.clearLine(2);
     pros::delay(150);
     DisplayCore core(&displayController, master);
-    ScrollingScreenDemo demo(&core);
-    core.pushScreen(&demo);
+
+    std::string lines[6] = {
+        "Hello 1",
+        "Hello 2",
+        "Hello A",
+        "Hello B",
+        "Goodbye",
+        "OK Boomer"
+    };
+
+    TextDisplayScreen textDisplay(&core, lines, 6);
+    core.pushScreen(&textDisplay);
+    //ScrollingScreenDemo demo(&core);
+    //core.pushScreen(&demo);
 
     while(true)
     {

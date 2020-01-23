@@ -20,6 +20,8 @@ private:
     std::string rumbleLine;
 
 public:
+    static const int charLengths[128];
+    
     /**
      * Construct a new Display Controller object
      * 
@@ -53,6 +55,14 @@ public:
      * Runs the next iteration of the update cycle. This should only be run every 50 milliseconds
      */
     void sendNext();
+
+    /**
+     * Get the Length for a given string
+     * 
+     * @param line The input string
+     * @return int The string length in pixels
+     */
+    static int getLength(std::string line);
 };
 
 

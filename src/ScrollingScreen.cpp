@@ -5,6 +5,11 @@ void ScrollingScreen::onPop()
     onExit();
 }
 
+void ScrollingScreen::setLineCount(int lineCount)
+{
+    count = lineCount;
+}
+
 void ScrollingScreen::onInput(ScreenInputType input)
 {
     if(input == LEFT || input == RIGHT)

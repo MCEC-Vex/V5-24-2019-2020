@@ -18,6 +18,8 @@ protected:
 public:
     ScrollingScreen(DisplayCore *core, int lineCount, bool isContinuous, bool alwaysCenter) :
             DisplayScreen(core), count(lineCount), continuous(isContinuous), alwaysCenter(alwaysCenter) {};
+
+    void setLineCount(int lineCount);
     void onInput(ScreenInputType type) override;
     void onPush() override;
     void onPop() override;

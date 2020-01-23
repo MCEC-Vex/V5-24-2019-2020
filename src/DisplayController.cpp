@@ -1,5 +1,7 @@
 #include "../include/DisplayController.h"
 
+const int DisplayController::charLengths[128] = {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 4, 1, 3, 8, 6, 10, 8, 1, 2, 2, 6, 7, 1, 3, 1, 5, 6, 3, 6, 6, 7, 6, 6, 6, 6, 6, 1, 1, 6, 6, 6, 5, 10, 8, 6, 7, 7, 5, 5, 8, 7, 3, 3, 6, 5, 9, 7, 8, 6, 8, 6, 6, 7, 7, 8, 12, 7, 7, 6, 3, 5, 3, 6, 6, 2, 6, 6, 5, 6, 6, 4, 6, 6, 1, 3, 5, 1, 9, 6, 6, 6, 6, 4, 5, 4, 6, 6, 10, 5, 6, 5, 4, 1, 4, 6, 1, 1};
+
 DisplayController::DisplayController(pros::Controller controller1) : controller(controller1)
 {
     
@@ -79,4 +81,23 @@ void DisplayController::rumble(std::string pattern)
     mutex.take(1000);
     rumbleLine = pattern;
     mutex.give();
+}
+
+int DisplayController::getLength(std::string line)
+{
+    int length = 0;
+    for(int i = 0; i < line.length(); i++)
+    {
+        char current = line[i];
+        if(current > 128)
+        {
+            length += 2;
+        }
+        else
+        {
+            length += DisplayController::charLengths[current] + 1;
+        }
+    }
+    length--;
+    return length;
 }
