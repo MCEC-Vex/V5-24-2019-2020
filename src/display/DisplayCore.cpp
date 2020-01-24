@@ -28,8 +28,34 @@ DisplayController* DisplayCore::getDisplayController()
     return displayController;
 }
 
+void DisplayCore::waitForEmpty()
+{
+    while(screens.size() > 0)
+    {
+        checkInput();
+        pros::delay(10);
+    }
+    
+    for(int i = 0; i < 3; i++)
+    {
+        displayController->clearLine(i);
+    }
+}
+
 void DisplayCore::checkInput()
 {
+    // Check button values
+    if(controller.get_digital_new_press(DIGITAL_A))
+    {
+        pros::lcd::print(5, "A");
+        screens.top()->onInput(ScreenInputType::SELECT);
+    }
+    if(controller.get_digital_new_press(DIGITAL_B))
+    {
+        screens.top()->onInput(ScreenInputType::BACK);
+    }
+
+    // Check directional values
     // "lastChecked" used to determine the polling interval of checkInput
     // this value is for determining the speed the joysticks should move the options
     unsigned long timeSince = pros::millis() - lastChecked;

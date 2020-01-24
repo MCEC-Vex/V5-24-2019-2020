@@ -32,18 +32,23 @@ void displayTesting()
 
     TextDisplayScreen textDisplay(&core, lines, 6);
     core.pushScreen(&textDisplay);*/
-    ScrollingScreenDemo demo(&core);
-    core.pushScreen(&demo);
-
-    while(true)
+    MenuAction action([](DisplayCore* core)
     {
-        core.checkInput();
-        if(master.get_digital_new_press(DIGITAL_B))
-        {
-            break;
-        }
-        pros::delay(10);
-    }
+        pros::lcd::print(7, "Woo Auton ran!");
+        master.rumble(".");
+    
+
+    }, "Run auto...", &core);
+
+    MenuAction menu[1] = {
+        action
+    };
+    MenuScreen screen(&core, menu, 1);
+    
+    core.pushScreen(&screen);
+    //ScrollingScreenDemo demo(&core);
+    //core.pushScreen(&demo);
+    core.waitForEmpty();
 }
 
 /**
@@ -161,6 +166,8 @@ void opcontrol()
             displayTesting();
             //shuffle(5_deg, 2_in, 20);
             //centerBot(5, 0.2);
+
+            //moveTrayToHighest();
         }
 
         if(master.get_digital_new_press(DIGITAL_Y))

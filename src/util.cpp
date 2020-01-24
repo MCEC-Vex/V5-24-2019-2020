@@ -72,3 +72,24 @@ void setTrayPosition(int trayPos, int speed)
     trayMotorFront.move_absolute(trayPos, speed);
     trayMotorBack.move_absolute(trayPos, speed);
 }
+
+void moveTrayToHighest()
+{
+    while(trayMotorFront.get_position() > TRAY_HIGHEST)
+    {
+        int speed = -80;
+        if(trayMotorFront.get_position() < -900)
+        {
+            speed = -20 - ((60.0 / 1000.0) * (1000 - abs(trayMotorFront.get_position() + 900)));
+        }
+
+        displayController.setLine(1, std::to_string(speed));
+        pros::lcd::print(2, "Speed: %d", speed);
+
+        trayMotorBack.move_velocity(speed);
+        trayMotorFront.move_velocity(speed);
+        pros::delay(5);
+    }
+    trayMotorBack.move_velocity(0);
+    trayMotorFront.move_velocity(0);
+}

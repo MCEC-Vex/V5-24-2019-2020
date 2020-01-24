@@ -53,6 +53,11 @@ public:
      * Called to check input and pass to the top screen on the stack
      */
     void checkInput();
+
+    /**
+     * Blocks until the stack is empty
+     */
+    void waitForEmpty();
 };
 
 #endif //MCEC_V5_DISPLAYCORE_H

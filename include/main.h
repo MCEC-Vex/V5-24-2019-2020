@@ -42,6 +42,8 @@
 #include "util.h"
 #include "autonomous.h"
 
+#include "displayLib/MenuAction.h"
+#include "displayLib/MenuScreen.h"
 #include "displayLib/DisplayController.h"
 #include "displayLib/DisplayCore.h"
 #include "displayLib/ScrollingScreenDemo.h"

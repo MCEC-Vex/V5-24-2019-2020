@@ -9,7 +9,8 @@ enum ScreenInputType
     RIGHT,
     MENU,
     BACK,
-    EXIT
+    EXIT,
+    SELECT
 };
 
 #endif

@@ -82,6 +82,18 @@ void ScrollingScreen::onInput(ScreenInputType input)
             refreshAll();
         }
     }
+
+    if(input == SELECT)
+    {
+        pros::lcd::print(5, "Triggering try");
+        onSelect(line);
+        pros::lcd::print(5, "Triggered");
+    }
+
+    if(input == BACK)
+    {
+        core->popScreen();
+    }
 }
 
 void ScrollingScreen::refreshAll()

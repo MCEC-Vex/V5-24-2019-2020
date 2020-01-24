@@ -28,4 +28,10 @@ void flipTray();
  */
 void setupMotors();
 
+/**
+ * Moves the tray to its highest, slowing it as it reaches the apex
+ * Note: This is a blocking function
+ */
+void moveTrayToHighest();
+
 #endif //MCEC_V5_UTIL_H
