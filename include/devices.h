@@ -31,8 +31,12 @@ extern pros::ADIPort autoBlueBig;
 //pros::ADIPort autoTesting(6);
 extern pros::ADIUltrasonic frontUltrasonic;
 extern pros::ADIUltrasonic backUltrasonic;
+extern pros::ADIUltrasonic rearUltrasonic;
+
 extern okapi::MedianFilter<5> frontUltrasonicFilter;
 extern okapi::MedianFilter<5> backUltrasonicFilter;
+extern okapi::MedianFilter<5> rearUltrasonicFilter;
+
 
 extern pros::Controller master;
 

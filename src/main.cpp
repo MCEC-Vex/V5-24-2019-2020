@@ -392,8 +392,10 @@ void opcontrol()
         //pros::lcd::print(1, "Front: %d", frontUltrasonic.get());
         //pros::lcd::print(2, "Back: %d", backUltrasonic.get());
 
-        //displayController.setLine(1, "F: " + std::to_string(frontUltrasonicFilter.filter(frontUltrasonic.get_value())));
-        //displayController.setLine(2, "B: " + std::to_string(backUltrasonicFilter.filter(backUltrasonic.get_value())));
+        displayController.setLine(1, "F: " + std::to_string(frontUltrasonicFilter.filter(frontUltrasonic.get_value())));
+        displayController.setLine(2, "B: " + std::to_string(backUltrasonicFilter.filter(backUltrasonic.get_value())));
+        displayController.setLine(0, "R: " + std::to_string(rearUltrasonicFilter.filter(rearUltrasonic.get_value())));
+
         //displayController.setLine(1, std::to_string(master.get_analog(ANALOG_LEFT_Y)));
         //displayController.setLine(2, std::to_string(master.get_analog(ANALOG_LEFT_X)));
 

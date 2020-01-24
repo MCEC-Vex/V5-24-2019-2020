@@ -25,8 +25,11 @@ pros::ADIPort autoBlueBig(4);
 //pros::ADIPort autoTesting(6);
 pros::ADIUltrasonic frontUltrasonic(7, 8);
 pros::ADIUltrasonic backUltrasonic(5, 6);
+pros::ADIUltrasonic rearUltrasonic(3, 4);
 okapi::MedianFilter<5> frontUltrasonicFilter;
 okapi::MedianFilter<5> backUltrasonicFilter;
+okapi::MedianFilter<5> rearUltrasonicFilter;
+
 
 pros::Controller master(pros::E_CONTROLLER_MASTER);
 
