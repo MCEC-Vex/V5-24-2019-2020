@@ -14,7 +14,7 @@ private:
 protected:
     virtual void onExit() = 0;
     virtual void cycleOption(int line, bool forwards) = 0;
-    virtual void onSelect(int line) = 0;
+    virtual void onSelect(int line) {};
     virtual std::string getLine(int line, bool selected) = 0;
 public:
     ScrollingScreen(DisplayCore *core, int lineCount, bool isContinuous, bool alwaysCenter) :

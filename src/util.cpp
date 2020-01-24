@@ -51,7 +51,7 @@ void checkTrayArmsPos()
 
     if(leftArmMotor.get_position() < 100)
     {
-        setTrayPosition(0, TRAY_SHIFT_SPEED);
+        setTrayPosition(-100, TRAY_SHIFT_SPEED);
     }
     else if(leftArmMotor.get_position() < 200)
     {

@@ -36,9 +36,17 @@ void DisplayCore::waitForEmpty()
         pros::delay(10);
     }
     
-    for(int i = 0; i < 3; i++)
+    pros::delay(50);
+    controller.set_text(-1, 0, "");
+    /*for(int i = 0; i < 3; i++)
     {
         displayController->clearLine(i);
+    }*/
+    
+    // Wait for "B" to be released
+    while(controller.get_digital(DIGITAL_B))
+    {
+        pros::delay(5);
     }
 }
 

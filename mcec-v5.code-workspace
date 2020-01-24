@@ -5,6 +5,10 @@
 		}
 	],
 	"settings": {
-		"doxdocgen.generic.briefTemplate": "{text}"
+		"doxdocgen.generic.briefTemplate": "{text}",
+		"files.associations": {
+			"*.pros": "json",
+			"functional": "cpp"
+		}
 	}
 }

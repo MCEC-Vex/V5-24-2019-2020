@@ -22,42 +22,53 @@ void displayTesting()
 
     MenuAction autonBig([](DisplayCore* core)
     {
-        runAutoBig(true);
         core->popScreen();
+        runAutoBig(true);
     }, "Auton big", &core);
 
     MenuAction autonSmall([](DisplayCore* core)
     {
-        runAutoSmall(true);
         core->popScreen();
+        runAutoSmall(true);
     }, "Auton small", &core);
 
     MenuAction extendTray([](DisplayCore* core)
     {
-        moveTrayToHighest();
         core->popScreen();
+        moveTrayToHighest();
     }, "Extend tray", &core);
 
     MenuAction flipTrayAction([](DisplayCore* core)
     {
-        flipTray();
         core->popScreen();
+        flipTray();
     }, "Flip tray", &core);
 
     MenuAction alignBot([](DisplayCore* core)
     {
-        centerBot(5, 0.2);
         core->popScreen();
+        centerBot(5, 0.2);
     }, "Align bot", &core);
 
-    MenuAction menu[5] = {
+    MenuAction intakeTemps([](DisplayCore* core)
+    {
+        std::string tempDisplay[2];
+        tempDisplay[0] = std::to_string(leftIntake.get_temperature());
+        tempDisplay[1] = std::to_string(rightIntake.get_temperature());
+
+        TextDisplayScreen temps(core, tempDisplay, 2);
+        core->pushScreen(&temps);
+    }, "Intake Temps", &core);
+
+    MenuAction menu[6] = {
         autonBig,
         autonSmall,
         extendTray,
         flipTrayAction,
-        alignBot
+        alignBot,
+        intakeTemps
     };
-    MenuScreen screen(&core, menu, 5);
+    MenuScreen screen(&core, menu, 6);
     
     core.pushScreen(&screen);
     //ScrollingScreenDemo demo(&core);
@@ -262,8 +273,15 @@ void opcontrol()
             {
                 // Move the arms up
                 // Slow speed is 80
-                leftArmMotor.move_velocity(150);
-                rightArmMotor.move_velocity(-150);
+                if(leftArmMotor.get_position() < 100 && trayMotorFront.get_position() > -90)
+                {
+                    setTrayPosition(-100, 200);
+                }
+                else
+                {
+                    leftArmMotor.move_velocity(150);
+                    rightArmMotor.move_velocity(-150);
+                }
 
                 armsWereMoving = true;
                 checkTrayArmsPos();
@@ -357,21 +375,21 @@ void opcontrol()
         }
 
         // Print debugging data
-        /*pros::lcd::print(1, "Left Y: %d", forwardPower);
+        pros::lcd::print(1, "Left Y: %d", forwardPower);
         pros::lcd::print(2, "Right X: %d", turningPower);
         pros::lcd::print(3, "L-Voltage: %d", forwardPower + turningPower);
         pros::lcd::print(4, "R-Voltage: %d", forwardPower - turningPower);
         pros::lcd::print(5, "Left Arm Pos: %f", leftArmMotor.get_position());
         pros::lcd::print(6, "Right Arm Pos: %f", rightArmMotor.get_position());
-        pros::lcd::print(7, "Tray Pos (b): %f", trayMotorBack.get_position());*/
+        pros::lcd::print(7, "Tray Pos (b): %f", trayMotorBack.get_position());
 
         //pros::lcd::print(1, "Front: %d", frontUltrasonic.get());
         //pros::lcd::print(2, "Back: %d", backUltrasonic.get());
 
         //displayController.setLine(1, "F: " + std::to_string(frontUltrasonicFilter.filter(frontUltrasonic.get_value())));
         //displayController.setLine(2, "B: " + std::to_string(backUltrasonicFilter.filter(backUltrasonic.get_value())));
-        displayController.setLine(1, std::to_string(master.get_analog(ANALOG_LEFT_Y)));
-        displayController.setLine(2, std::to_string(master.get_analog(ANALOG_LEFT_X)));
+        //displayController.setLine(1, std::to_string(master.get_analog(ANALOG_LEFT_Y)));
+        //displayController.setLine(2, std::to_string(master.get_analog(ANALOG_LEFT_X)));
 
         pros::delay(10);
     }
