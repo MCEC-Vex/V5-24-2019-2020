@@ -94,6 +94,33 @@ void moveTrayToHighest()
     trayMotorFront.move_velocity(0);
 }
 
+int getUltrasonicDifference()
+{
+    return frontUltrasonic.get_value() - backUltrasonic.get_value();
+}
+
+void moveAlignedWithWallOkapi(std::shared_ptr<okapi::ChassisController> chassis, okapi::QLength distance)
+{
+    const double newTarget = distance.convert(okapi::meter) *
+            chassis->getChassisScales().straight *
+            chassis->getGearsetRatioPair().ratio;
+
+    leftTopMotor.tare_position();
+
+    pros::delay(15);
+
+    leftTopMotor.move_relative(newTarget, 50);
+    leftBottomMotor.move_relative(newTarget, 50);
+
+    rightTopMotor.move_relative(newTarget * -1, 50);
+    rightBottomMotor.move_relative(newTarget * -1, 50);
+
+    while(leftTopMotor.get_position() < newTarget - 5)
+    {
+        pros::delay(10);
+    }
+}
+
 void moveAlignedWithWall(int distance)
 {
   rightTopMotor.tare_position();
@@ -111,7 +138,6 @@ while (abs(rightTopMotor.get_position()) < distance)
   displayController.setLine(1, std::to_string(leftSpeed));
   displayController.setLine(2, std::to_string(rightSpeed));
     displayController.setLine(0, std::to_string(rightTopMotor.get_position()));
-
       if(abs(frontUltrasonic.get_value() - backUltrasonic.get_value()) < 10){
         leftSpeed = 25;
         rightSpeed = -25;

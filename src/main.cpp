@@ -50,25 +50,49 @@ void displayTesting()
         centerBot(5, 0.2);
     }, "Align bot", &core);
 
+    MenuAction moveAlongWall([](DisplayCore* core)
+    {
+        core->popScreen();
+        moveAlignedWithWallOkapi(chassis, 5_ft);
+
+        chassis->setMaxVelocity(35);
+        chassis->moveDistance(-5_ft);
+    }, "Move w/ wall", &core);
+
     MenuAction intakeTemps([](DisplayCore* core)
     {
-        std::string tempDisplay[2];
-        tempDisplay[0] = std::to_string(leftIntake.get_temperature());
-        tempDisplay[1] = std::to_string(rightIntake.get_temperature());
+        std::string tempDisplay[14];
+        tempDisplay[0] = "Intake:";
+        tempDisplay[1] = "L: " + std::to_string(leftIntake.get_temperature());
+        tempDisplay[2] = "R: " + std::to_string(rightIntake.get_temperature());
+        tempDisplay[3] = "Drive:";
+        tempDisplay[4] = "LT: " + std::to_string(leftTopMotor.get_temperature());
+        tempDisplay[5] = "LB: " + std::to_string(leftBottomMotor.get_temperature());
+        tempDisplay[6] = "RT: " + std::to_string(rightTopMotor.get_temperature());
+        tempDisplay[7] = "RB: " + std::to_string(rightBottomMotor.get_temperature());
+        tempDisplay[8] = "Arms:";
+        tempDisplay[9] = "L: " + std::to_string(leftArmMotor.get_temperature());
+        tempDisplay[10] = "R: " + std::to_string(rightArmMotor.get_temperature());
+        tempDisplay[11] = "Tray:";
+        tempDisplay[12] = "F: " + std::to_string(trayMotorFront.get_temperature());
+        tempDisplay[13] = "B: " + std::to_string(trayMotorBack.get_temperature());
 
-        TextDisplayScreen temps(core, tempDisplay, 2);
+        TextDisplayScreen temps(core, tempDisplay, 14);
         core->pushScreen(&temps);
+        core->waitForPop();
+        core->popScreen();
     }, "Intake Temps", &core);
 
-    MenuAction menu[6] = {
+    MenuAction menu[7] = {
         autonBig,
         autonSmall,
         extendTray,
         flipTrayAction,
         alignBot,
-        intakeTemps
+        intakeTemps,
+        moveAlongWall
     };
-    MenuScreen screen(&core, menu, 6);
+    MenuScreen screen(&core, menu, 7);
 
     core.pushScreen(&screen);
     //ScrollingScreenDemo demo(&core);

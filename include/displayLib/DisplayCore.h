@@ -54,6 +54,10 @@ public:
      */
     void checkInput();
 
+    void waitForSize(int size);
+
+    void waitForPop();
+
     /**
      * Blocks until the stack is empty
      */

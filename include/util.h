@@ -3,6 +3,7 @@
 
 #include "devices.h"
 #include "constants.h"
+#include "okapi/api.hpp"
 
 /**
  * Set the tray position to a particular point with specified speed
@@ -34,6 +35,28 @@ void setupMotors();
  */
 void moveTrayToHighest();
 
+/**
+ * Get the difference between ultrasonic sensors on the right side
+ * 
+ * @return int The difference value. Positive indicates the bot is rotated clockwise
+ */
+int getUltrasonicDifference();
+
+/**
+ * Moves the chassis a distance while keeping the right side of the bot
+ * parallel to a wall using okapilib methods
+ * 
+ * @param chassis
+ * @param distance 
+ */
+void moveAlignedWithWallOkapi(std::shared_ptr<okapi::ChassisController> chassis, okapi::QLength distance);
+
+/**
+ * Moves the chassis a distance while keeping the right side of the bot
+ * parallel to a wall
+ * 
+ * @param distance The distance to move
+ */
 void moveAlignedWithWall(int distance);
 
 #endif //MCEC_V5_UTIL_H

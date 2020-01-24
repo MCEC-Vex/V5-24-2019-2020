@@ -16,6 +16,11 @@ void DisplayCore::popScreen()
 {
     screens.top()->onPop();
     screens.pop();
+
+    if(screens.size() > 0)
+    {
+        screens.top()->onPush();
+    }
 }
 
 DisplayScreen* DisplayCore::getTopScreen()
@@ -28,20 +33,27 @@ DisplayController* DisplayCore::getDisplayController()
     return displayController;
 }
 
-void DisplayCore::waitForEmpty()
+void DisplayCore::waitForSize(int size)
 {
-    while(screens.size() > 0)
+    while(screens.size() != size)
     {
         checkInput();
         pros::delay(10);
     }
-    
-    pros::delay(50);
-    controller.set_text(-1, 0, "");
-    /*for(int i = 0; i < 3; i++)
+}
+
+void DisplayCore::waitForPop()
+{
+    waitForSize(screens.size() - 1);
+}
+
+void DisplayCore::waitForEmpty()
+{
+    waitForSize(0);
+    for(int i = 0; i < 3; i++)
     {
         displayController->clearLine(i);
-    }*/
+    }
     
     // Wait for "B" to be released
     while(controller.get_digital(DIGITAL_B))
