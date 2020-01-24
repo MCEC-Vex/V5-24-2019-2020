@@ -40,3 +40,8 @@ std::shared_ptr<okapi::ChassisController> chassis = okapi::ChassisControllerBuil
         .withMotors({1, 2}, {-3, -4})
         .withDimensions(okapi::AbstractMotor::gearset::green, {{4_in, 12.5_in}, okapi::imev5GreenTPR})
         .build();
+
+std::shared_ptr<okapi::AsyncMotionProfileController> profileController = okapi::AsyncMotionProfileControllerBuilder()
+    .withLimits({1.0, 2.0, 10.0})
+    .withOutput(chassis)
+    .buildMotionProfileController();

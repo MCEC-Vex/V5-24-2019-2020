@@ -43,5 +43,5 @@ extern pros::Controller master;
 extern DisplayController displayController;
 
 extern std::shared_ptr<okapi::ChassisController> chassis;
-
+extern std::shared_ptr<okapi::AsyncMotionProfileController> profileController;
 #endif //MCEC_V5_DEVICES_H
