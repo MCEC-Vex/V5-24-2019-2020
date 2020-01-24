@@ -66,7 +66,7 @@ void runAutoSmall(bool red)
     rightIntake.move_velocity(0);
     chassis->moveDistance(-1.5_ft);
 
-    // Turn to face scoring zone
+    // Turn to face, then move towards scoring zone
     chassis->turnAngle(105_deg * sign);
     chassis->moveDistance(0.5_ft);
 
@@ -110,23 +110,24 @@ void runAutoBig(bool red)
     // 250 for arms
     int sign = red ? 1 : -1;
 
-    //flipTray();
-    pros::delay(1500);
+    flipTray();
+    pros::delay(1000);
 
-    chassis->setMaxVelocity(25);
+    chassis->setMaxVelocity(35);
 
     //move forward and intake "2nd row"
     leftIntake.move_velocity(200);
     rightIntake.move_velocity(-200);
     chassis->moveDistance(1.75_ft);
 
-    pros::delay(1000);
+
+    pros::delay(500);
 
     //arm movement to intake the stacked cubes at end of "2nd row"
     leftIntake.move_velocity(0);
     rightIntake.move_velocity(0);
     chassis->moveDistance(-0.2_ft);
-    pros::delay(1000);
+    pros::delay(500);
     leftArmMotor.move_absolute(350, 100);
     rightArmMotor.move_absolute(-350, 100);
     trayMotorBack.move_absolute(-500, 100);
@@ -153,7 +154,7 @@ void runAutoBig(bool red)
     chassis->turnAngle(60_deg * sign);
 
     //backup against the wall
-    chassis->moveDistance(-0.3_ft);
+    chassis->moveDistance(-0.4_ft);
 
     // Move forward and intake cube stack... copied from runAutoSmall
 
@@ -164,14 +165,14 @@ void runAutoBig(bool red)
     rightIntake.move_velocity(0);
     chassis->moveDistance(-1.5_ft);
 
-    // Turn to face scoring zone
+    // Turn to face, then move towards, scoring zone
     chassis->turnAngle(105_deg * sign);
-    chassis->moveDistance(0.5_ft);
+    chassis->moveDistance(0.2_ft);
 
     // Slightly outtake cubes
     leftIntake.move_velocity(-50);
     rightIntake.move_velocity(50);
-    pros::delay(400);
+    pros::delay(200);
     leftIntake.move_velocity(0);
     rightIntake.move_velocity(-0);
 

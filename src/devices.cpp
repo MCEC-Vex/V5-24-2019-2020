@@ -1,5 +1,7 @@
 #include "devices.h"
 
+//bad ports: 5,6,21,12,15
+
 pros::Motor leftTopMotor(1);
 pros::Motor leftBottomMotor(2);
 pros::Motor rightTopMotor(3);
@@ -7,7 +9,7 @@ pros::Motor rightBottomMotor(4);
 pros::Motor centerWheel(15);
 
 pros::Motor leftIntake(11);
-pros::Motor rightIntake(12);
+pros::Motor rightIntake(16);
 
 pros::Motor leftArmMotor(8);
 pros::Motor rightArmMotor(9);
