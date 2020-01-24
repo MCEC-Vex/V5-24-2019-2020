@@ -50,6 +50,22 @@ void centerBot(int tolerance, float speedMod)
     while(abs(error) > tolerance);
 }
 
+void moveDistanceParallel(okapi::QLength distance, okapi::QLength distanceFromWall)
+{
+    //use ultrasonics to determine current location & angle
+    double x, y, theta;
+    y = (frontUltrasonic.get_value() + backUltrasonic.get_value()) / 2.0;
+    x = rearUltrasonic.get_value();
+    theta = atan2(getUltrasonicDifference(), 260.0);
+    profileController->generatePath({
+      {x * 1_mm, y * 1_mm, theta*1_rad},  // Profile starting position, this will normally be (0, 0, 0)
+      {distance, distanceFromWall, 0_deg}}, // The next point in the profile, 3 feet forward
+      "A" // Profile name
+    );
+    profileController->setTarget("A");
+    profileController->waitUntilSettled();
+}
+
 void runAutoSmall(bool red)
 {
     int sign = red ? 1 : -1;
@@ -170,9 +186,12 @@ void runAutoBig(bool red)
 
     leftIntake.move_velocity(200);
     rightIntake.move_velocity(-200);
+
+    //put moveDistanceParallel(x_ft,y_ft);
     chassis->moveDistance(2.5_ft);
     leftIntake.move(20);
     rightIntake.move(-20);
+    //put moveDistanceParallel(-x_ft,y_ft);
     chassis->moveDistance(-1.6_ft);
 
     // Turn to face, then move towards, scoring zone

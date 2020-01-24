@@ -206,7 +206,7 @@ void opcontrol()
             pros::delay(10);
             continue;
         }
-        
+
         if(antiTipTriggered)
         {
             pros::delay(100);
@@ -245,13 +245,7 @@ void opcontrol()
 
         if(master.get_digital_new_press(DIGITAL_Y))
         {
-          //  autonomous();
-          moveAlignedWithWall(2000);
-
-
-      //    } while(rightTopMotor.get_position()<distance);
-
-
+            moveDistanceParallel(4_ft,2_ft);
         }
 
         if(master.get_digital(TRAY_OUT))
@@ -442,7 +436,7 @@ void opcontrol()
 
         displayController.setLine(1, "F: " + std::to_string(frontUltrasonicFilter.filter(frontUltrasonic.get_value())));
         displayController.setLine(2, "B: " + std::to_string(backUltrasonicFilter.filter(backUltrasonic.get_value())));
-        displayController.setLine(0, "R: " + std::to_string(rearUltrasonicFilter.filter(rearUltrasonic.get_value())));        
+        displayController.setLine(0, "R: " + std::to_string(rearUltrasonicFilter.filter(rearUltrasonic.get_value())));
 
         //displayController.setLine(1, std::to_string(master.get_analog(ANALOG_LEFT_Y)));
         //displayController.setLine(2, std::to_string(master.get_analog(ANALOG_LEFT_X)));
