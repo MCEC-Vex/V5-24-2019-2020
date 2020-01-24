@@ -93,3 +93,58 @@ void moveTrayToHighest()
     trayMotorBack.move_velocity(0);
     trayMotorFront.move_velocity(0);
 }
+
+void moveAlignedWithWall(int distance)
+{
+  rightTopMotor.tare_position();
+  int leftSpeed = 25;
+  int rightSpeed = -25;
+  leftTopMotor.move(leftSpeed);
+  leftBottomMotor.move(leftSpeed);
+  rightTopMotor.move(rightSpeed);
+  rightBottomMotor.move(rightSpeed);
+
+displayController.setLine(0, std::to_string(rightTopMotor.get_position()));
+while (abs(rightTopMotor.get_position()) < distance)
+{
+  displayController.setLine(0, std::to_string(rightTopMotor.get_position()));
+  displayController.setLine(1, std::to_string(leftSpeed));
+  displayController.setLine(2, std::to_string(rightSpeed));
+    displayController.setLine(0, std::to_string(rightTopMotor.get_position()));
+
+      if(abs(frontUltrasonic.get_value() - backUltrasonic.get_value()) < 10){
+        leftSpeed = 25;
+        rightSpeed = -25;
+        leftTopMotor.move(leftSpeed);
+        leftBottomMotor.move(leftSpeed);
+        rightTopMotor.move(rightSpeed);
+        rightBottomMotor.move(rightSpeed);
+        pros::delay(100);
+      }
+      else if(frontUltrasonic.get_value() > backUltrasonic.get_value()){
+        leftSpeed ++;
+        rightSpeed ++;
+        leftTopMotor.move(leftSpeed);
+        leftBottomMotor.move(leftSpeed);
+        rightTopMotor.move(rightSpeed);
+        rightBottomMotor.move(rightSpeed);
+      }
+      else if(frontUltrasonic.get_value() < backUltrasonic.get_value()){
+        leftSpeed --;
+        rightSpeed --;
+        leftTopMotor.move(leftSpeed);
+        leftBottomMotor.move(leftSpeed);
+        rightTopMotor.move(rightSpeed);
+        rightBottomMotor.move(rightSpeed);
+      }
+      if(rightTopMotor.get_position() > distance){
+        leftSpeed = 0;
+        rightSpeed = 0;
+        leftTopMotor.move(leftSpeed);
+        leftBottomMotor.move(leftSpeed);
+        rightTopMotor.move(rightSpeed);
+        rightBottomMotor.move(rightSpeed);
+      }
+        pros::delay(10);
+}
+}

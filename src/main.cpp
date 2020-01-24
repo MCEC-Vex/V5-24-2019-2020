@@ -69,7 +69,7 @@ void displayTesting()
         intakeTemps
     };
     MenuScreen screen(&core, menu, 6);
-    
+
     core.pushScreen(&screen);
     //ScrollingScreenDemo demo(&core);
     //core.pushScreen(&demo);
@@ -197,7 +197,13 @@ void opcontrol()
 
         if(master.get_digital_new_press(DIGITAL_Y))
         {
-            autonomous();
+          //  autonomous();
+          moveAlignedWithWall(2000);
+
+
+      //    } while(rightTopMotor.get_position()<distance);
+
+
         }
 
         if(master.get_digital(TRAY_OUT))

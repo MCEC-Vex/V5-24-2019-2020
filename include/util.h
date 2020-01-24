@@ -34,4 +34,6 @@ void setupMotors();
  */
 void moveTrayToHighest();
 
+void moveAlignedWithWall(int distance);
+
 #endif //MCEC_V5_UTIL_H
