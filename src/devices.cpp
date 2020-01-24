@@ -21,6 +21,7 @@ pros::ADIPort autoRedSmall(1);
 pros::ADIPort autoRedBig(2);
 pros::ADIPort autoBlueSmall(3);
 pros::ADIPort autoBlueBig(4);
+pros::ADIPort tipSensor(1);
 //pros::ADIPort autoSafe(5);
 //pros::ADIPort autoTesting(6);
 pros::ADIUltrasonic frontUltrasonic(7, 8);

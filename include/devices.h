@@ -27,6 +27,7 @@ extern pros::ADIPort autoRedSmall;
 extern pros::ADIPort autoRedBig;
 extern pros::ADIPort autoBlueSmall;
 extern pros::ADIPort autoBlueBig;
+extern pros::ADIPort tipSensor;
 //pros::ADIPort autoSafe(5);
 //pros::ADIPort autoTesting(6);
 extern pros::ADIUltrasonic frontUltrasonic;

@@ -59,7 +59,7 @@ void displayTesting()
         chassis->moveDistance(-5_ft);
     }, "Move w/ wall", &core);
 
-    MenuAction intakeTemps([](DisplayCore* core)
+    MenuAction temps([](DisplayCore* core)
     {
         std::string tempDisplay[14];
         tempDisplay[0] = "Intake:";
@@ -81,7 +81,7 @@ void displayTesting()
         core->pushScreen(&temps);
         core->waitForPop();
         core->popScreen();
-    }, "Intake Temps", &core);
+    }, "Motor Temps", &core);
 
     MenuAction menu[7] = {
         autonBig,
@@ -89,7 +89,7 @@ void displayTesting()
         extendTray,
         flipTrayAction,
         alignBot,
-        intakeTemps,
+        temps,
         moveAlongWall
     };
     MenuScreen screen(&core, menu, 7);
@@ -187,12 +187,36 @@ void opcontrol()
     // Flags for setting 0 velocity
     bool trayWasMoving = false;
     bool armsWereMoving = false;
+    bool antiTipTriggered = false;
 
     // Arm macro flag
     int armMacroPos = 0;
 
     while(true)
     {
+        if(tipSensor.get_value())
+        {
+            leftTopMotor.move(-127);
+            leftBottomMotor.move(-127);
+            rightTopMotor.move(127);
+            rightBottomMotor.move(127);
+
+            antiTipTriggered = true;
+
+            pros::delay(10);
+            continue;
+        }
+        
+        if(antiTipTriggered)
+        {
+            pros::delay(100);
+            leftTopMotor.move(0);
+            leftBottomMotor.move(0);
+            rightTopMotor.move(0);
+            rightBottomMotor.move(0);
+            antiTipTriggered = false;
+        }
+
         // Arcade-style driving controls
         int forwardPower = master.get_analog(ANALOG_LEFT_Y);
         int turningPower = master.get_analog(ANALOG_RIGHT_X);
@@ -405,10 +429,10 @@ void opcontrol()
         }
 
         // Print debugging data
-        pros::lcd::print(1, "Left Y: %d", forwardPower);
-        pros::lcd::print(2, "Right X: %d", turningPower);
-        pros::lcd::print(3, "L-Voltage: %d", forwardPower + turningPower);
-        pros::lcd::print(4, "R-Voltage: %d", forwardPower - turningPower);
+        //pros::lcd::print(1, "Left Y: %d", forwardPower);
+        //pros::lcd::print(2, "Right X: %d", turningPower);
+        //pros::lcd::print(3, "L-Voltage: %d", forwardPower + turningPower);
+        //pros::lcd::print(4, "R-Voltage: %d", forwardPower - turningPower);
         pros::lcd::print(5, "Left Arm Pos: %f", leftArmMotor.get_position());
         pros::lcd::print(6, "Right Arm Pos: %f", rightArmMotor.get_position());
         pros::lcd::print(7, "Tray Pos (b): %f", trayMotorBack.get_position());
@@ -418,7 +442,7 @@ void opcontrol()
 
         displayController.setLine(1, "F: " + std::to_string(frontUltrasonicFilter.filter(frontUltrasonic.get_value())));
         displayController.setLine(2, "B: " + std::to_string(backUltrasonicFilter.filter(backUltrasonic.get_value())));
-        displayController.setLine(0, "R: " + std::to_string(rearUltrasonicFilter.filter(rearUltrasonic.get_value())));
+        displayController.setLine(0, "R: " + std::to_string(rearUltrasonicFilter.filter(rearUltrasonic.get_value())));        
 
         //displayController.setLine(1, std::to_string(master.get_analog(ANALOG_LEFT_Y)));
         //displayController.setLine(2, std::to_string(master.get_analog(ANALOG_LEFT_X)));
