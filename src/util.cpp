@@ -77,10 +77,10 @@ void moveTrayToHighest()
 {
     while(trayMotorFront.get_position() > TRAY_HIGHEST)
     {
-        int speed = -80;
+        int speed = -60;
         if(trayMotorFront.get_position() < -900)
         {
-            speed = -20 - ((60.0 / 1000.0) * (1000 - abs(trayMotorFront.get_position() + 900)));
+            speed = -20 - ((40.0 / 1000.0) * (1000 - abs(trayMotorFront.get_position() + 900)));
         }
 
         displayController.setLine(1, std::to_string(speed));
