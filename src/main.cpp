@@ -18,32 +18,46 @@ void displayTesting()
     displayController.clearLine(0);
     displayController.clearLine(1);
     displayController.clearLine(2);
-    pros::delay(150);
     DisplayCore core(&displayController, master);
 
-    /*std::string lines[6] = {
-        "Hello 1",
-        "Hello 2",
-        "Hello A",
-        "Hello B",
-        "Goodbye",
-        "OK Boomer"
-    };
-
-    TextDisplayScreen textDisplay(&core, lines, 6);
-    core.pushScreen(&textDisplay);*/
-    MenuAction action([](DisplayCore* core)
+    MenuAction autonBig([](DisplayCore* core)
     {
-        pros::lcd::print(7, "Woo Auton ran!");
-        master.rumble(".");
-    
+        runAutoBig(true);
+        core->popScreen();
+    }, "Auton big", &core);
 
-    }, "Run auto...", &core);
+    MenuAction autonSmall([](DisplayCore* core)
+    {
+        runAutoSmall(true);
+        core->popScreen();
+    }, "Auton small", &core);
 
-    MenuAction menu[1] = {
-        action
+    MenuAction extendTray([](DisplayCore* core)
+    {
+        moveTrayToHighest();
+        core->popScreen();
+    }, "Extend tray", &core);
+
+    MenuAction flipTrayAction([](DisplayCore* core)
+    {
+        flipTray();
+        core->popScreen();
+    }, "Flip tray", &core);
+
+    MenuAction alignBot([](DisplayCore* core)
+    {
+        centerBot(5, 0.2);
+        core->popScreen();
+    }, "Align bot", &core);
+
+    MenuAction menu[5] = {
+        autonBig,
+        autonSmall,
+        extendTray,
+        flipTrayAction,
+        alignBot
     };
-    MenuScreen screen(&core, menu, 1);
+    MenuScreen screen(&core, menu, 5);
     
     core.pushScreen(&screen);
     //ScrollingScreenDemo demo(&core);

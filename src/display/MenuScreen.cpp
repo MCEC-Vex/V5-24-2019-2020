@@ -1,7 +1,7 @@
 #include "displayLib/MenuScreen.h"
 
 MenuScreen::MenuScreen(DisplayCore *core, MenuAction* menuArr, int count) :
-        ScrollingScreen(core, count, false, false), menuArr(menuArr)
+        ScrollingScreen(core, count, true, false), menuArr(menuArr)
 {
     
 }
