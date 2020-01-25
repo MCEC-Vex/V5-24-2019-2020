@@ -70,4 +70,6 @@ double convertToEncoderUnits(std::shared_ptr<okapi::ChassisController> chassis, 
  */
 void waitUntilMotorWithin(pros::Motor motor, int value, int tolerance, int timeout);
 
+void moveMotors(std::shared_ptr<okapi::ChassisController> chassis, okapi::QLength distance, int speed, int timeout);
+
 #endif //MCEC_V5_UTIL_H

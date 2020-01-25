@@ -123,8 +123,6 @@ void runAutoBig(bool red)
 
     chassis->setMaxVelocity(35);
 
-    displayController.setLine(0, "1st intake");
-
     //move forward and intake "2nd row"
     leftIntake.move_velocity(AUTON_BIG_INTAKE_SPEED);
     rightIntake.move_velocity(AUTON_BIG_INTAKE_SPEED * -1);
@@ -138,14 +136,10 @@ void runAutoBig(bool red)
     leftIntake.move_velocity(0);
     rightIntake.move_velocity(0);
 
-    displayController.setLine(0, "Going back");
     chassis->moveDistance(-2.0_ft);
-    displayController.setLine(0, "Turning -90");
     chassis->turnAngle(-90_deg * sign);
-    displayController.setLine(0, "Going back more");
     chassis->moveDistance(-1.25_ft);
 
-    displayController.setLine(0, "Turing fancy");
     double rightTurnDistance = convertToEncoderUnits(chassis, 1.5_ft);
     //rightTopMotor.tare_position();
     rightTopMotor.move_relative(rightTurnDistance, 50);
@@ -155,7 +149,6 @@ void runAutoBig(bool red)
     //chassis->turnAngle(85_deg * sign);
 
     //backup against the wall
-    displayController.setLine(0, "Backup bump");
     chassis->moveDistance(-0.1_ft);
 
     // Move forward and intake cube stack... copied from runAutoSmall
@@ -163,20 +156,18 @@ void runAutoBig(bool red)
     leftIntake.move_velocity(AUTON_BIG_INTAKE_SPEED);
     rightIntake.move_velocity(AUTON_BIG_INTAKE_SPEED * -1);
 
-    displayController.setLine(0, "Second forward");
     chassis->moveDistance(2.5_ft);
 
     pros::delay(200);
     // Put slight voltage pressure on the cubes
     //leftIntake.move(20);
     //rightIntake.move(-20);
-    displayController.setLine(0, "Back 1.5");
-    chassis->moveDistance(-1.50_ft);
+    chassis->moveDistance(-1.45_ft);
 
     // Turn to face, then move towards, scoring zone
-    displayController.setLine(0, "Turn 115 deg");
-    chassis->turnAngle(115_deg * sign);
-    chassis->moveDistance(0.35_ft);
+    chassis->turnAngle(116.5_deg * sign);
+    //chassis->moveDistance(0.35_ft);
+    moveMotors(chassis, 0.35_ft, 10, 3000);
 
     // Slightly intake cubes
     leftIntake.move_velocity(AUTON_BIG_INTAKE_SPEED);
@@ -196,7 +187,8 @@ void runAutoBig(bool red)
 
     // "Bump" the robot forward a bit
     chassis->setMaxVelocity(15);
-    chassis->moveDistance(3_in);
+    moveMotors(chassis, 3_in, 10, 3000);
+    //chassis->moveDistance(3_in);
 
     // Back the robot up
     chassis->moveDistance(-1.6_ft);

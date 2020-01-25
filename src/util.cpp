@@ -189,3 +189,15 @@ void waitUntilMotorWithin(pros::Motor motor, int value, int tolerance, int timeo
         pros::delay(10);
     }
 }
+
+void moveMotors(std::shared_ptr<okapi::ChassisController> chassis, okapi::QLength distance, int speed, int timeout)
+{
+    double dPos = convertToEncoderUnits(chassis, distance);
+
+    leftTopMotor.move_relative(dPos, speed);
+    leftBottomMotor.move_relative(dPos, speed);
+    rightTopMotor.move_relative(dPos * -1, speed);
+    rightBottomMotor.move_relative(dPos * -1, speed);
+
+    waitUntilMotorWithin(leftTopMotor, dPos, 15, timeout);
+}
