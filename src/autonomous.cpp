@@ -1,9 +1,7 @@
 #include "autonomous.h"
 
-void centerBot(int tolerance, float speedMod)
+/*void centerBot(int tolerance, float speedMod)
 {
-    /*int averagePos = (frontUltrasonicFilter.filter(frontUltrasonic.get_value())
-                    + backUltrasonicFilter.filter(backUltrasonic.get_value())) / 2;*/
     int leftDeviance, rightDeviance, error;
     int integral = 0;
 
@@ -64,7 +62,7 @@ void moveDistanceParallel(okapi::QLength distance, okapi::QLength distanceFromWa
     );
     profileController->setTarget("A");
     profileController->waitUntilSettled();
-}
+}*/
 
 void runAutoSmall(bool red)
 {

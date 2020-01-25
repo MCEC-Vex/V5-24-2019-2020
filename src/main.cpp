@@ -47,12 +47,12 @@ void displayTesting()
     MenuAction alignBot([](DisplayCore* core)
     {
         core->popScreen();
-        centerBot(5, 0.2);
+        //centerBot(5, 0.2);
     }, "Align bot", &core);
 
     MenuAction moveAlongWall([](DisplayCore* core)
     {
-        core->getDisplayController()->setLine(0, "Testing Wall");
+        /*core->getDisplayController()->setLine(0, "Testing Wall");
         core->getDisplayController()->clearLine(2);
         int tests = 10;
         for(int i = 0; i < tests; i++)
@@ -63,17 +63,15 @@ void displayTesting()
             pros::delay(500);
             chassis->moveDistance(-4_ft);
             pros::delay(500);
-        }
+        }*/
         core->popScreen();
     }, "Test wall 10x", &core);
 
-    MenuAction driveVector([](DisplayCore* core)
+    MenuAction runAuton([](DisplayCore* core)
     {
         core->popScreen();
-        //centerBot(5, 0.2);
-        //chassis->getModel()->driveVector()
-
-    }, "Align bot", &core);
+        autonomous();
+    }, "Auton Sim", &core);
 
     MenuAction temps([](DisplayCore* core)
     {
@@ -99,16 +97,17 @@ void displayTesting()
         core->popScreen();
     }, "Motor Temps", &core);
 
-    MenuAction menu[7] = {
+    MenuAction menu[8] = {
         autonBig,
         autonSmall,
         extendTray,
         flipTrayAction,
         alignBot,
         temps,
-        moveAlongWall
+        moveAlongWall,
+        runAuton
     };
-    MenuScreen screen(&core, menu, 7);
+    MenuScreen screen(&core, menu, 8);
 
     core.pushScreen(&screen);
     //ScrollingScreenDemo demo(&core);
@@ -210,7 +209,7 @@ void opcontrol()
 
     while(true)
     {
-        if(tipSensor.get_value())
+        /*if(tipSensor.get_value())
         {
             leftTopMotor.move(-127);
             leftBottomMotor.move(-127);
@@ -231,7 +230,7 @@ void opcontrol()
             rightTopMotor.move(0);
             rightBottomMotor.move(0);
             antiTipTriggered = false;
-        }
+        }*/
 
         // Arcade-style driving controls
         int forwardPower = master.get_analog(ANALOG_LEFT_Y);
@@ -261,7 +260,7 @@ void opcontrol()
 
         if(master.get_digital_new_press(DIGITAL_Y))
         {
-            moveDistanceParallel(4_ft,2_ft);
+            //moveDistanceParallel(4_ft,2_ft);
         }
 
         if(master.get_digital(TRAY_OUT))
@@ -443,6 +442,22 @@ void opcontrol()
         //pros::lcd::print(2, "Right X: %d", turningPower);
         //pros::lcd::print(3, "L-Voltage: %d", forwardPower + turningPower);
         //pros::lcd::print(4, "R-Voltage: %d", forwardPower - turningPower);
+        if(autoRedSmall.get_value())
+        {
+            pros::lcd::print(4, "Auton red small");
+        }
+        else if(autoBlueSmall.get_value())
+        {
+            pros::lcd::print(4, "Auton blue small");
+        }
+        else if(autoRedBig.get_value())
+        {
+            pros::lcd::print(4, "Auton red big");
+        }
+        else if(autoBlueBig.get_value())
+        {
+            pros::lcd::print(4, "Auton blue big");
+        }
         pros::lcd::print(5, "Left Arm Pos: %f", leftArmMotor.get_position());
         pros::lcd::print(6, "Right Arm Pos: %f", rightArmMotor.get_position());
         pros::lcd::print(7, "Tray Pos (b): %f", trayMotorBack.get_position());
@@ -450,10 +465,12 @@ void opcontrol()
         //pros::lcd::print(1, "Front: %d", frontUltrasonic.get());
         //pros::lcd::print(2, "Back: %d", backUltrasonic.get());
 
-        displayController.setLine(1, "F: " + std::to_string(frontUltrasonicFilter.filter(frontUltrasonic.get_value())));
-        displayController.setLine(2, "B: " + std::to_string(backUltrasonicFilter.filter(backUltrasonic.get_value())));
-        displayController.setLine(0, "R: " + std::to_string(rearUltrasonicFilter.filter(rearUltrasonic.get_value())));
+        //displayController.setLine(1, "F: " + std::to_string(frontUltrasonicFilter.filter(frontUltrasonic.get_value())));
+        //displayController.setLine(2, "B: " + std::to_string(backUltrasonicFilter.filter(backUltrasonic.get_value())));
+        //displayController.setLine(0, "R: " + std::to_string(rearUltrasonicFilter.filter(rearUltrasonic.get_value())));
 
+        displayController.setLine(0, "L: " + std::to_string(leftIntake.get_temperature()));
+        displayController.setLine(0, "R: " + std::to_string(rightIntake.get_temperature()));
         //displayController.setLine(1, std::to_string(master.get_analog(ANALOG_LEFT_Y)));
         //displayController.setLine(2, std::to_string(master.get_analog(ANALOG_LEFT_X)));
 

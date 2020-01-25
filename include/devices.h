@@ -27,16 +27,16 @@ extern pros::ADIPort autoRedSmall;
 extern pros::ADIPort autoRedBig;
 extern pros::ADIPort autoBlueSmall;
 extern pros::ADIPort autoBlueBig;
-extern pros::ADIPort tipSensor;
+//extern pros::ADIPort tipSensor;
 //pros::ADIPort autoSafe(5);
 //pros::ADIPort autoTesting(6);
-extern pros::ADIUltrasonic frontUltrasonic;
+/*extern pros::ADIUltrasonic frontUltrasonic;
 extern pros::ADIUltrasonic backUltrasonic;
 extern pros::ADIUltrasonic rearUltrasonic;
 
 extern okapi::MedianFilter<5> frontUltrasonicFilter;
 extern okapi::MedianFilter<5> backUltrasonicFilter;
-extern okapi::MedianFilter<5> rearUltrasonicFilter;
+extern okapi::MedianFilter<5> rearUltrasonicFilter;*/
 
 
 extern pros::Controller master;
