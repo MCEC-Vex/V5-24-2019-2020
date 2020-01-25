@@ -138,11 +138,21 @@ void runAutoBig(bool red)
     chassis->turnAngle(-90_deg * sign);
     chassis->moveDistance(-1.25_ft);
 
-    double rightTurnDistance = convertToEncoderUnits(chassis, 1.5_ft);
+    double turnDistance = convertToEncoderUnits(chassis, 1.54_ft);
     //rightTopMotor.tare_position();
-    rightTopMotor.move_relative(rightTurnDistance, 50);
-    rightBottomMotor.move_relative(rightTurnDistance, 50);
-    waitUntilMotorWithin(rightTopMotor, rightTurnDistance * -1, 15, 5000);
+    if(red)
+    {
+        rightTopMotor.move_relative(turnDistance, 50);
+        rightBottomMotor.move_relative(turnDistance, 50);
+        waitUntilMotorWithin(rightTopMotor, turnDistance * -1, 15, 5000);
+    }
+    else
+    {
+        leftTopMotor.move_relative(turnDistance * -1, 50);
+        leftBottomMotor.move_relative(turnDistance * -1, 50);
+        waitUntilMotorWithin(leftTopMotor, turnDistance, 15, 5000);
+    }
+    
 
     //chassis->turnAngle(85_deg * sign);
 
@@ -163,17 +173,24 @@ void runAutoBig(bool red)
     chassis->moveDistance(-1.45_ft);
 
     // Turn to face, then move towards, scoring zone
-    chassis->turnAngle(116.5_deg * sign);
-    //chassis->moveDistance(0.35_ft);
-    moveMotors(chassis, 0.35_ft, 15, 3000);
+
+    if(red)
+    {
+        chassis->turnAngle(120.5_deg * sign);
+    }
+    else
+    {
+        chassis->turnAngle(131.5_deg * sign);
+    }
+    moveMotors(chassis, 0.37_ft, 15, 3000);
 
     // Slightly intake cubes
     leftIntake.move_velocity(AUTON_BIG_INTAKE_SPEED);
     rightIntake.move_velocity(AUTON_BIG_INTAKE_SPEED * -1);
     pros::delay(400);
     // Slightly outtake cubes
-    leftIntake.move_velocity(-50);
-    rightIntake.move_velocity(50);
+    leftIntake.move_velocity(-15);
+    rightIntake.move_velocity(15);
     pros::delay(400);
     leftIntake.move_velocity(0);
     rightIntake.move_velocity(0);
@@ -185,7 +202,7 @@ void runAutoBig(bool red)
 
     // "Bump" the robot forward a bit
     chassis->setMaxVelocity(15);
-    moveMotors(chassis, 3_in, 15, 3000);
+    moveMotors(chassis, 3.3_in, 15, 3000);
     //chassis->moveDistance(3_in);
 
     // Back the robot up
