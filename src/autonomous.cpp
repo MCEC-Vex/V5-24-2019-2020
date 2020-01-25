@@ -167,7 +167,7 @@ void runAutoBig(bool red)
     // Turn to face, then move towards, scoring zone
     chassis->turnAngle(116.5_deg * sign);
     //chassis->moveDistance(0.35_ft);
-    moveMotors(chassis, 0.35_ft, 10, 3000);
+    moveMotors(chassis, 0.35_ft, 15, 3000);
 
     // Slightly intake cubes
     leftIntake.move_velocity(AUTON_BIG_INTAKE_SPEED);
@@ -187,7 +187,7 @@ void runAutoBig(bool red)
 
     // "Bump" the robot forward a bit
     chassis->setMaxVelocity(15);
-    moveMotors(chassis, 3_in, 10, 3000);
+    moveMotors(chassis, 3_in, 15, 3000);
     //chassis->moveDistance(3_in);
 
     // Back the robot up
