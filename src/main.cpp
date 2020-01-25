@@ -8,7 +8,7 @@ void displayTimerTask(void* unused)
     while(true)
     {
         displayController.sendNext();
-        pros::delay(50);
+        pros::delay(51);
     }
 }
 
@@ -250,17 +250,34 @@ void opcontrol()
 
         if(master.get_digital_new_press(DIGITAL_X))
         {
-            //flipTray();
             displayTesting();
-            //shuffle(5_deg, 2_in, 20);
-            //centerBot(5, 0.2);
-
-            //moveTrayToHighest();
         }
 
         if(master.get_digital_new_press(DIGITAL_Y))
         {
-            //moveDistanceParallel(4_ft,2_ft);
+            if(master.get_digital(DIGITAL_A))
+            {
+                tipMotorLeft.move(127);
+                tipMotorRight.move(127);
+                antiTipTriggered = true;
+                displayController.setLine(2, "BEEF OUT");
+            }
+            else
+            {
+                if(antiTipTriggered)
+                {
+                    tipMotorLeft.move_absolute(0, 100);
+                    tipMotorRight.move_absolute(0, 100);
+                    displayController.setLine(2, "Anti-tip IN");
+                }
+                else
+                {
+                    tipMotorLeft.move_absolute(TIP_LOW_POS, 100);
+                    tipMotorRight.move_absolute(TIP_LOW_POS, 100);
+                    displayController.setLine(2, "Anti-tip OUT");
+                }
+                antiTipTriggered = !antiTipTriggered;
+            }
         }
 
         if(master.get_digital(TRAY_OUT))
@@ -442,6 +459,9 @@ void opcontrol()
         //pros::lcd::print(2, "Right X: %d", turningPower);
         //pros::lcd::print(3, "L-Voltage: %d", forwardPower + turningPower);
         //pros::lcd::print(4, "R-Voltage: %d", forwardPower - turningPower);
+        pros::lcd::print(2, "Left tip: %f", tipMotorLeft.get_position());
+        pros::lcd::print(3, "Right tip: %f", tipMotorRight.get_position());
+
         if(autoRedSmall.get_value())
         {
             pros::lcd::print(4, "Auton red small");
@@ -470,7 +490,7 @@ void opcontrol()
         //displayController.setLine(0, "R: " + std::to_string(rearUltrasonicFilter.filter(rearUltrasonic.get_value())));
 
         displayController.setLine(0, "L: " + std::to_string(leftIntake.get_temperature()));
-        displayController.setLine(0, "R: " + std::to_string(rightIntake.get_temperature()));
+        displayController.setLine(1, "R: " + std::to_string(rightIntake.get_temperature()));
         //displayController.setLine(1, std::to_string(master.get_analog(ANALOG_LEFT_Y)));
         //displayController.setLine(2, std::to_string(master.get_analog(ANALOG_LEFT_X)));
 

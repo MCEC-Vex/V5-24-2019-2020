@@ -17,6 +17,8 @@
 
 #define TRAY_SHIFT_SPEED 200
 
+#define TIP_LOW_POS 1400
+
 // Control definitions
 #define ARMS_UP DIGITAL_UP
 #define ARMS_DOWN DIGITAL_DOWN

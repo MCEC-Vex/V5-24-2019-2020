@@ -19,6 +19,10 @@ void setupMotors()
     // Set the intake motors to "coast" as no significant difference was found between "hold" and "coast"
     leftIntake.set_brake_mode(pros::E_MOTOR_BRAKE_COAST);
     rightIntake.set_brake_mode(pros::E_MOTOR_BRAKE_COAST);
+
+    tipMotorLeft.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
+    tipMotorRight.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
+    tipMotorRight.set_reversed(true);
 }
 
 void flipTray()

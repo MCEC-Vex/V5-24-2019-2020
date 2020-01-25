@@ -17,6 +17,9 @@ pros::Motor rightArmMotor(9);
 pros::Motor trayMotorBack(13);
 pros::Motor trayMotorFront(14);
 
+pros::Motor tipMotorLeft(17);
+pros::Motor tipMotorRight(18);
+
 pros::ADIPort autoRedSmall(1);
 pros::ADIPort autoRedBig(2);
 pros::ADIPort autoBlueSmall(3);

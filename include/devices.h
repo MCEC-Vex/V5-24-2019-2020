@@ -23,6 +23,9 @@ extern pros::Motor rightArmMotor;
 extern pros::Motor trayMotorBack;
 extern pros::Motor trayMotorFront;
 
+extern pros::Motor tipMotorLeft;
+extern pros::Motor tipMotorRight;
+
 extern pros::ADIPort autoRedSmall;
 extern pros::ADIPort autoRedBig;
 extern pros::ADIPort autoBlueSmall;
