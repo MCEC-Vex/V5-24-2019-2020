@@ -58,7 +58,7 @@ void moveDistanceParallel(okapi::QLength distance, okapi::QLength distanceFromWa
     x = rearUltrasonic.get_value();
     theta = atan2(getUltrasonicDifference(), 260.0);
     profileController->generatePath({
-      {x * 1_mm, y * 1_mm, theta*1_rad},  // Profile starting position, this will normally be (0, 0, 0)
+      {x * 1_mm, y * 1_mm, theta * 1_rad},  // Profile starting position, this will normally be (0, 0, 0)
       {distance, distanceFromWall, 0_deg}}, // The next point in the profile, 3 feet forward
       "A" // Profile name
     );
@@ -111,96 +111,76 @@ void runAutoSmall(bool red)
     // Move the tray back down
     trayMotorFront.move_absolute(0, 50);
     trayMotorBack.move_absolute(0, 50);
-
-    /*if(autoTesting.get_value())
-    {
-        // Go back to starting pos
-        chassis->turnAngle(-105_deg * sign);
-        chassis->moveDistance(-0.5_ft);
-    }*/
 }
 
 void runAutoBig(bool red)
 {
     //TODO fully document big auto process
-    // 250 for arms
     int sign = red ? 1 : -1;
 
     flipTray();
-    pros::delay(1000);
+    pros::delay(500);
 
     chassis->setMaxVelocity(35);
 
+    displayController.setLine(0, "1st intake");
+
     //move forward and intake "2nd row"
-    leftIntake.move_velocity(200);
-    rightIntake.move_velocity(-200);
-    chassis->moveDistance(2.4_ft);
+    leftIntake.move_velocity(AUTON_BIG_INTAKE_SPEED);
+    rightIntake.move_velocity(AUTON_BIG_INTAKE_SPEED * -1);
+
+    chassis->moveDistance(2.9_ft);
+
     leftIntake.move_velocity(0);
     rightIntake.move_velocity(0);
-    pros::delay(500);
-    //move back to the wall
-    chassis->moveDistance(-2.1_ft);
+
+    pros::delay(250);
+    leftIntake.move_velocity(0);
+    rightIntake.move_velocity(0);
+
+    displayController.setLine(0, "Going back");
+    chassis->moveDistance(-2.0_ft);
+    displayController.setLine(0, "Turning -90");
     chassis->turnAngle(-90_deg * sign);
-    chassis->moveDistance(-22_in);
-    chassis->turnAngle(90_deg*sign);
+    displayController.setLine(0, "Going back more");
+    chassis->moveDistance(-1.25_ft);
 
+    displayController.setLine(0, "Turing fancy");
+    double rightTurnDistance = convertToEncoderUnits(chassis, 1.5_ft);
+    //rightTopMotor.tare_position();
+    rightTopMotor.move_relative(rightTurnDistance, 50);
+    rightBottomMotor.move_relative(rightTurnDistance, 50);
+    waitUntilMotorWithin(rightTopMotor, rightTurnDistance * -1, 15, 5000);
 
-/*
-    pros::delay(500);
-
-    //arm movement to intake the stacked cubes at end of "2nd row"
-    leftIntake.move_velocity(0);
-    rightIntake.move_velocity(0);
-    chassis->moveDistance(-0.2_ft);
-    pros::delay(500);
-    leftArmMotor.move_absolute(350, 100);
-    rightArmMotor.move_absolute(-350, 100);
-    trayMotorBack.move_absolute(-500, 100);
-    trayMotorFront.move_absolute(-500, 100);
-    pros::delay(1000);
-
-    chassis->moveDistance(0.4_ft);
-    leftIntake.move_velocity(200);
-    rightIntake.move_velocity(-200);
-    chassis->moveDistance(0.5_ft);
-
-    leftArmMotor.move_absolute(0, 200);
-    rightArmMotor.move_absolute(0, 200);
-    trayMotorBack.move_absolute(0, 100);
-    trayMotorFront.move_absolute(0, 100);
-
-    pros::delay(1500);
-    leftIntake.move_velocity(0);
-    rightIntake.move_velocity(0);
-
-    chassis->moveDistance(-1.0_ft);
-    chassis->turnAngle(-60_deg * sign);
-    chassis->moveDistance(-2.1_ft);
-    chassis->turnAngle(60_deg * sign);
+    //chassis->turnAngle(85_deg * sign);
 
     //backup against the wall
-    chassis->moveDistance(-0.4_ft);
-*/
+    displayController.setLine(0, "Backup bump");
+    chassis->moveDistance(-0.1_ft);
 
     // Move forward and intake cube stack... copied from runAutoSmall
 
-    leftIntake.move_velocity(200);
-    rightIntake.move_velocity(-200);
+    leftIntake.move_velocity(AUTON_BIG_INTAKE_SPEED);
+    rightIntake.move_velocity(AUTON_BIG_INTAKE_SPEED * -1);
 
-    //put moveDistanceParallel(x_ft,y_ft);
+    displayController.setLine(0, "Second forward");
     chassis->moveDistance(2.5_ft);
-    leftIntake.move(20);
-    rightIntake.move(-20);
-    //put moveDistanceParallel(-x_ft,y_ft);
-    chassis->moveDistance(-1.6_ft);
+
+    pros::delay(200);
+    // Put slight voltage pressure on the cubes
+    //leftIntake.move(20);
+    //rightIntake.move(-20);
+    displayController.setLine(0, "Back 1.5");
+    chassis->moveDistance(-1.50_ft);
 
     // Turn to face, then move towards, scoring zone
-    chassis->turnAngle(112_deg * sign);
-    chassis->moveDistance(0.3_ft);
+    displayController.setLine(0, "Turn 115 deg");
+    chassis->turnAngle(115_deg * sign);
+    chassis->moveDistance(0.35_ft);
 
     // Slightly intake cubes
-    leftIntake.move_velocity(200);
-    rightIntake.move_velocity(-200);
+    leftIntake.move_velocity(AUTON_BIG_INTAKE_SPEED);
+    rightIntake.move_velocity(AUTON_BIG_INTAKE_SPEED * -1);
     pros::delay(400);
     // Slightly outtake cubes
     leftIntake.move_velocity(-50);

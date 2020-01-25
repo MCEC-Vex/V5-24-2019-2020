@@ -77,14 +77,11 @@ void moveTrayToHighest()
 {
     while(trayMotorFront.get_position() > TRAY_HIGHEST)
     {
-        int speed = -60;
+        int speed = -50;
         if(trayMotorFront.get_position() < -900)
         {
-            speed = -20 - ((40.0 / 1000.0) * (1000 - abs(trayMotorFront.get_position() + 900)));
+            speed = -10 - ((40.0 / 1000.0) * (1000 - abs(trayMotorFront.get_position() + 900)));
         }
-
-        displayController.setLine(1, std::to_string(speed));
-        pros::lcd::print(2, "Speed: %d", speed);
 
         trayMotorBack.move_velocity(speed);
         trayMotorFront.move_velocity(speed);
@@ -172,5 +169,23 @@ while (abs(rightTopMotor.get_position()) < distance)
         rightBottomMotor.move(rightSpeed);
       }
         pros::delay(10);
+    }
 }
+
+double convertToEncoderUnits(std::shared_ptr<okapi::ChassisController> chassis, okapi::QLength distance)
+{
+    return distance.convert(okapi::meter) *
+            chassis->getChassisScales().straight *
+            chassis->getGearsetRatioPair().ratio;
+}
+
+void waitUntilMotorWithin(pros::Motor motor, int value, int tolerance, int timeout)
+{
+    double startPos = motor.get_position();
+
+    unsigned long current = pros::millis();
+    while(abs(abs(motor.get_position() - startPos) - value) > tolerance && (pros::millis() - current) < timeout)
+    {
+        pros::delay(10);
+    }
 }

@@ -8,6 +8,8 @@
 #include <cmath>
 using namespace okapi::literals;
 
+#define AUTON_BIG_INTAKE_SPEED 100
+
 /**
  * Center the bot against the right wall
  */
@@ -28,5 +30,7 @@ void runAutoSmall(bool red);
 void runAutoBig(bool red);
 
 void moveDistanceParallel(okapi::QLength distance, okapi::QLength distanceFromWall);
+
+void backupTurn(double forwardSpeed, double yaw, int leftLength);
 
 #endif //MCEC_V5_AUTONOMOUS_H

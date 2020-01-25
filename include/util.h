@@ -59,4 +59,15 @@ void moveAlignedWithWallOkapi(std::shared_ptr<okapi::ChassisController> chassis,
  */
 void moveAlignedWithWall(int distance);
 
+double convertToEncoderUnits(std::shared_ptr<okapi::ChassisController> chassis, okapi::QLength distance);
+
+/**
+ * Blocks thread execution until the specificed motor is within tolerance
+ * 
+ * @param motor 
+ * @param value 
+ * @param tolerance 
+ */
+void waitUntilMotorWithin(pros::Motor motor, int value, int tolerance, int timeout);
+
 #endif //MCEC_V5_UTIL_H

@@ -52,12 +52,28 @@ void displayTesting()
 
     MenuAction moveAlongWall([](DisplayCore* core)
     {
-        core->popScreen();
-        moveAlignedWithWallOkapi(chassis, 5_ft);
+        core->getDisplayController()->setLine(0, "Testing Wall");
+        core->getDisplayController()->clearLine(2);
+        int tests = 10;
+        for(int i = 0; i < tests; i++)
+        {
+            core->getDisplayController()->setLine(1, std::to_string(i + 1) + " / " + std::to_string(tests));
 
-        chassis->setMaxVelocity(35);
-        chassis->moveDistance(-5_ft);
-    }, "Move w/ wall", &core);
+            moveDistanceParallel(4_ft, 2_ft);
+            pros::delay(500);
+            chassis->moveDistance(-4_ft);
+            pros::delay(500);
+        }
+        core->popScreen();
+    }, "Test wall 10x", &core);
+
+    MenuAction driveVector([](DisplayCore* core)
+    {
+        core->popScreen();
+        //centerBot(5, 0.2);
+        //chassis->getModel()->driveVector()
+
+    }, "Align bot", &core);
 
     MenuAction temps([](DisplayCore* core)
     {
