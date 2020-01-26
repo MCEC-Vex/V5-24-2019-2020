@@ -161,7 +161,8 @@ void competition_initialize()
  */
 void autonomous()
 {
-    if(autoRedSmall.get_value())
+    runAutoSmall(false);
+    /*if(autoRedSmall.get_value())
     {
         runAutoSmall(true);
     }
@@ -176,7 +177,7 @@ void autonomous()
     else if(autoBlueBig.get_value())
     {
         runAutoBig(false);
-    }
+    }*/
     /*else if(autoSafe.get_value())
     {
         chassis->setMaxVelocity(75);
@@ -250,7 +251,21 @@ void opcontrol()
 
         if(master.get_digital_new_press(DIGITAL_X))
         {
-            displayTesting();
+            if(disableMenu.get_value())
+            {
+                if(master.get_digital(DIGITAL_LEFT) || master.get_digital(DIGITAL_RIGHT))
+                {
+                    displayTesting();
+                }
+                else
+                {
+                    displayController.rumble(".");
+                }
+            }
+            else
+            {
+                displayTesting();
+            }   
         }
 
         if(master.get_digital_new_press(DIGITAL_Y))
@@ -465,18 +480,22 @@ void opcontrol()
         if(autoRedSmall.get_value())
         {
             pros::lcd::print(4, "Auton red small");
+            displayController.setLine(2, "Auton red small");
         }
         else if(autoBlueSmall.get_value())
         {
             pros::lcd::print(4, "Auton blue small");
+            displayController.setLine(2, "Auton blue small");
         }
         else if(autoRedBig.get_value())
         {
             pros::lcd::print(4, "Auton red big");
+            displayController.setLine(2, "Auton red big");
         }
         else if(autoBlueBig.get_value())
         {
             pros::lcd::print(4, "Auton blue big");
+            displayController.setLine(2, "Auton blue big");
         }
         pros::lcd::print(5, "Left Arm Pos: %f", leftArmMotor.get_position());
         pros::lcd::print(6, "Right Arm Pos: %f", rightArmMotor.get_position());

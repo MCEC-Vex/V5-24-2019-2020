@@ -75,10 +75,10 @@ void runAutoSmall(bool red)
     chassis->setMaxVelocity(25);
     leftIntake.move_velocity(100);
     rightIntake.move_velocity(-100);
-    chassis->moveDistance(2.5_ft);
+    chassis->moveDistance(2.3_ft);
     leftIntake.move_velocity(0);
     rightIntake.move_velocity(0);
-    chassis->moveDistance(-1.5_ft);
+    chassis->moveDistance(-1.3_ft);
 
     // Turn to face, then move towards scoring zone
     chassis->turnAngle(105_deg * sign);
@@ -134,9 +134,9 @@ void runAutoBig(bool red)
     leftIntake.move_velocity(0);
     rightIntake.move_velocity(0);
 
-    chassis->moveDistance(-2.0_ft);
-    chassis->turnAngle(-90_deg * sign);
-    chassis->moveDistance(-1.25_ft);
+    chassis->moveDistance(-2.2_ft);
+    chassis->turnAngle(-88_deg * sign);
+    chassis->moveDistance(-1.3_ft);
 
     double turnDistance = convertToEncoderUnits(chassis, 1.54_ft);
     //rightTopMotor.tare_position();
@@ -157,7 +157,7 @@ void runAutoBig(bool red)
     //chassis->turnAngle(85_deg * sign);
 
     //backup against the wall
-    chassis->moveDistance(-0.1_ft);
+    //chassis->moveDistance(-0.1_ft);
 
     // Move forward and intake cube stack... copied from runAutoSmall
 
@@ -165,6 +165,9 @@ void runAutoBig(bool red)
     rightIntake.move_velocity(AUTON_BIG_INTAKE_SPEED * -1);
 
     chassis->moveDistance(2.5_ft);
+
+    leftIntake.move_velocity(0);
+    rightIntake.move_velocity(0);
 
     pros::delay(200);
     // Put slight voltage pressure on the cubes
@@ -180,13 +183,13 @@ void runAutoBig(bool red)
     }
     else
     {
-        chassis->turnAngle(131.5_deg * sign);
+        chassis->turnAngle(127.5_deg * sign);
     }
-    moveMotors(chassis, 0.37_ft, 15, 3000);
+    moveMotors(chassis, 0.50_ft, 15, 3000);
 
     // Slightly intake cubes
-    leftIntake.move_velocity(AUTON_BIG_INTAKE_SPEED);
-    rightIntake.move_velocity(AUTON_BIG_INTAKE_SPEED * -1);
+    //leftIntake.move_velocity(AUTON_BIG_INTAKE_SPEED);
+    //rightIntake.move_velocity(AUTON_BIG_INTAKE_SPEED * -1);
     pros::delay(400);
     // Slightly outtake cubes
     leftIntake.move_velocity(-15);
