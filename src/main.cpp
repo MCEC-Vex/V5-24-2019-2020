@@ -208,6 +208,8 @@ void opcontrol()
     // Arm macro flag
     int armMacroPos = 0;
 
+    unsigned long lastSent = pros::millis();
+
     while(true)
     {
         /*if(tipSensor.get_value())
@@ -414,8 +416,9 @@ void opcontrol()
             // Move slowly if A is pressed
             if(!master.get_digital(DIGITAL_A))
             {
-                leftIntake.move(-127);
-                rightIntake.move(127);
+                //leftIntake.move(-127);
+                //rightIntake.move(127);
+                moveIntakeAtSharedSpeed(-200);
             }
             else
             {
@@ -429,8 +432,9 @@ void opcontrol()
             // Move slowly if A is pressed
             if(!master.get_digital(DIGITAL_A))
             {
-                leftIntake.move(127);
-                rightIntake.move(-127);
+                /*leftIntake.move(127);
+                rightIntake.move(-127);*/
+                moveIntakeAtSharedSpeed(200);
             }
             else
             {
@@ -508,8 +512,16 @@ void opcontrol()
         //displayController.setLine(2, "B: " + std::to_string(backUltrasonicFilter.filter(backUltrasonic.get_value())));
         //displayController.setLine(0, "R: " + std::to_string(rearUltrasonicFilter.filter(rearUltrasonic.get_value())));
 
-        displayController.setLine(0, "L: " + std::to_string(leftIntake.get_temperature()));
-        displayController.setLine(1, "R: " + std::to_string(rightIntake.get_temperature()));
+        //displayController.setLine(0, "L: " + std::to_string(leftIntake.get_temperature()));
+        //displayController.setLine(1, "R: " + std::to_string(rightIntake.get_temperature()));
+        if(pros::millis() - lastSent > 1500)
+        {
+            lastSent = pros::millis();
+
+            displayController.setLine(0, "L: " + std::to_string(leftIntake.get_actual_velocity()));
+            displayController.setLine(1, "R: " + std::to_string(rightIntake.get_actual_velocity()));
+        }
+        
         //displayController.setLine(1, std::to_string(master.get_analog(ANALOG_LEFT_Y)));
         //displayController.setLine(2, std::to_string(master.get_analog(ANALOG_LEFT_X)));
 

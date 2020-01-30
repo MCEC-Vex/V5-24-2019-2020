@@ -17,8 +17,8 @@ void setupMotors()
     rightArmMotor.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
 
     // Set the intake motors to "coast" as no significant difference was found between "hold" and "coast"
-    leftIntake.set_brake_mode(pros::E_MOTOR_BRAKE_COAST);
-    rightIntake.set_brake_mode(pros::E_MOTOR_BRAKE_COAST);
+    leftIntake.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
+    rightIntake.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
 
     tipMotorLeft.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
     tipMotorRight.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
@@ -205,4 +205,29 @@ void moveMotors(std::shared_ptr<okapi::ChassisController> chassis, okapi::QLengt
     rightBottomMotor.move_relative(dPos * -1, speed);
 
     waitUntilMotorWithin(leftTopMotor, dPos, 15, timeout);
+}
+
+void moveIntakeAtSharedSpeed(int velocity)
+{
+    /*if(velocity > 80 && leftIntake.get_actual_velocity() > 120 && rightIntake.get_actual_velocity() < -120)
+    {
+        int difference = leftIntake.get_actual_velocity() - (rightIntake.get_actual_velocity() * -1);
+
+        if(abs(difference) > 90)
+        {
+            leftIntake.move_velocity(-100);
+            rightIntake.move_velocity(100);
+            pros::delay(200);
+            leftIntake.move_velocity(velocity);
+            rightIntake.move_velocity(velocity * -1);
+            pros::delay(200);
+        }
+    }
+    else
+    {
+        leftIntake.move(velocity);
+        rightIntake.move(velocity * -1);
+    }*/
+    leftIntake.move_velocity(velocity);
+    rightIntake.move_velocity(velocity * -1);
 }

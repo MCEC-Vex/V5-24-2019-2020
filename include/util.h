@@ -72,4 +72,6 @@ void waitUntilMotorWithin(pros::Motor motor, int value, int tolerance, int timeo
 
 void moveMotors(std::shared_ptr<okapi::ChassisController> chassis, okapi::QLength distance, int speed, int timeout);
 
+void moveIntakeAtSharedSpeed(int velocity);
+
 #endif //MCEC_V5_UTIL_H
