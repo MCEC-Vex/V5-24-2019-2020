@@ -231,3 +231,11 @@ void moveIntakeAtSharedSpeed(int velocity)
     leftIntake.move_velocity(velocity);
     rightIntake.move_velocity(velocity * -1);
 }
+
+void setChassisBrakeMode(pros::motor_brake_mode_e_t brakeMode)
+{
+    leftTopMotor.set_brake_mode(brakeMode);
+    leftBottomMotor.set_brake_mode(brakeMode);
+    rightTopMotor.set_brake_mode(brakeMode);
+    rightBottomMotor.set_brake_mode(brakeMode);
+}

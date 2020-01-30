@@ -41,6 +41,7 @@
 #include "constants.h"
 #include "util.h"
 #include "autonomous.h"
+#include "menu.h"
 
 #include "displayLib/MenuAction.h"
 #include "displayLib/MenuScreen.h"

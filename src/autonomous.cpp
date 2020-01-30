@@ -215,3 +215,102 @@ void runAutoBig(bool red)
     trayMotorFront.move_absolute(0, 50);
     trayMotorBack.move_absolute(0, 50);
 }
+
+void runAutoBigFast(bool red)
+{
+    int sign = red ? 1 : -1;
+
+    flipTray();
+    pros::delay(200);
+
+    // 80 up from 35
+    chassis->setMaxVelocity(80);
+
+    //move forward and intake "2nd row"
+    leftIntake.move_velocity(AUTON_BIG_INTAKE_SPEED_FAST);
+    rightIntake.move_velocity(AUTON_BIG_INTAKE_SPEED_FAST * -1);
+
+    chassis->moveDistance(2.9_ft);
+
+    leftIntake.move_velocity(0);
+    rightIntake.move_velocity(0);
+
+    pros::delay(250);
+
+    chassis->moveDistance(-2.2_ft);
+    chassis->turnAngle(-88_deg * sign);
+    chassis->moveDistance(-1.3_ft);
+
+    double turnDistance = convertToEncoderUnits(chassis, 1.54_ft);
+    //rightTopMotor.tare_position();
+    if(red)
+    {
+        // 120 up from 50
+        rightTopMotor.move_relative(turnDistance, 120);
+        rightBottomMotor.move_relative(turnDistance, 120);
+        waitUntilMotorWithin(rightTopMotor, turnDistance * -1, 15, 5000);
+    }
+    else
+    {
+        leftTopMotor.move_relative(turnDistance * -1, 120);
+        leftBottomMotor.move_relative(turnDistance * -1, 120);
+        waitUntilMotorWithin(leftTopMotor, turnDistance, 15, 5000);
+    }
+
+    // Move forward and intake cube stack... copied from runAutoSmall
+
+    leftIntake.move_velocity(AUTON_BIG_INTAKE_SPEED_FAST);
+    rightIntake.move_velocity(AUTON_BIG_INTAKE_SPEED_FAST * -1);
+
+    chassis->moveDistance(2.5_ft);
+
+    leftIntake.move_velocity(0);
+    rightIntake.move_velocity(0);
+
+    pros::delay(200);
+    // Put slight voltage pressure on the cubes
+    //leftIntake.move(20);
+    //rightIntake.move(-20);
+    chassis->moveDistance(-1.45_ft);
+
+    // Turn to face, then move towards, scoring zone
+
+    if(red)
+    {
+        chassis->turnAngle(120.5_deg * sign);
+    }
+    else
+    {
+        chassis->turnAngle(127.5_deg * sign);
+    }
+    
+    moveMotors(chassis, 0.50_ft, 15, 3000);
+
+    // Slightly intake cubes
+    //leftIntake.move_velocity(AUTON_BIG_INTAKE_SPEED);
+    //rightIntake.move_velocity(AUTON_BIG_INTAKE_SPEED * -1);
+    pros::delay(400);
+    // Slightly outtake cubes
+    leftIntake.move_velocity(-15);
+    rightIntake.move_velocity(15);
+    pros::delay(400);
+    leftIntake.move_velocity(0);
+    rightIntake.move_velocity(0);
+
+    // Move the tray up
+    moveTrayToHighest();
+
+    pros::delay(500);
+
+    // "Bump" the robot forward a bit
+    chassis->setMaxVelocity(15);
+    moveMotors(chassis, 3.3_in, 15, 3000);
+    //chassis->moveDistance(3_in);
+
+    // Back the robot up
+    chassis->moveDistance(-1.6_ft);
+
+    // Move the tray back down
+    trayMotorFront.move_absolute(0, 50);
+    trayMotorBack.move_absolute(0, 50);
+}

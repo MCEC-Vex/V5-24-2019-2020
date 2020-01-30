@@ -9,6 +9,7 @@
 using namespace okapi::literals;
 
 #define AUTON_BIG_INTAKE_SPEED 100
+#define AUTON_BIG_INTAKE_SPEED_FAST 200
 
 /**
  * Center the bot against the right wall
@@ -28,6 +29,13 @@ void runAutoSmall(bool red);
  * @param red True if the bot is on the red alliance, false if on blue
  */
 void runAutoBig(bool red);
+
+/**
+ * Run auto for the sideways "L" of cubes near the right (quickly)
+ * 
+ * @param red True if the bot is on the red alliance, false if on blue
+ */
+void runAutoBigFast(bool red);
 
 void moveDistanceParallel(okapi::QLength distance, okapi::QLength distanceFromWall);
 

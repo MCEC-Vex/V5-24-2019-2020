@@ -74,4 +74,6 @@ void moveMotors(std::shared_ptr<okapi::ChassisController> chassis, okapi::QLengt
 
 void moveIntakeAtSharedSpeed(int velocity);
 
+void setChassisBrakeMode(pros::motor_brake_mode_e_t brakeMode);
+
 #endif //MCEC_V5_UTIL_H
