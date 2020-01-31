@@ -20,9 +20,9 @@ void setupMotors()
     leftIntake.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
     rightIntake.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
 
-    tipMotorLeft.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
-    tipMotorRight.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
-    tipMotorRight.set_reversed(true);
+    //tipMotorLeft.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
+    //tipMotorRight.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
+    //tipMotorRight.set_reversed(true);
 }
 
 void flipTray()
@@ -53,21 +53,21 @@ void checkTrayArmsPos()
         return;
     }
 
-    if(leftArmMotor.get_position() < 100)
+    if(leftArmMotor.get_position() < 150)
     {
-        setTrayPosition(-100, TRAY_SHIFT_SPEED);
-    }
-    else if(leftArmMotor.get_position() < 200)
-    {
-        setTrayPosition(-250, TRAY_SHIFT_SPEED);
+        setTrayPosition(-70, TRAY_SHIFT_SPEED);
     }
     else if(leftArmMotor.get_position() < 350)
     {
-        setTrayPosition(-600, TRAY_SHIFT_SPEED);
+        setTrayPosition(-200, TRAY_SHIFT_SPEED);
+    }
+    else if(leftArmMotor.get_position() < 650)
+    {
+        setTrayPosition(-350, TRAY_SHIFT_SPEED);
     }
     else if(leftArmMotor.get_position() < 1500)
     {
-        setTrayPosition(-1000, TRAY_SHIFT_SPEED);
+        setTrayPosition(-750, TRAY_SHIFT_SPEED);
     }
 }
 
@@ -189,7 +189,8 @@ void waitUntilMotorWithin(pros::Motor motor, int value, int tolerance, int timeo
     double startPos = motor.get_position();
 
     unsigned long current = pros::millis();
-    while(abs(abs(motor.get_position() - startPos) - value) > tolerance && (pros::millis() - current) < timeout)
+    while(abs(abs(motor.get_position() - startPos) - value) > tolerance &&
+            (pros::millis() - current) < timeout)
     {
         pros::delay(10);
     }
@@ -230,6 +231,8 @@ void moveIntakeAtSharedSpeed(int velocity)
     }*/
     leftIntake.move_velocity(velocity);
     rightIntake.move_velocity(velocity * -1);
+    //leftIntake.move(velocity);
+    //rightIntake.move(velocity * -1);
 }
 
 void setChassisBrakeMode(pros::motor_brake_mode_e_t brakeMode)

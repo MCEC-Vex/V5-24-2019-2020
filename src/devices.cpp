@@ -1,14 +1,13 @@
 #include "devices.h"
 
-//bad ports: 5,6,21,12,15
-
+//bad ports: 5,6,21,12,15,11
 pros::Motor leftTopMotor(1);
 pros::Motor leftBottomMotor(2);
 pros::Motor rightTopMotor(3);
 pros::Motor rightBottomMotor(4);
 pros::Motor centerWheel(15);
 
-pros::Motor leftIntake(11);
+pros::Motor leftIntake(17);
 pros::Motor rightIntake(16);
 
 pros::Motor leftArmMotor(8);
@@ -17,8 +16,8 @@ pros::Motor rightArmMotor(9);
 pros::Motor trayMotorBack(13);
 pros::Motor trayMotorFront(14);
 
-pros::Motor tipMotorLeft(17);
-pros::Motor tipMotorRight(18);
+//pros::Motor tipMotorLeft(17);
+//pros::Motor tipMotorRight(18);
 
 pros::ADIPort autoRedSmall(1);
 pros::ADIPort autoRedBig(2);

@@ -38,12 +38,17 @@ void openMainMenu(DisplayController* controller, pros::Controller master)
         openTempMenu(core);
     }, "Motor Temps", &core);
 
+    MenuAction positions([](DisplayCore* core)
+    {
+        openPosMenu(core);
+    }, "Positions", &core);
+
     MenuAction auton([](DisplayCore* core)
     {
         openAutoMenu(core);
     }, "Auton...", &core);
 
-    MenuAction menu[6] = {
+    MenuAction menu[7] = {
     //    autonBig,
     //    autonSmall,
         auton,
@@ -51,10 +56,11 @@ void openMainMenu(DisplayController* controller, pros::Controller master)
         flipTrayAction,
         alignBot,
         temps,
-        moveAlongWall
+        moveAlongWall,
+        positions
     //    runAuton
     };
-    MenuScreen screen(&core, menu, 6);
+    MenuScreen screen(&core, menu, 7);
 
     core.pushScreen(&screen);
     //ScrollingScreenDemo demo(&core);
@@ -86,18 +92,52 @@ void openAutoMenu(DisplayCore* core)
         runAutoSmall(true);
     }, "Small red", core);
 
+    MenuAction bigBlue([](DisplayCore* core)
+    {
+        core->popScreen();
+
+        unsigned long startTime = pros::millis();
+        runAutoBig(false);
+        unsigned long timeTaken = pros::millis() - startTime;
+
+        std::string tempDisplay[2];
+        tempDisplay[0] = "Time taken:";
+        tempDisplay[1] = std::to_string(timeTaken);
+        TextDisplayScreen timeTakenText(core, tempDisplay, 2);
+        core->pushScreen(&timeTakenText);
+        core->waitForPop();
+    }, "Big blue", core);
+
+    MenuAction smallBlue([](DisplayCore* core)
+    {
+        core->popScreen();
+        runAutoSmall(false);
+    }, "Small blue", core);
+
     MenuAction redFast([](DisplayCore* core)
     {
         core->popScreen();
-        runAutoBig(true);
+
+        unsigned long startTime = pros::millis();
+        runAutoBigFast(true);
+        unsigned long timeTaken = pros::millis() - startTime;
+
+        std::string tempDisplay[2];
+        tempDisplay[0] = "Time taken:";
+        tempDisplay[1] = std::to_string(timeTaken);
+        TextDisplayScreen timeTakenText(core, tempDisplay, 2);
+        core->pushScreen(&timeTakenText);
+        core->waitForPop();
     }, "Big red fast", core);
 
-    MenuAction menu[3] = {
+    MenuAction menu[5] = {
         bigRed,
         smallRed,
+        bigBlue,
+        smallBlue,
         redFast
     };
-    MenuScreen screen(core, menu, 3);
+    MenuScreen screen(core, menu, 5);
 
     core->pushScreen(&screen);
     core->waitForPop();
@@ -129,7 +169,18 @@ void openTempMenu(DisplayCore* core)
 
 void openPosMenu(DisplayCore* core)
 {
+    std::string posDisplay[6];
+    posDisplay[0] = "Arms:";
+    posDisplay[1] = "L: " + std::to_string(leftArmMotor.get_position());
+    posDisplay[2] = "R: " + std::to_string(rightArmMotor.get_position());
+    posDisplay[3] = "Tray:";
+    posDisplay[4] = "F: " + std::to_string(trayMotorFront.get_position());
+    posDisplay[5] = "B: " + std::to_string(trayMotorBack.get_position());
 
+    TextDisplayScreen positions(core, posDisplay, 6);
+    core->pushScreen(&positions);
+    core->waitForPop();
+    core->popScreen();
 }
 
 void openSensorMenu(DisplayCore* core)

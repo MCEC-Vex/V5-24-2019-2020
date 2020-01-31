@@ -181,8 +181,8 @@ void opcontrol()
         {
             if(master.get_digital(DIGITAL_A))
             {
-                tipMotorLeft.move(127);
-                tipMotorRight.move(127);
+                //tipMotorLeft.move(127);
+                //tipMotorRight.move(127);
                 antiTipTriggered = true;
                 displayController.setLine(2, "BEEF OUT");
             }
@@ -190,14 +190,14 @@ void opcontrol()
             {
                 if(antiTipTriggered)
                 {
-                    tipMotorLeft.move_absolute(0, 100);
-                    tipMotorRight.move_absolute(0, 100);
+                    //tipMotorLeft.move_absolute(0, 100);
+                    //tipMotorRight.move_absolute(0, 100);
                     displayController.setLine(2, "Anti-tip IN");
                 }
                 else
                 {
-                    tipMotorLeft.move_absolute(TIP_LOW_POS, 100);
-                    tipMotorRight.move_absolute(TIP_LOW_POS, 100);
+                    //tipMotorLeft.move_absolute(TIP_LOW_POS, 100);
+                    //tipMotorRight.move_absolute(TIP_LOW_POS, 100);
                     displayController.setLine(2, "Anti-tip OUT");
                 }
                 antiTipTriggered = !antiTipTriggered;
@@ -277,14 +277,14 @@ void opcontrol()
             {
                 // Move the arms up
                 // Slow speed is 80
-                if(leftArmMotor.get_position() < 100 && trayMotorFront.get_position() > -90)
+                if(leftArmMotor.get_position() < 100 && trayMotorFront.get_position() > -60)
                 {
                     setTrayPosition(-100, 200);
                 }
                 else
                 {
-                    leftArmMotor.move_velocity(150);
-                    rightArmMotor.move_velocity(-150);
+                    leftArmMotor.move_velocity(ARMS_SPEED);
+                    rightArmMotor.move_velocity(ARMS_SPEED * -1);
                 }
 
                 armsWereMoving = true;
@@ -303,8 +303,8 @@ void opcontrol()
             else
             {
                 // Move the arms down
-                leftArmMotor.move_velocity(-150);
-                rightArmMotor.move_velocity(150);
+                leftArmMotor.move_velocity(ARMS_SPEED * -1);
+                rightArmMotor.move_velocity(ARMS_SPEED);
 
                 armsWereMoving = true;
                 checkTrayArmsPos();
@@ -385,8 +385,8 @@ void opcontrol()
         //pros::lcd::print(2, "Right X: %d", turningPower);
         //pros::lcd::print(3, "L-Voltage: %d", forwardPower + turningPower);
         //pros::lcd::print(4, "R-Voltage: %d", forwardPower - turningPower);
-        pros::lcd::print(2, "Left tip: %f", tipMotorLeft.get_position());
-        pros::lcd::print(3, "Right tip: %f", tipMotorRight.get_position());
+        //pros::lcd::print(2, "Left tip: %f", tipMotorLeft.get_position());
+        //pros::lcd::print(3, "Right tip: %f", tipMotorRight.get_position());
 
         if(autoRedSmall.get_value())
         {

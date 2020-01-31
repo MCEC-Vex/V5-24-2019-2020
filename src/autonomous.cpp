@@ -144,13 +144,13 @@ void runAutoBig(bool red)
     {
         rightTopMotor.move_relative(turnDistance, 50);
         rightBottomMotor.move_relative(turnDistance, 50);
-        waitUntilMotorWithin(rightTopMotor, turnDistance * -1, 15, 5000);
+        waitUntilMotorWithin(rightTopMotor, turnDistance, 10, 3000);
     }
     else
     {
         leftTopMotor.move_relative(turnDistance * -1, 50);
         leftBottomMotor.move_relative(turnDistance * -1, 50);
-        waitUntilMotorWithin(leftTopMotor, turnDistance, 15, 5000);
+        waitUntilMotorWithin(leftTopMotor, turnDistance * -1, 10, 3000);
     }
     
 
@@ -177,14 +177,15 @@ void runAutoBig(bool red)
 
     // Turn to face, then move towards, scoring zone
 
-    if(red)
+    chassis->turnAngle(120.5_deg * sign);
+    /*if(red)
     {
         chassis->turnAngle(120.5_deg * sign);
     }
     else
     {
         chassis->turnAngle(127.5_deg * sign);
-    }
+    }*/
     moveMotors(chassis, 0.50_ft, 15, 3000);
 
     // Slightly intake cubes
@@ -220,7 +221,7 @@ void runAutoBigFast(bool red)
 {
     int sign = red ? 1 : -1;
 
-    flipTray();
+    //flipTray();
     pros::delay(200);
 
     // 80 up from 35
@@ -248,14 +249,15 @@ void runAutoBigFast(bool red)
         // 120 up from 50
         rightTopMotor.move_relative(turnDistance, 120);
         rightBottomMotor.move_relative(turnDistance, 120);
-        waitUntilMotorWithin(rightTopMotor, turnDistance * -1, 15, 5000);
+        waitUntilMotorWithin(rightTopMotor, turnDistance, 10, 3000);
     }
     else
     {
         leftTopMotor.move_relative(turnDistance * -1, 120);
         leftBottomMotor.move_relative(turnDistance * -1, 120);
-        waitUntilMotorWithin(leftTopMotor, turnDistance, 15, 5000);
+        waitUntilMotorWithin(leftTopMotor, turnDistance * -1, 10, 3000);
     }
+    pros::delay(500);
 
     // Move forward and intake cube stack... copied from runAutoSmall
 
@@ -284,6 +286,7 @@ void runAutoBigFast(bool red)
         chassis->turnAngle(127.5_deg * sign);
     }
     
+    /*
     moveMotors(chassis, 0.50_ft, 15, 3000);
 
     // Slightly intake cubes
@@ -312,5 +315,5 @@ void runAutoBigFast(bool red)
 
     // Move the tray back down
     trayMotorFront.move_absolute(0, 50);
-    trayMotorBack.move_absolute(0, 50);
+    trayMotorBack.move_absolute(0, 50);*/
 }
