@@ -76,4 +76,6 @@ void moveIntakeAtSharedSpeed(int velocity);
 
 void setChassisBrakeMode(pros::motor_brake_mode_e_t brakeMode);
 
+void tareChassis();
+
 #endif //MCEC_V5_UTIL_H

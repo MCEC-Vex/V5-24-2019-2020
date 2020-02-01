@@ -85,6 +85,9 @@ void setTrayPosition(int trayPos, int speed)
 
 void moveTrayToHighest()
 {
+    leftIntake.move(-30);
+    rightIntake.move(30);
+
     while(trayMotorFront.get_position() > TRAY_HIGHEST)
     {
         int speed = -50;
@@ -99,6 +102,9 @@ void moveTrayToHighest()
     }
     trayMotorBack.move_velocity(0);
     trayMotorFront.move_velocity(0);
+
+    leftIntake.move(0);
+    rightIntake.move(0);
 }
 
 int getUltrasonicDifference()
@@ -247,4 +253,12 @@ void setChassisBrakeMode(pros::motor_brake_mode_e_t brakeMode)
     leftBottomMotor.set_brake_mode(brakeMode);
     rightTopMotor.set_brake_mode(brakeMode);
     rightBottomMotor.set_brake_mode(brakeMode);
+}
+
+void tareChassis()
+{
+    leftTopMotor.tare_position();
+    leftBottomMotor.tare_position();
+    rightTopMotor.tare_position();
+    rightBottomMotor.tare_position();
 }

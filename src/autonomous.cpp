@@ -221,7 +221,7 @@ void runAutoBigFast(bool red)
 {
     int sign = red ? 1 : -1;
 
-    //flipTray();
+    flipTray();
     pros::delay(200);
 
     // 80 up from 35
@@ -231,7 +231,13 @@ void runAutoBigFast(bool red)
     leftIntake.move_velocity(AUTON_BIG_INTAKE_SPEED_FAST);
     rightIntake.move_velocity(AUTON_BIG_INTAKE_SPEED_FAST * -1);
 
-    chassis->moveDistance(2.9_ft);
+    chassis->moveDistance(1.7_ft);
+    chassis->setMaxVelocity(20);
+    leftIntake.move_velocity(AUTON_BIG_INTAKE_SPEED_FAST / 2);
+    rightIntake.move_velocity(AUTON_BIG_INTAKE_SPEED_FAST / 2 * -1);
+
+    chassis->moveDistance(1.2_ft);
+    chassis->setMaxVelocity(80);
 
     leftIntake.move_velocity(0);
     rightIntake.move_velocity(0);
@@ -242,7 +248,8 @@ void runAutoBigFast(bool red)
     chassis->turnAngle(-88_deg * sign);
     chassis->moveDistance(-1.3_ft);
 
-    double turnDistance = convertToEncoderUnits(chassis, 1.54_ft);
+    double turnDistance = convertToEncoderUnits(chassis, 1.60_ft);
+    //rightTopMotor.tare_position();
     if(red)
     {
         // 120 up from 50
@@ -263,7 +270,8 @@ void runAutoBigFast(bool red)
     leftIntake.move_velocity(AUTON_BIG_INTAKE_SPEED_FAST);
     rightIntake.move_velocity(AUTON_BIG_INTAKE_SPEED_FAST * -1);
 
-    chassis->moveDistance(2.5_ft);
+    chassis->setMaxVelocity(70);
+    chassis->moveDistance(2.8_ft);
 
     leftIntake.move_velocity(0);
     rightIntake.move_velocity(0);
@@ -272,14 +280,11 @@ void runAutoBigFast(bool red)
     // Put slight voltage pressure on the cubes
     //leftIntake.move(20);
     //rightIntake.move(-20);
-    chassis->moveDistance(-1.45_ft);
+    chassis->moveDistance(-1.73_ft);
 
     // Turn to face, then move towards, scoring zone
-
-    chassis->turnAngle(115_deg * sign);
-
-    // Was previously having problems with mechanical asymetry
-    /*
+    chassis->turnAngle(110_deg * sign);
+    /*chassis->setMaxVelocity(40);
     if(red)
     {
         
@@ -288,18 +293,18 @@ void runAutoBigFast(bool red)
     {
         chassis->turnAngle(127.5_deg * sign);
     }*/
+    pros::delay(200);
     
-    /*
-    moveMotors(chassis, 0.50_ft, 15, 3000);
+    moveMotors(chassis, 0.42_ft, 15, 3000);
 
     // Slightly intake cubes
     //leftIntake.move_velocity(AUTON_BIG_INTAKE_SPEED);
     //rightIntake.move_velocity(AUTON_BIG_INTAKE_SPEED * -1);
     pros::delay(400);
     // Slightly outtake cubes
-    leftIntake.move_velocity(-15);
-    rightIntake.move_velocity(15);
-    pros::delay(400);
+    leftIntake.move_velocity(-40);
+    rightIntake.move_velocity(40);
+    pros::delay(200);
     leftIntake.move_velocity(0);
     rightIntake.move_velocity(0);
 
@@ -310,13 +315,17 @@ void runAutoBigFast(bool red)
 
     // "Bump" the robot forward a bit
     chassis->setMaxVelocity(15);
-    moveMotors(chassis, 3.3_in, 15, 3000);
+    moveMotors(chassis, 3.0_in, 15, 3000);
     //chassis->moveDistance(3_in);
+    pros::delay(500);
 
-    // Back the robot up
-    chassis->moveDistance(-1.6_ft);
+    moveMotors(chassis, -6_in, 30, 3000);
 
     // Move the tray back down
-    trayMotorFront.move_absolute(0, 50);
-    trayMotorBack.move_absolute(0, 50);*/
+    trayMotorFront.move_absolute(0, 150);
+    trayMotorBack.move_absolute(0, 150);
+
+    // Back the robot up
+    chassis->setMaxVelocity(60);
+    chassis->moveDistance(-1.6_ft);
 }

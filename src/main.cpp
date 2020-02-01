@@ -68,8 +68,8 @@ void competition_initialize()
  */
 void autonomous()
 {
-    runAutoSmall(false);
-    /*if(autoRedSmall.get_value())
+    //runAutoSmall(false);
+    if(autoRedSmall.get_value())
     {
         runAutoSmall(true);
     }
@@ -79,12 +79,12 @@ void autonomous()
     }
     else if(autoRedBig.get_value())
     {
-        runAutoBig(true);
+        runAutoBigFast(true);
     }
     else if(autoBlueBig.get_value())
     {
-        runAutoBig(false);
-    }*/
+        runAutoBigFast(false);
+    }
     /*else if(autoSafe.get_value())
     {
         chassis->setMaxVelocity(75);
@@ -417,6 +417,12 @@ void opcontrol()
             pros::lcd::print(4, "Auton blue big");
             displayController.setLine(2, "Auton blue big");
         }
+        else
+        {
+            pros::lcd::print(4, "NO AUTON");
+            displayController.setLine(2, "NO AUTON");
+        }
+
         pros::lcd::print(5, "Left Arm Pos: %f", leftArmMotor.get_position());
         pros::lcd::print(6, "Right Arm Pos: %f", rightArmMotor.get_position());
         pros::lcd::print(7, "Tray Pos (b): %f", trayMotorBack.get_position());
