@@ -20,6 +20,12 @@ void setTrayPosition(int trayPos, int speed);
 void checkTrayArmsPos();
 
 /**
+ * Used when moving the arms
+ * Checks the arm position against a list of bounds to set the tray position accordingly
+ */
+void checkTrayArmsPosOld();
+
+/**
  * Flip the tray out by moving the arms and tray violently
  */
 void flipTray();

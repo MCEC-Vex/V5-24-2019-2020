@@ -107,8 +107,8 @@ void runAutoSmall(bool red)
     chassis->moveDistance(-1.6_ft);
 
     // Move the tray back down
-    trayMotorFront.move_absolute(0, 50);
-    trayMotorBack.move_absolute(0, 50);
+    trayMotorFront.move_absolute(TRAY_LOWEST, 50);
+    trayMotorBack.move_absolute(TRAY_LOWEST, 50);
 }
 
 void runAutoBig(bool red)
@@ -213,8 +213,8 @@ void runAutoBig(bool red)
     chassis->moveDistance(-1.6_ft);
 
     // Move the tray back down
-    trayMotorFront.move_absolute(0, 50);
-    trayMotorBack.move_absolute(0, 50);
+    trayMotorFront.move_absolute(TRAY_LOWEST, 50);
+    trayMotorBack.move_absolute(TRAY_LOWEST, 50);
 }
 
 void runAutoBigFast(bool red)
@@ -319,13 +319,13 @@ void runAutoBigFast(bool red)
     //chassis->moveDistance(3_in);
     pros::delay(500);
 
-    moveMotors(chassis, -6_in, 30, 3000);
+    moveMotors(chassis, -6_in, 30, 6000);
 
-    // Move the tray back down
-    trayMotorFront.move_absolute(0, 150);
-    trayMotorBack.move_absolute(0, 150);
+    /*// Move the tray back down
+    trayMotorFront.move_absolute(TRAY_LOWEST, 150);
+    trayMotorBack.move_absolute(TRAY_LOWEST, 150);
 
     // Back the robot up
     chassis->setMaxVelocity(60);
-    chassis->moveDistance(-1.6_ft);
+    chassis->moveDistance(-1.6_ft);*/
 }

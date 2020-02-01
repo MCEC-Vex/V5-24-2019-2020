@@ -27,12 +27,16 @@ void setupMotors()
 
 void flipTray()
 {
-    leftIntake.move(127);
+    /*leftIntake.move(127);
     rightIntake.move(-127);
 
     // Move the arms up and use the pre-made tray movement function to adjust the tray in response
     leftArmMotor.move_absolute(500, 200);
     rightArmMotor.move_absolute(-500, 200);
+
+    trayMotorFront.move_absolute(-500, 200);
+    trayMotorFront.move_absolute(-500, 200);
+
     for(int i = 0; i < 100; i++)
     {
         checkTrayArmsPos();
@@ -48,8 +52,58 @@ void flipTray()
         pros::delay(10);
     }
 
+    pros::delay(1000);
+
+    leftArmMotor.move_absolute(0, 200);
+    rightArmMotor.move_absolute(0, 200);
+    trayMotorFront.move_absolute(-500, 200);
+    trayMotorFront.move_absolute(-500, 200);
+
     leftIntake.move(0);
-    rightIntake.move(0);
+    rightIntake.move(0);*/
+
+    // Move the arms up and use the pre-made tray movement function to adjust the tray in response
+    leftArmMotor.move_absolute(500, 200);
+    rightArmMotor.move_absolute(-500, 200);
+    for(int i = 0; i < 100; i++)
+    {
+        checkTrayArmsPosOld();
+        pros::delay(10);
+    }
+
+    // Move the arms back down in the same way
+    leftArmMotor.move_absolute(0, 200);
+    rightArmMotor.move_absolute(0, 200);
+    for(int i = 0; i < 100; i++)
+    {
+        checkTrayArmsPosOld();
+        pros::delay(10);
+    }
+}
+
+void checkTrayArmsPosOld()
+{
+    if(leftArmMotor.get_position() < 20)
+    {
+        return;
+    }
+
+    if(leftArmMotor.get_position() < 100)
+    {
+        setTrayPosition(TRAY_LOWEST - 100, TRAY_SHIFT_SPEED);
+    }
+    else if(leftArmMotor.get_position() < 200)
+    {
+        setTrayPosition(TRAY_LOWEST - 250, TRAY_SHIFT_SPEED);
+    }
+    else if(leftArmMotor.get_position() < 350)
+    {
+        setTrayPosition(TRAY_LOWEST - 600, TRAY_SHIFT_SPEED);
+    }
+    else if(leftArmMotor.get_position() < 1500)
+    {
+        setTrayPosition(TRAY_LOWEST - 1000, TRAY_SHIFT_SPEED);
+    }
 }
 
 void checkTrayArmsPos()
@@ -61,19 +115,19 @@ void checkTrayArmsPos()
 
     if(leftArmMotor.get_position() < 150)
     {
-        setTrayPosition(-70, TRAY_SHIFT_SPEED);
+        setTrayPosition(TRAY_LOWEST - 70, TRAY_SHIFT_SPEED);
     }
     else if(leftArmMotor.get_position() < 350)
     {
-        setTrayPosition(-200, TRAY_SHIFT_SPEED);
+        setTrayPosition(TRAY_LOWEST - 200, TRAY_SHIFT_SPEED);
     }
     else if(leftArmMotor.get_position() < 650)
     {
-        setTrayPosition(-350, TRAY_SHIFT_SPEED);
+        setTrayPosition(TRAY_LOWEST - 350, TRAY_SHIFT_SPEED);
     }
     else if(leftArmMotor.get_position() < 1500)
     {
-        setTrayPosition(-750, TRAY_SHIFT_SPEED);
+        setTrayPosition(TRAY_LOWEST - 750, TRAY_SHIFT_SPEED);
     }
 }
 
