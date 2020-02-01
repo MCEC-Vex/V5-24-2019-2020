@@ -27,6 +27,9 @@ void setupMotors()
 
 void flipTray()
 {
+    leftIntake.move(127);
+    rightIntake.move(-127);
+
     // Move the arms up and use the pre-made tray movement function to adjust the tray in response
     leftArmMotor.move_absolute(500, 200);
     rightArmMotor.move_absolute(-500, 200);
@@ -44,6 +47,9 @@ void flipTray()
         checkTrayArmsPos();
         pros::delay(10);
     }
+
+    leftIntake.move(0);
+    rightIntake.move(0);
 }
 
 void checkTrayArmsPos()

@@ -243,7 +243,6 @@ void runAutoBigFast(bool red)
     chassis->moveDistance(-1.3_ft);
 
     double turnDistance = convertToEncoderUnits(chassis, 1.54_ft);
-    //rightTopMotor.tare_position();
     if(red)
     {
         // 120 up from 50
@@ -277,14 +276,18 @@ void runAutoBigFast(bool red)
 
     // Turn to face, then move towards, scoring zone
 
+    chassis->turnAngle(115_deg * sign);
+
+    // Was previously having problems with mechanical asymetry
+    /*
     if(red)
     {
-        chassis->turnAngle(120.5_deg * sign);
+        
     }
     else
     {
         chassis->turnAngle(127.5_deg * sign);
-    }
+    }*/
     
     /*
     moveMotors(chassis, 0.50_ft, 15, 3000);

@@ -179,7 +179,7 @@ void opcontrol()
 
         if(master.get_digital_new_press(DIGITAL_Y))
         {
-            if(master.get_digital(DIGITAL_A))
+            /*if(master.get_digital(DIGITAL_A))
             {
                 //tipMotorLeft.move(127);
                 //tipMotorRight.move(127);
@@ -201,7 +201,9 @@ void opcontrol()
                     displayController.setLine(2, "Anti-tip OUT");
                 }
                 antiTipTriggered = !antiTipTriggered;
-            }
+            }*/
+            trayMotorBack.move_absolute(0, 50);
+            trayMotorFront.move_absolute(0, 50);
         }
 
         if(master.get_digital(TRAY_OUT))
@@ -250,10 +252,8 @@ void opcontrol()
             {
                 // Move the tray quickly if A is pressed, slowly if Y is pressed, and regular speed if neither is pressed
                 //TODO clean up this logic
-                trayMotorBack.move_velocity(master.get_digital(DIGITAL_A) ? 200 :
-                                            master.get_digital(DIGITAL_Y) ? 50 : 80);
-                trayMotorFront.move_velocity(master.get_digital(DIGITAL_A) ? 200 :
-                                             master.get_digital(DIGITAL_Y) ? 50 : 80);
+                trayMotorBack.move_velocity(master.get_digital(DIGITAL_A) ? 200 : 50);
+                trayMotorFront.move_velocity(master.get_digital(DIGITAL_A) ? 200 : 50);
                 trayWasMoving = true;
             }
         }
@@ -341,7 +341,16 @@ void opcontrol()
             {
                 /*leftIntake.move(127);
                 rightIntake.move(-127);*/
-                moveIntakeAtSharedSpeed(200);
+
+                // Deny intake if arms are up
+                if(leftArmMotor.get_position() > 750)
+                {
+                    moveIntakeAtSharedSpeed(-200);
+                }
+                else
+                {
+                    moveIntakeAtSharedSpeed(200);
+                }
             }
             else
             {
@@ -425,8 +434,8 @@ void opcontrol()
         {
             lastSent = pros::millis();
 
-            displayController.setLine(0, "L: " + std::to_string(leftIntake.get_actual_velocity()));
-            displayController.setLine(1, "R: " + std::to_string(rightIntake.get_actual_velocity()));
+            displayController.setLine(0, "L: " + std::to_string(leftIntake.get_current_draw()));
+            displayController.setLine(1, "R: " + std::to_string(rightIntake.get_current_draw()));
         }
         
         //displayController.setLine(1, std::to_string(master.get_analog(ANALOG_LEFT_Y)));

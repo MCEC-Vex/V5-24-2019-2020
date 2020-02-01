@@ -713,11 +713,11 @@
             "-funwind-tables",
             "--std=gnu++17",
             "-o",
-            "bin/menu.cpp.o",
-            "src\\menu.cpp"
+            "bin/util.cpp.o",
+            "src\\util.cpp"
         ],
         "directory": "c:\\Users\\Techdoodle\\Documents\\c\\PROS\\mcec-v5",
-        "file": "src\\menu.cpp"
+        "file": "src\\util.cpp"
     },
     {
         "arguments": [
@@ -749,11 +749,11 @@
             "-funwind-tables",
             "--std=gnu++17",
             "-o",
-            "bin/autonomous.cpp.o",
-            "src\\autonomous.cpp"
+            "bin/menu.cpp.o",
+            "src\\menu.cpp"
         ],
         "directory": "c:\\Users\\Techdoodle\\Documents\\c\\PROS\\mcec-v5",
-        "file": "src\\autonomous.cpp"
+        "file": "src\\menu.cpp"
     },
     {
         "arguments": [
@@ -821,10 +821,10 @@
             "-funwind-tables",
             "--std=gnu++17",
             "-o",
-            "bin/util.cpp.o",
-            "src\\util.cpp"
+            "bin/autonomous.cpp.o",
+            "src\\autonomous.cpp"
         ],
         "directory": "c:\\Users\\Techdoodle\\Documents\\c\\PROS\\mcec-v5",
-        "file": "src\\util.cpp"
+        "file": "src\\autonomous.cpp"
     }
 ]
