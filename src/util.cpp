@@ -8,10 +8,13 @@ void setupMotors()
     rightTopMotor.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
     rightBottomMotor.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
 
-    centerWheel.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
+    //centerWheel.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
 
     trayMotorBack.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
     trayMotorFront.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
+
+    trayMotorBack.set_reversed(true);
+    trayMotorFront.set_reversed(true);
 
     leftArmMotor.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
     rightArmMotor.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
@@ -27,41 +30,6 @@ void setupMotors()
 
 void flipTray()
 {
-    /*leftIntake.move(127);
-    rightIntake.move(-127);
-
-    // Move the arms up and use the pre-made tray movement function to adjust the tray in response
-    leftArmMotor.move_absolute(500, 200);
-    rightArmMotor.move_absolute(-500, 200);
-
-    trayMotorFront.move_absolute(-500, 200);
-    trayMotorFront.move_absolute(-500, 200);
-
-    for(int i = 0; i < 100; i++)
-    {
-        checkTrayArmsPos();
-        pros::delay(10);
-    }
-
-    // Move the arms back down in the same way
-    leftArmMotor.move_absolute(0, 200);
-    rightArmMotor.move_absolute(0, 200);
-    for(int i = 0; i < 100; i++)
-    {
-        checkTrayArmsPos();
-        pros::delay(10);
-    }
-
-    pros::delay(1000);
-
-    leftArmMotor.move_absolute(0, 200);
-    rightArmMotor.move_absolute(0, 200);
-    trayMotorFront.move_absolute(-500, 200);
-    trayMotorFront.move_absolute(-500, 200);
-
-    leftIntake.move(0);
-    rightIntake.move(0);*/
-
     // Move the arms up and use the pre-made tray movement function to adjust the tray in response
     leftArmMotor.move_absolute(500, 200);
     rightArmMotor.move_absolute(-500, 200);
@@ -127,7 +95,7 @@ void checkTrayArmsPos()
     }
     else if(leftArmMotor.get_position() < 1500)
     {
-        setTrayPosition(TRAY_LOWEST - 750, TRAY_SHIFT_SPEED);
+        setTrayPosition(TRAY_LOWEST - 1250, TRAY_SHIFT_SPEED);
     }
 }
 

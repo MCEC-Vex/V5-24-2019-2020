@@ -8,11 +8,11 @@ using namespace okapi::literals;
 
 // Motors are numbered from left to right
 extern pros::Motor leftTopMotor;
-
 extern pros::Motor leftBottomMotor;
 extern pros::Motor rightTopMotor;
 extern pros::Motor rightBottomMotor;
-extern pros::Motor centerWheel;
+
+//extern pros::Motor centerWheel;
 
 extern pros::Motor leftIntake;
 extern pros::Motor rightIntake;
@@ -23,8 +23,8 @@ extern pros::Motor rightArmMotor;
 extern pros::Motor trayMotorBack;
 extern pros::Motor trayMotorFront;
 
-extern pros::Motor tipMotorLeft;
-extern pros::Motor tipMotorRight;
+//extern pros::Motor tipMotorLeft;
+//extern pros::Motor tipMotorRight;
 
 extern pros::ADIPort autoRedSmall;
 extern pros::ADIPort autoRedBig;
@@ -42,11 +42,13 @@ extern okapi::MedianFilter<5> frontUltrasonicFilter;
 extern okapi::MedianFilter<5> backUltrasonicFilter;
 extern okapi::MedianFilter<5> rearUltrasonicFilter;*/
 
-
 extern pros::Controller master;
 
 extern DisplayController displayController;
 
 extern std::shared_ptr<okapi::ChassisController> chassis;
 extern std::shared_ptr<okapi::AsyncMotionProfileController> profileController;
+
+extern bool tankMode;
+
 #endif //MCEC_V5_DEVICES_H

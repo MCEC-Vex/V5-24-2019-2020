@@ -48,7 +48,13 @@ void openMainMenu(DisplayController* controller, pros::Controller master)
         openAutoMenu(core);
     }, "Auton...", &core);
 
-    MenuAction menu[7] = {
+    MenuAction tank([](DisplayCore* core)
+    {
+        tankMode = !tankMode;
+        core->popScreen();
+    }, tankMode ? "Turn tank off" : "Turn tank on", &core);
+
+    MenuAction menu[8] = {
     //    autonBig,
     //    autonSmall,
         auton,
@@ -57,10 +63,11 @@ void openMainMenu(DisplayController* controller, pros::Controller master)
         alignBot,
         temps,
         moveAlongWall,
-        positions
+        positions,
+        tank
     //    runAuton
     };
-    MenuScreen screen(&core, menu, 7);
+    MenuScreen screen(&core, menu, 8);
 
     core.pushScreen(&screen);
     //ScrollingScreenDemo demo(&core);

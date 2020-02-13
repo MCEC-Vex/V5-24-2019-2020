@@ -259,6 +259,7 @@ void runAutoBigFast(bool red)
     }
     else
     {
+        double turnDistance = convertToEncoderUnits(chassis, 1.55_ft);
         leftTopMotor.move_relative(turnDistance * -1, 120);
         leftBottomMotor.move_relative(turnDistance * -1, 120);
         waitUntilMotorWithin(leftTopMotor, turnDistance * -1, 10, 3000);
@@ -315,11 +316,13 @@ void runAutoBigFast(bool red)
 
     // "Bump" the robot forward a bit
     chassis->setMaxVelocity(15);
-    moveMotors(chassis, 3.0_in, 15, 3000);
+    moveMotors(chassis, 4.0_in, 15, 3000);
     //chassis->moveDistance(3_in);
     pros::delay(500);
 
-    moveMotors(chassis, -6_in, 30, 6000);
+    //moveMotors(chassis, -6_in, 30, 6000);
+
+    moveMotors(chassis, -8_in, 30, 6000);
 
     /*// Move the tray back down
     trayMotorFront.move_absolute(TRAY_LOWEST, 150);

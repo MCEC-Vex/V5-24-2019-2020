@@ -142,21 +142,41 @@ void opcontrol()
             antiTipTriggered = false;
         }*/
 
-        // Arcade-style driving controls
-        int forwardPower = master.get_analog(ANALOG_LEFT_Y);
-        int turningPower = master.get_analog(ANALOG_RIGHT_X);
-
-        // Make drive significantly slower when tray buttons are held
-        if(master.get_digital(TRAY_OUT) || master.get_digital(TRAY_IN))
+        if(!tankMode)
         {
-            forwardPower /= 4;
-            turningPower /= 4;
-        }
+            // Arcade-style driving controls
+            int forwardPower = master.get_analog(ANALOG_LEFT_Y);
+            int turningPower = master.get_analog(ANALOG_RIGHT_X);
 
-        leftTopMotor.move(forwardPower + turningPower);
-        leftBottomMotor.move(forwardPower + turningPower);
-        rightTopMotor.move((forwardPower - turningPower) * -1);
-        rightBottomMotor.move((forwardPower - turningPower) * -1);
+            // Make drive significantly slower when tray buttons are held
+            if(master.get_digital(TRAY_OUT) || master.get_digital(TRAY_IN))
+            {
+                forwardPower /= 4;
+                turningPower /= 4;
+            }
+
+            leftTopMotor.move(forwardPower + turningPower);
+            leftBottomMotor.move(forwardPower + turningPower);
+            rightTopMotor.move((forwardPower - turningPower) * -1);
+            rightBottomMotor.move((forwardPower - turningPower) * -1);
+        }
+        else
+        {
+            int leftPower = master.get_analog(ANALOG_LEFT_Y);
+            int rightPower = master.get_analog(ANALOG_RIGHT_Y);
+
+            // Make drive significantly slower when tray buttons are held
+            if(master.get_digital(TRAY_OUT) || master.get_digital(TRAY_IN))
+            {
+                leftPower /= 4;
+                rightPower /= 4;
+            }
+
+            leftTopMotor.move(leftPower);
+            leftBottomMotor.move(leftPower);
+            rightTopMotor.move(rightPower * -1);
+            rightBottomMotor.move(rightPower * -1);
+        }
 
         if(master.get_digital_new_press(DIGITAL_X))
         {
@@ -179,31 +199,7 @@ void opcontrol()
 
         if(master.get_digital_new_press(DIGITAL_Y))
         {
-            /*if(master.get_digital(DIGITAL_A))
-            {
-                //tipMotorLeft.move(127);
-                //tipMotorRight.move(127);
-                antiTipTriggered = true;
-                displayController.setLine(2, "BEEF OUT");
-            }
-            else
-            {
-                if(antiTipTriggered)
-                {
-                    //tipMotorLeft.move_absolute(0, 100);
-                    //tipMotorRight.move_absolute(0, 100);
-                    displayController.setLine(2, "Anti-tip IN");
-                }
-                else
-                {
-                    //tipMotorLeft.move_absolute(TIP_LOW_POS, 100);
-                    //tipMotorRight.move_absolute(TIP_LOW_POS, 100);
-                    displayController.setLine(2, "Anti-tip OUT");
-                }
-                antiTipTriggered = !antiTipTriggered;
-            }*/
-            trayMotorBack.move_absolute(0, 50);
-            trayMotorFront.move_absolute(0, 50);
+            flipTray();
         }
 
         if(master.get_digital(TRAY_OUT))
@@ -221,13 +217,19 @@ void opcontrol()
                 // Flick the tray when "A" is being held to deploy the tray
                 if(master.get_digital(DIGITAL_A))
                 {
-                    speed = -200;
+                    speed = -50;
+                }
+                else if(trayMotorFront.get_position() < -2000)
+                {
+                    speed = -10;
                 }
                 else if(trayMotorFront.get_position() < -900)
                 {
                     //TODO clean up math
                     // Reduces tray speed as it reaches the apex
-                    speed = -20 - ((60.0 / 1000.0) * (1000 - abs(trayMotorFront.get_position() + 900)));
+                    /*speed = -20 - ((60.0 / TRAY_HIGHEST - 900) *
+                            ((TRAY_HIGHEST - 900) - abs(trayMotorFront.get_position() + 900)));*/
+                    speed = -30;
                 }
 
                 trayMotorBack.move_velocity(speed);
@@ -252,8 +254,8 @@ void opcontrol()
             {
                 // Move the tray quickly if A is pressed, slowly if Y is pressed, and regular speed if neither is pressed
                 //TODO clean up this logic
-                trayMotorBack.move_velocity(master.get_digital(DIGITAL_A) ? 200 : 50);
-                trayMotorFront.move_velocity(master.get_digital(DIGITAL_A) ? 200 : 50);
+                trayMotorBack.move_velocity(master.get_digital(DIGITAL_A) ? 50 : 200);
+                trayMotorFront.move_velocity(master.get_digital(DIGITAL_A) ? 50 : 200);
                 trayWasMoving = true;
             }
         }
@@ -376,7 +378,7 @@ void opcontrol()
             rightIntake.move(80);
         }
 
-        if(master.get_digital(DIGITAL_LEFT))
+        /*if(master.get_digital(DIGITAL_LEFT))
         {
             centerWheel.move(127);
         }
@@ -387,7 +389,7 @@ void opcontrol()
         else
         {
             centerWheel.move(0);
-        }
+        }*/
 
         // Print debugging data
         //pros::lcd::print(1, "Left Y: %d", forwardPower);

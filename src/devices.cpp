@@ -1,11 +1,12 @@
 #include "devices.h"
 
-//bad ports: 5,6,21,12,15,11
+// Bad ports: 5,6,21,12,15,11
 pros::Motor leftTopMotor(1);
 pros::Motor leftBottomMotor(2);
 pros::Motor rightTopMotor(3);
 pros::Motor rightBottomMotor(4);
-pros::Motor centerWheel(15);
+
+//pros::Motor centerWheel(15);
 
 pros::Motor leftIntake(17);
 pros::Motor rightIntake(16);
@@ -49,3 +50,5 @@ std::shared_ptr<okapi::AsyncMotionProfileController> profileController = okapi::
     .withLimits({1.0, 2.0, 10.0})
     .withOutput(chassis)
     .buildMotionProfileController();
+
+bool tankMode = false;
