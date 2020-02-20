@@ -20,6 +20,9 @@
 
 #define TIP_LOW_POS 1400
 
+#define ANTI_TIP_DECEL_TIME 5000.0
+#define ANTI_TIP_SCALE 3.5
+
 // Control definitions
 #define ARMS_UP DIGITAL_UP
 #define ARMS_DOWN DIGITAL_DOWN

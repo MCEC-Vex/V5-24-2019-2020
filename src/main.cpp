@@ -22,6 +22,140 @@ void displayTesting()
     openMainMenu(&displayController, master);
 }
 
+// Prototypes for hidden vex functions to bypass PROS bug
+extern "C" int32_t vexGenericSerialReceive( uint32_t index, uint8_t *buffer, int32_t length );
+extern "C" void vexGenericSerialEnable(  uint32_t index, uint32_t nu );
+extern "C" void vexGenericSerialBaudrate(  uint32_t index, uint32_t rate );
+
+uint8_t cobsBuffer[1024];
+uint8_t cobsDecodedBuffer[1024];
+size_t cobsBufferIndex;
+
+float gyroY = 0.0;
+unsigned long lastAntiTipPacket = 0;
+
+#define SERIALPORT 19
+
+void onPacketReceived(const uint8_t* buffer, size_t size)
+{
+    PacketHeader header;
+    memcpy(&header, buffer, sizeof(PacketHeader));
+
+    if(header.type == CLEAR)
+    {
+        ClearPacket clearPacket;
+        memcpy(&clearPacket, buffer + sizeof(PacketHeader), sizeof(ClearPacket));
+
+        pros::lcd::clear_line(clearPacket.line);
+    }
+    else if(header.type == PRINT_DEMO)
+    {
+        PrintDemoPacket demoPacket;
+        memcpy(&demoPacket, buffer + sizeof(PacketHeader), sizeof(PrintDemoPacket));
+
+        pros::lcd::print(demoPacket.line, "Demo is working!");
+    }
+    else if(header.type == ANTI_TIP)
+    {
+        AntiTipPacket antiTipPacket;
+        memcpy(&antiTipPacket, buffer + sizeof(PacketHeader), sizeof(AntiTipPacket));
+
+        gyroY = antiTipPacket.gyroY;
+        lastAntiTipPacket = pros::millis();
+    }
+}
+
+void checkSerialTask(void* unused)
+{
+    while(true)
+    {
+        
+        // Buffer to store serial data
+        uint8_t buffer[256];
+        int len = 256;
+        
+        // Get serial data
+        int32_t nRead = vexGenericSerialReceive(SERIALPORT - 1, buffer, len);
+        
+        for(int i = 0; i < nRead; i++)
+        {
+            uint8_t data = buffer[i];
+
+            if(data == 0)
+            {
+                //cobs_decode_result result;
+
+                size_t numDecoded = COBS::decode(cobsBuffer, cobsBufferIndex, cobsDecodedBuffer);
+                onPacketReceived(cobsDecodedBuffer, numDecoded);
+
+                //result = cobs_decode(cobsDecodedBuffer, 1024, cobsBuffer, cobsBufferIndex);
+                //onPacketReceived(cobsDecodedBuffer, result.out_len);
+
+                cobsBufferIndex = 0;
+            }
+            else
+            {
+                //TODO implement overflow checks
+                cobsBuffer[cobsBufferIndex++] = data;
+            }
+        }
+
+        if(nRead > 0)
+        {
+            pros::lcd::print(0, "Got data! l: %d, bi: %d", nRead, cobsBufferIndex);
+
+            std::string data = "";
+            std::string dataSwapped = "";
+
+            std::stringstream ss;
+            ss << std::hex;
+
+            for (int i = 0; i < nRead; i++)
+            {
+                uint8_t digit = buffer[i];
+                //uint8_t digit_swapped = swap_endian<uint8_t>(digit);
+                // Get current char
+                //char thisDigit = (char)buffer[i] + '0';
+				//myStream << thisDigit;
+				data += std::to_string(digit);
+                ss << std::setw(2) << std::setfill('0') << (int) digit;
+
+                if(i != nRead - 1)
+                {
+                    ss << " ";
+                    data += ",";
+                }
+                //dataSwapped += std::to_string(digit_swapped) + ",";
+            }
+
+            pros::lcd::print(1, data.c_str());
+            //pros::lcd::print(2, ss.str().c_str());
+        }
+
+        // Now parse the data
+        /*if(nRead > 0)
+        {
+            
+            // Stream to put the characters in
+            std::string data = "";
+            bool recordAngle = false;
+            
+            // Go through characters
+            for (int i = 0; i < nRead; i++) {
+                // Get current char
+                char thisDigit = (char)buffer[i];
+				//myStream << thisDigit;
+				data += thisDigit;
+            }
+			pros::lcd::print(2, "Got data! Length is %d", nRead);
+			pros::lcd::print(3, data.c_str());
+        }*/
+    
+        // Delay to let serial data arrive
+        pros::delay(20);
+    }
+}
+
 /**
  * Runs initialization code. This occurs as soon as the program is started.
  *
@@ -33,6 +167,16 @@ void initialize()
     pros::lcd::initialize();
     setupMotors();
     pros::Task displayTask(displayTimerTask, (void*)"", TASK_PRIORITY_DEFAULT, TASK_STACK_DEPTH_DEFAULT);
+
+    // Start serial on desired port
+    vexGenericSerialEnable(SERIALPORT - 1, 0);
+    
+    // Set BAUD rate
+    vexGenericSerialBaudrate(SERIALPORT - 1, 115200);
+    
+    // Let VEX OS configure port
+    pros::delay(10);
+    pros::Task serialTask(checkSerialTask, (void*)"", TASK_PRIORITY_DEFAULT, TASK_STACK_DEPTH_DEFAULT);
 }
 
 /**
@@ -141,11 +285,69 @@ void opcontrol()
             rightBottomMotor.move(0);
             antiTipTriggered = false;
         }*/
+        /*if(antiTipActivated)
+        {
+            antiTipActivated = false;
+
+            for(int i = 0; i < 127; i++)
+            {
+                leftTopMotor.move(-1 * i);
+                leftBottomMotor.move(-1 * i);
+                rightTopMotor.move(i);
+                rightBottomMotor.move(i);
+
+                pros::delay(2);
+            }
+            
+            pros::delay(200);
+
+            for(int i = 127; i > 0; i--)
+            {
+                int speed = i;
+
+                leftTopMotor.move(-1 * speed);
+                leftBottomMotor.move(-1 * speed);
+                rightTopMotor.move(speed);
+                rightBottomMotor.move(speed);
+                
+                pros::delay(2);
+            }
+            leftTopMotor.move(0);
+            leftBottomMotor.move(0);
+            rightTopMotor.move(0);
+            rightBottomMotor.move(0);
+        }*/
+
+        int antiTipSpeedChange = 0;
+        //int packetTime = 100 + (abs(gyroY) * 5);
+        int packetTime = 500;
+
+        if(lastAntiTipPacket != 0 && gyroY != 0)
+        {
+            if(pros::millis() - lastAntiTipPacket < packetTime)
+            {
+                //antiTipSpeedChange = -1 * ANTI_TIP_SCALE * abs(gyroY);
+                gyroY = 127;
+                antiTipSpeedChange = -1 * gyroY;
+                displayController.setLine(0, std::to_string(antiTipSpeedChange));
+            }
+            else if(gyroY > 0)
+            {
+                gyroY -= 2;
+                //antiTipSpeedChange = -1 * ANTI_TIP_SCALE * abs(gyroY);
+                antiTipSpeedChange = -1 * gyroY;
+
+                if(gyroY < 0)
+                {
+                    gyroY == 0;
+                }
+            }
+        }
 
         if(!tankMode)
         {
             // Arcade-style driving controls
-            int forwardPower = master.get_analog(ANALOG_LEFT_Y);
+            int forwardPower = master.get_analog(ANALOG_LEFT_Y) + antiTipSpeedChange;
             int turningPower = master.get_analog(ANALOG_RIGHT_X);
 
             // Make drive significantly slower when tray buttons are held
@@ -162,8 +364,8 @@ void opcontrol()
         }
         else
         {
-            int leftPower = master.get_analog(ANALOG_LEFT_Y);
-            int rightPower = master.get_analog(ANALOG_RIGHT_Y);
+            int leftPower = master.get_analog(ANALOG_LEFT_Y) + antiTipSpeedChange;
+            int rightPower = master.get_analog(ANALOG_RIGHT_Y) + antiTipSpeedChange;
 
             // Make drive significantly slower when tray buttons are held
             if(master.get_digital(TRAY_OUT) || master.get_digital(TRAY_IN))
@@ -438,13 +640,13 @@ void opcontrol()
 
         //displayController.setLine(0, "L: " + std::to_string(leftIntake.get_temperature()));
         //displayController.setLine(1, "R: " + std::to_string(rightIntake.get_temperature()));
-        if(pros::millis() - lastSent > 1500)
+        /*if(pros::millis() - lastSent > 1500)
         {
             lastSent = pros::millis();
 
             displayController.setLine(0, "L: " + std::to_string(leftIntake.get_current_draw()));
             displayController.setLine(1, "R: " + std::to_string(rightIntake.get_current_draw()));
-        }
+        }*/
         
         //displayController.setLine(1, std::to_string(master.get_analog(ANALOG_LEFT_Y)));
         //displayController.setLine(2, std::to_string(master.get_analog(ANALOG_LEFT_X)));

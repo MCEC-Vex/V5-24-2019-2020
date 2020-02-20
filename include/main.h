@@ -50,6 +50,13 @@
 #include "displayLib/ScrollingScreenDemo.h"
 #include "displayLib/TextDisplayScreen.h"
 
+#include "cobs.h"
+#include "serial_definitions.h"
+
+#include <sstream>
+#include <iomanip>
+
+
 /**
  * If you find doing pros::Motor() to be tedious and you'd prefer just to do
  * Motor, you can use the namespace with the following commented out line.
