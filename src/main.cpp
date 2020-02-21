@@ -152,7 +152,7 @@ void checkSerialTask(void* unused)
         }*/
     
         // Delay to let serial data arrive
-        pros::delay(20);
+        pros::delay(1);
     }
 }
 
@@ -255,11 +255,15 @@ void opcontrol()
     bool trayWasMoving = false;
     bool armsWereMoving = false;
     bool antiTipTriggered = false;
+    bool intakesWereMoving = false;
 
     // Arm macro flag
     int armMacroPos = 0;
 
     unsigned long lastSent = pros::millis();
+
+    unsigned long lastJiggleTime = 0;
+    bool jiggleForwards;
 
     while(true)
     {
@@ -333,7 +337,7 @@ void opcontrol()
             }
             else if(gyroY > 0)
             {
-                gyroY -= 2;
+                gyroY -= 1.2;
                 //antiTipSpeedChange = -1 * ANTI_TIP_SCALE * abs(gyroY);
                 antiTipSpeedChange = -1 * gyroY;
 
@@ -349,12 +353,41 @@ void opcontrol()
             // Arcade-style driving controls
             int forwardPower = master.get_analog(ANALOG_LEFT_Y) + antiTipSpeedChange;
             int turningPower = master.get_analog(ANALOG_RIGHT_X);
+            if(antiTipSpeedChange != 0)
+            {
+                turningPower = 0;
+            }
 
             // Make drive significantly slower when tray buttons are held
             if(master.get_digital(TRAY_OUT) || master.get_digital(TRAY_IN))
             {
                 forwardPower /= 4;
                 turningPower /= 4;
+
+                if(pros::millis() - lastJiggleTime > 300 && trayMotorBack.get_position() < (TRAY_HIGHEST + 300)
+                    && forwardPower < 0)
+                {
+                    lastJiggleTime = pros::millis();
+
+                    jiggleForwards = !jiggleForwards;
+
+                    if(jiggleForwards)
+                    {
+                        leftIntake.move(80);
+                        rightIntake.move(-80);
+                    }
+                    else
+                    {
+                        leftIntake.move(-80);
+                        rightIntake.move(80);
+                    }
+                }
+                
+            }
+            else if(pros::millis() - lastJiggleTime > 100)
+            {
+                leftIntake.move(0);
+                rightIntake.move(0);
             }
 
             leftTopMotor.move(forwardPower + turningPower);
@@ -421,16 +454,16 @@ void opcontrol()
                 {
                     speed = -50;
                 }
-                else if(trayMotorFront.get_position() < -2000)
+                /*else if(trayMotorFront.get_position() < -2000)
                 {
                     speed = -10;
-                }
-                else if(trayMotorFront.get_position() < -900)
+                }*/
+                else if(trayMotorFront.get_position() < -2250)
                 {
                     //TODO clean up math
                     // Reduces tray speed as it reaches the apex
-                    /*speed = -20 - ((60.0 / TRAY_HIGHEST - 900) *
-                            ((TRAY_HIGHEST - 900) - abs(trayMotorFront.get_position() + 900)));*/
+                    //speed = -20 - ((60.0 / (TRAY_HIGHEST - 2250)) *
+                    //        ((TRAY_HIGHEST - 2250) - abs(trayMotorFront.get_position() + (TRAY_HIGHEST - 2250))));
                     speed = -30;
                 }
 
@@ -536,6 +569,7 @@ void opcontrol()
                 leftIntake.move_velocity(-100);
                 rightIntake.move_velocity(100);
             }
+            intakesWereMoving = true;
         }
         else if(master.get_digital(ROLLER_INTAKE))
         {
@@ -561,11 +595,13 @@ void opcontrol()
                 leftIntake.move_velocity(100);
                 rightIntake.move_velocity(-100);
             }
+            intakesWereMoving = true;
         }
-        else
+        else if(intakesWereMoving)
         {
             leftIntake.move(0);
             rightIntake.move(0);
+            intakesWereMoving = false;
         }
 
         // Back up the robot while spinning the intake out
