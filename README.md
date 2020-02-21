@@ -10,5 +10,8 @@
 ---
 
 ## Features
-- 45 Second Autonomous
+- Various features to make driving the robot easier
+- Autonomous routine
 - Controller display library (in progress)
+- Controller menu enabling auton testing, motor temperature display, and motor positions display
+- Arduino communication for robot tip detection and prevention (in progress)
