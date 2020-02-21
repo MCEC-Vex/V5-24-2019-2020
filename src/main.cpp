@@ -14,7 +14,6 @@ void displayTimerTask(void* unused)
 
 void displayTesting()
 {
-    //displayController.setLine(0, "Testing Mode");
     displayController.clearLine(0);
     displayController.clearLine(1);
     displayController.clearLine(2);
@@ -69,7 +68,6 @@ void checkSerialTask(void* unused)
 {
     while(true)
     {
-        
         // Buffer to store serial data
         uint8_t buffer[256];
         int len = 256;
@@ -83,13 +81,8 @@ void checkSerialTask(void* unused)
 
             if(data == 0)
             {
-                //cobs_decode_result result;
-
                 size_t numDecoded = COBS::decode(cobsBuffer, cobsBufferIndex, cobsDecodedBuffer);
                 onPacketReceived(cobsDecodedBuffer, numDecoded);
-
-                //result = cobs_decode(cobsDecodedBuffer, 1024, cobsBuffer, cobsBufferIndex);
-                //onPacketReceived(cobsDecodedBuffer, result.out_len);
 
                 cobsBufferIndex = 0;
             }
@@ -113,10 +106,6 @@ void checkSerialTask(void* unused)
             for (int i = 0; i < nRead; i++)
             {
                 uint8_t digit = buffer[i];
-                //uint8_t digit_swapped = swap_endian<uint8_t>(digit);
-                // Get current char
-                //char thisDigit = (char)buffer[i] + '0';
-				//myStream << thisDigit;
 				data += std::to_string(digit);
                 ss << std::setw(2) << std::setfill('0') << (int) digit;
 
@@ -125,31 +114,10 @@ void checkSerialTask(void* unused)
                     ss << " ";
                     data += ",";
                 }
-                //dataSwapped += std::to_string(digit_swapped) + ",";
             }
 
             pros::lcd::print(1, data.c_str());
-            //pros::lcd::print(2, ss.str().c_str());
         }
-
-        // Now parse the data
-        /*if(nRead > 0)
-        {
-            
-            // Stream to put the characters in
-            std::string data = "";
-            bool recordAngle = false;
-            
-            // Go through characters
-            for (int i = 0; i < nRead; i++) {
-                // Get current char
-                char thisDigit = (char)buffer[i];
-				//myStream << thisDigit;
-				data += thisDigit;
-            }
-			pros::lcd::print(2, "Got data! Length is %d", nRead);
-			pros::lcd::print(3, data.c_str());
-        }*/
     
         // Delay to let serial data arrive
         pros::delay(1);
@@ -267,70 +235,13 @@ void opcontrol()
 
     while(true)
     {
-        /*if(tipSensor.get_value())
-        {
-            leftTopMotor.move(-127);
-            leftBottomMotor.move(-127);
-            rightTopMotor.move(127);
-            rightBottomMotor.move(127);
-
-            antiTipTriggered = true;
-
-            pros::delay(10);
-            continue;
-        }
-
-        if(antiTipTriggered)
-        {
-            pros::delay(100);
-            leftTopMotor.move(0);
-            leftBottomMotor.move(0);
-            rightTopMotor.move(0);
-            rightBottomMotor.move(0);
-            antiTipTriggered = false;
-        }*/
-        /*if(antiTipActivated)
-        {
-            antiTipActivated = false;
-
-            for(int i = 0; i < 127; i++)
-            {
-                leftTopMotor.move(-1 * i);
-                leftBottomMotor.move(-1 * i);
-                rightTopMotor.move(i);
-                rightBottomMotor.move(i);
-
-                pros::delay(2);
-            }
-            
-            pros::delay(200);
-
-            for(int i = 127; i > 0; i--)
-            {
-                int speed = i;
-
-                leftTopMotor.move(-1 * speed);
-                leftBottomMotor.move(-1 * speed);
-                rightTopMotor.move(speed);
-                rightBottomMotor.move(speed);
-                
-                pros::delay(2);
-            }
-            leftTopMotor.move(0);
-            leftBottomMotor.move(0);
-            rightTopMotor.move(0);
-            rightBottomMotor.move(0);
-        }*/
-
         int antiTipSpeedChange = 0;
-        //int packetTime = 100 + (abs(gyroY) * 5);
         int packetTime = 500;
 
         if(lastAntiTipPacket != 0 && gyroY != 0)
         {
             if(pros::millis() - lastAntiTipPacket < packetTime)
             {
-                //antiTipSpeedChange = -1 * ANTI_TIP_SCALE * abs(gyroY);
                 gyroY = 127;
                 antiTipSpeedChange = -1 * gyroY;
                 displayController.setLine(0, std::to_string(antiTipSpeedChange));
@@ -338,7 +249,6 @@ void opcontrol()
             else if(gyroY > 0)
             {
                 gyroY -= 1.2;
-                //antiTipSpeedChange = -1 * ANTI_TIP_SCALE * abs(gyroY);
                 antiTipSpeedChange = -1 * gyroY;
 
                 if(gyroY < 0)
@@ -454,10 +364,6 @@ void opcontrol()
                 {
                     speed = -50;
                 }
-                /*else if(trayMotorFront.get_position() < -2000)
-                {
-                    speed = -10;
-                }*/
                 else if(trayMotorFront.get_position() < -1500)
                 {
                     // Reduces tray speed as it reaches the apex
@@ -578,9 +484,6 @@ void opcontrol()
             // Move slowly if A is pressed
             if(!master.get_digital(DIGITAL_A))
             {
-                /*leftIntake.move(127);
-                rightIntake.move(-127);*/
-
                 // Deny intake if arms are up
                 if(leftArmMotor.get_position() > 750)
                 {
@@ -617,27 +520,6 @@ void opcontrol()
             rightIntake.move(80);
         }
 
-        /*if(master.get_digital(DIGITAL_LEFT))
-        {
-            centerWheel.move(127);
-        }
-        else if(master.get_digital(DIGITAL_RIGHT))
-        {
-            centerWheel.move(-127);
-        }
-        else
-        {
-            centerWheel.move(0);
-        }*/
-
-        // Print debugging data
-        //pros::lcd::print(1, "Left Y: %d", forwardPower);
-        //pros::lcd::print(2, "Right X: %d", turningPower);
-        //pros::lcd::print(3, "L-Voltage: %d", forwardPower + turningPower);
-        //pros::lcd::print(4, "R-Voltage: %d", forwardPower - turningPower);
-        //pros::lcd::print(2, "Left tip: %f", tipMotorLeft.get_position());
-        //pros::lcd::print(3, "Right tip: %f", tipMotorRight.get_position());
-
         if(autoRedSmall.get_value())
         {
             pros::lcd::print(4, "Auton red small");
@@ -667,26 +549,6 @@ void opcontrol()
         pros::lcd::print(5, "Left Arm Pos: %f", leftArmMotor.get_position());
         pros::lcd::print(6, "Right Arm Pos: %f", rightArmMotor.get_position());
         pros::lcd::print(7, "Tray Pos (b): %f", trayMotorBack.get_position());
-
-        //pros::lcd::print(1, "Front: %d", frontUltrasonic.get());
-        //pros::lcd::print(2, "Back: %d", backUltrasonic.get());
-
-        //displayController.setLine(1, "F: " + std::to_string(frontUltrasonicFilter.filter(frontUltrasonic.get_value())));
-        //displayController.setLine(2, "B: " + std::to_string(backUltrasonicFilter.filter(backUltrasonic.get_value())));
-        //displayController.setLine(0, "R: " + std::to_string(rearUltrasonicFilter.filter(rearUltrasonic.get_value())));
-
-        //displayController.setLine(0, "L: " + std::to_string(leftIntake.get_temperature()));
-        //displayController.setLine(1, "R: " + std::to_string(rightIntake.get_temperature()));
-        /*if(pros::millis() - lastSent > 1500)
-        {
-            lastSent = pros::millis();
-
-            displayController.setLine(0, "L: " + std::to_string(leftIntake.get_current_draw()));
-            displayController.setLine(1, "R: " + std::to_string(rightIntake.get_current_draw()));
-        }*/
-        
-        //displayController.setLine(1, std::to_string(master.get_analog(ANALOG_LEFT_Y)));
-        //displayController.setLine(2, std::to_string(master.get_analog(ANALOG_LEFT_X)));
 
         pros::delay(10);
     }
