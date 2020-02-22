@@ -165,7 +165,100 @@ void runAutoBigFast(bool red)
 
 void runSpicyAuton(bool red)
 {
+    int sign = red ? 1 : -1;
 
+    flipTray();
+    pros::delay(200);
+
+    // Move forward to collect the cubes from the first row
+    leftIntake.move_velocity(150);
+    rightIntake.move_velocity(-150);
+    chassis->setMaxVelocity(80);
+    chassis->moveDistance(3.5_ft);
+    leftIntake.move_velocity(0);
+    rightIntake.move_velocity(0);
+    chassis->setMaxVelocity(200);
+
+    // Move backwards in an "S" to get second row
+    profileController->generatePath({
+        {3.2_ft, 1.9_ft * sign, 0_deg},
+        {0_ft, 0_ft, 0_deg}},
+        "Row2Prep" // Profile name
+    );
+    profileController->setTarget("Row2Prep", true);
+    profileController->waitUntilSettled();
+
+    // Get second row of cubes
+    leftIntake.move_velocity(150);
+    rightIntake.move_velocity(-150);
+    profileController->generatePath({
+        {0_ft, 0_ft, 0_deg},
+        {1.65_ft, 0_ft, 0_deg}},
+        "Row2" // Profile name
+    );
+    profileController->setTarget("Row2", false);
+    profileController->waitUntilSettled();
+    pros::delay(400);
+    leftIntake.move_velocity(0);
+    rightIntake.move_velocity(0);
+
+    // Turn 90 degrees and go to the goal
+    // Move up tray
+    setTrayPosition(-800, 30);
+    leftIntake.move_relative(-90, 20);
+    rightIntake.move_relative(90, 20);
+
+    chassis->turnAngle(90_deg * sign);
+    profileController->generatePath({
+        {0_ft, 0_ft, 0_deg},
+        {1.55_ft, -1.30_ft * sign, red ? -65_deg : 75_deg}},
+        "GoToGoal"
+    );
+    profileController->setTarget("GoToGoal");
+    profileController->waitUntilSettled();
+
+    // Deposit cubes
+    setTrayPosition(-1500, 40);
+    moveMotors(chassis, 0.52_ft, 25, 1000);
+    moveTrayToHighest();
+    moveMotors(chassis, 0.1_ft, 10, 1000);
+
+    setTrayPosition(TRAY_HIGHEST + 1900, 60);
+    pros::delay(1000);
+
+    leftIntake.move(-80);
+    rightIntake.move(80);
+    pros::delay(50);
+    leftTopMotor.move_relative(-1500, 80);
+    leftBottomMotor.move_relative(-1500, 80);
+    rightTopMotor.move_relative(1500, 80);
+    rightBottomMotor.move_relative(1500, 80);
+
+    pros::delay(3000);
+    leftIntake.move(0);
+    rightIntake.move(0);
+
+    setTrayPosition(0, 50);
+
+    // Go backwards while jiggling the intake to (try to) prevent cubes from being stuck
+    /*leftTopMotor.move_relative(-500, 20);
+    leftBottomMotor.move_relative(-500, 20);
+    rightTopMotor.move_relative(500, 20);
+    rightBottomMotor.move_relative(500, 20);
+
+    for(int i = 0; i < 3; i++)
+    {
+        leftIntake.move(200);
+        rightIntake.move(-200);
+        pros::delay(200);
+        leftIntake.move(200);
+        rightIntake.move(-200);
+        pros::delay(200);
+    }
+    leftIntake.move(0);
+    rightIntake.move(0);
+
+    setTrayPosition(0, 50);*/
 }
 
 void runAsymmetryForwardTests(int iterations)

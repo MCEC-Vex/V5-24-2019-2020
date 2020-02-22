@@ -161,7 +161,7 @@ void openAutoMenu(DisplayCore* core)
         core->popScreen();
 
         unsigned long startTime = pros::millis();
-        runSpicyAuton(true);
+        runSpicyAuton(false);
         unsigned long timeTaken = pros::millis() - startTime;
 
         std::string tempDisplay[2];

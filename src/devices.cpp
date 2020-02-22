@@ -43,11 +43,16 @@ DisplayController displayController(master);
 std::shared_ptr<okapi::ChassisController> chassis = okapi::ChassisControllerBuilder()
         // Left side is 1,2 right side is -3,-4 (negative indicates reversed)
         .withMotors({1, 2}, {-3, -4})
-        .withDimensions(okapi::AbstractMotor::gearset::green, {{4_in, 12.5_in}, okapi::imev5GreenTPR})
+        .withDimensions(okapi::AbstractMotor::gearset::green, {{4_in, 9.5_in}, okapi::imev5GreenTPR})
         .build();
 
 std::shared_ptr<okapi::AsyncMotionProfileController> profileController = okapi::AsyncMotionProfileControllerBuilder()
-    .withLimits({1.0, 2.0, 10.0})
+    .withLimits({0.5, 1.0, 5.0})
+    .withOutput(chassis)
+    .buildMotionProfileController();
+
+    std::shared_ptr<okapi::AsyncMotionProfileController> profileControllerFast = okapi::AsyncMotionProfileControllerBuilder()
+    .withLimits({0.8, 1.5, 7.5})
     .withOutput(chassis)
     .buildMotionProfileController();
 

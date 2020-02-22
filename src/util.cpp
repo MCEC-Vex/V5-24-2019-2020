@@ -293,6 +293,13 @@ void moveChassisDistance(std::shared_ptr<okapi::ChassisController> chassis,
     double dPosLeft = convertToEncoderUnits(chassis, leftDistance);
     double dPosRight = convertToEncoderUnits(chassis, rightDistance);
 
+    int leftVelocity = velocity;
+    int rightVelocity = velocity;
+
+    // Ensure motors get to the same place at the same time
+    // If the left distance is greater than the right distance, drop the left speed
+    double percentDifference = abs(dPosLeft - dPosRight) / ((dPosLeft + dPosRight) / 2.0);
+
     leftTopMotor.move_relative(dPosLeft, velocity);
     leftBottomMotor.move_relative(dPosLeft, velocity);
     rightTopMotor.move_relative(dPosRight * -1, velocity);

@@ -48,6 +48,7 @@ extern DisplayController displayController;
 
 extern std::shared_ptr<okapi::ChassisController> chassis;
 extern std::shared_ptr<okapi::AsyncMotionProfileController> profileController;
+extern std::shared_ptr<okapi::AsyncMotionProfileController> profileControllerFast;
 
 extern bool tankMode;
 
