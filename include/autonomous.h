@@ -24,18 +24,32 @@ void centerBot(int tolerance, float speedMod);
 void runAutoSmall(bool red);
 
 /**
- * Run auto for the sideways "L" of cubes near the right
- *
- * @param red True if the bot is on the red alliance, false if on blue
- */
-void runAutoBig(bool red);
-
-/**
  * Run auto for the sideways "L" of cubes near the right (quickly)
  * 
  * @param red True if the bot is on the red alliance, false if on blue
  */
 void runAutoBigFast(bool red);
+
+/**
+ * Run auton spicy mode (new and fresh with a lil bit of kick)
+ * 
+ * @param red True if the bot is on the red alliance, false if on blue
+ */
+void runSpicyAuton(bool red);
+
+/**
+ * Run asymmetry tests for forwards + backwards
+ * 
+ * @param iterations The number of times to go back and forth
+ */
+void runAsymmetryForwardTests(int iterations);
+
+/**
+ * Run asymmetry tests for turning left / right
+ * 
+ * @param iterations The number of times to turn back and forth
+ */
+void runAsymmetryTurningTests(int iterations);
 
 void moveDistanceParallel(okapi::QLength distance, okapi::QLength distanceFromWall);
 

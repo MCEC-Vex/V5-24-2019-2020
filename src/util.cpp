@@ -112,10 +112,11 @@ void moveTrayToHighest()
 
     while(trayMotorFront.get_position() > TRAY_HIGHEST)
     {
-        int speed = -50;
-        if(trayMotorFront.get_position() < -900)
+        int speed = -80;
+        if(trayMotorFront.get_position() < -1500)
         {
-            speed = -10 - ((40.0 / 1000.0) * (1000 - abs(trayMotorFront.get_position() + 900)));
+            float segments = abs(TRAY_HIGHEST) - 1500;
+            speed = -20 - ((60.0 / segments) * (segments - abs(trayMotorFront.get_position() + 1500)));
         }
 
         trayMotorBack.move_velocity(speed);
@@ -221,6 +222,7 @@ double convertToEncoderUnits(std::shared_ptr<okapi::ChassisController> chassis, 
 void waitUntilMotorWithin(pros::Motor motor, int value, int tolerance, int timeout)
 {
     double startPos = motor.get_position();
+    double distanceFromStart = abs(motor.get_position() - startPos);
 
     unsigned long current = pros::millis();
     while(abs(abs(motor.get_position() - startPos) - value) > tolerance &&
@@ -283,4 +285,18 @@ void tareChassis()
     leftBottomMotor.tare_position();
     rightTopMotor.tare_position();
     rightBottomMotor.tare_position();
+}
+
+void moveChassisDistance(std::shared_ptr<okapi::ChassisController> chassis,
+    okapi::QLength leftDistance, okapi::QLength rightDistance, int velocity)
+{
+    double dPosLeft = convertToEncoderUnits(chassis, leftDistance);
+    double dPosRight = convertToEncoderUnits(chassis, rightDistance);
+
+    leftTopMotor.move_relative(dPosLeft, velocity);
+    leftBottomMotor.move_relative(dPosLeft, velocity);
+    rightTopMotor.move_relative(dPosRight * -1, velocity);
+    rightBottomMotor.move_relative(dPosRight * -1, velocity);
+
+    waitUntilMotorWithin(leftTopMotor, dPosLeft, 15, 10000);
 }

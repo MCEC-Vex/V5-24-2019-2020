@@ -16,16 +16,17 @@ void openMainMenu(DisplayController* controller, pros::Controller master)
         flipTray();
     }, "Flip tray", &core);
 
-    MenuAction alignBot([](DisplayCore* core)
+    MenuAction forwardAsymmetryTests([](DisplayCore* core)
     {
+        runAsymmetryForwardTests(10);
         core->popScreen();
-        //centerBot(5, 0.2);
-    }, "Align bot", &core);
+    }, "Forward asym", &core);
 
-    MenuAction moveAlongWall([](DisplayCore* core)
+    MenuAction turnAsymmetryTests([](DisplayCore* core)
     {
+        runAsymmetryTurningTests(10);
         core->popScreen();
-    }, "Test wall 10x", &core);
+    }, "Turn asymmetry", &core);
 
     MenuAction runAuton([](DisplayCore* core)
     {
@@ -60,9 +61,9 @@ void openMainMenu(DisplayController* controller, pros::Controller master)
         auton,
         extendTray,
         flipTrayAction,
-        alignBot,
+        turnAsymmetryTests,
+        forwardAsymmetryTests,
         temps,
-        moveAlongWall,
         positions,
         tank
     //    runAuton
@@ -77,34 +78,11 @@ void openMainMenu(DisplayController* controller, pros::Controller master)
 
 void openAutoMenu(DisplayCore* core)
 {
-    MenuAction bigRed([](DisplayCore* core)
-    {
-        core->popScreen();
-
-        unsigned long startTime = pros::millis();
-        runAutoBig(true);
-        unsigned long timeTaken = pros::millis() - startTime;
-
-        std::string tempDisplay[2];
-        tempDisplay[0] = "Time taken:";
-        tempDisplay[1] = std::to_string(timeTaken);
-        TextDisplayScreen timeTakenText(core, tempDisplay, 2);
-        core->pushScreen(&timeTakenText);
-        core->waitForPop();
-    }, "Big red", core);
-
     MenuAction smallRed([](DisplayCore* core)
     {
         core->popScreen();
-        runAutoSmall(true);
-    }, "Small red", core);
-
-    MenuAction bigBlue([](DisplayCore* core)
-    {
-        core->popScreen();
-
         unsigned long startTime = pros::millis();
-        runAutoBig(false);
+        runAutoSmall(true);
         unsigned long timeTaken = pros::millis() - startTime;
 
         std::string tempDisplay[2];
@@ -113,12 +91,21 @@ void openAutoMenu(DisplayCore* core)
         TextDisplayScreen timeTakenText(core, tempDisplay, 2);
         core->pushScreen(&timeTakenText);
         core->waitForPop();
-    }, "Big blue", core);
+    }, "Small red", core);
 
     MenuAction smallBlue([](DisplayCore* core)
     {
         core->popScreen();
+        unsigned long startTime = pros::millis();
         runAutoSmall(false);
+        unsigned long timeTaken = pros::millis() - startTime;
+
+        std::string tempDisplay[2];
+        tempDisplay[0] = "Time taken:";
+        tempDisplay[1] = std::to_string(timeTaken);
+        TextDisplayScreen timeTakenText(core, tempDisplay, 2);
+        core->pushScreen(&timeTakenText);
+        core->waitForPop();
     }, "Small blue", core);
 
     MenuAction redFast([](DisplayCore* core)
@@ -153,13 +140,45 @@ void openAutoMenu(DisplayCore* core)
         core->waitForPop();
     }, "Big blue fast", core);
 
+    MenuAction spicyRed([](DisplayCore* core)
+    {
+        core->popScreen();
+
+        unsigned long startTime = pros::millis();
+        runSpicyAuton(true);
+        unsigned long timeTaken = pros::millis() - startTime;
+
+        std::string tempDisplay[2];
+        tempDisplay[0] = "Time taken:";
+        tempDisplay[1] = std::to_string(timeTaken);
+        TextDisplayScreen timeTakenText(core, tempDisplay, 2);
+        core->pushScreen(&timeTakenText);
+        core->waitForPop();
+    }, "Spicy red", core);
+
+    MenuAction spicyBlue([](DisplayCore* core)
+    {
+        core->popScreen();
+
+        unsigned long startTime = pros::millis();
+        runSpicyAuton(true);
+        unsigned long timeTaken = pros::millis() - startTime;
+
+        std::string tempDisplay[2];
+        tempDisplay[0] = "Time taken:";
+        tempDisplay[1] = std::to_string(timeTaken);
+        TextDisplayScreen timeTakenText(core, tempDisplay, 2);
+        core->pushScreen(&timeTakenText);
+        core->waitForPop();
+    }, "Spicy blue", core);
+
     MenuAction menu[6] = {
-        bigRed,
         smallRed,
-        bigBlue,
         smallBlue,
         redFast,
-        blueFast
+        blueFast,
+        spicyRed,
+        spicyBlue
     };
     MenuScreen screen(core, menu, 6);
 

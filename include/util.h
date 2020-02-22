@@ -84,4 +84,7 @@ void setChassisBrakeMode(pros::motor_brake_mode_e_t brakeMode);
 
 void tareChassis();
 
+void moveChassisDistance(std::shared_ptr<okapi::ChassisController> chassis,
+    okapi::QLength leftDistance, okapi::QLength rightDistance, int velocity);
+
 #endif //MCEC_V5_UTIL_H
