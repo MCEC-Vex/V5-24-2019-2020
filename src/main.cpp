@@ -32,7 +32,7 @@ size_t cobsBufferIndex;
 
 float gyroY = 0.0;
 unsigned long lastAntiTipPacket = 0;
-unsigned int antiTipTriggerCount = 0;
+unsigned int antiTipTriggerCount = 1;
 pros::Mutex antiTipMutex;
 bool antiTipDisabled = false;
 
@@ -59,14 +59,16 @@ void onPacketReceived(const uint8_t* buffer, size_t size)
     }
     else if(header.type == ANTI_TIP)
     {
-        antiTipMutex.take(20);
-        AntiTipPacket antiTipPacket;
-        memcpy(&antiTipPacket, buffer + sizeof(PacketHeader), sizeof(AntiTipPacket));
+        if(!antiTipDisabled)
+        {
+            antiTipMutex.take(20);
+            AntiTipPacket antiTipPacket;
+            memcpy(&antiTipPacket, buffer + sizeof(PacketHeader), sizeof(AntiTipPacket));
 
-        gyroY = antiTipPacket.gyroY;
-        lastAntiTipPacket = pros::millis();
-        antiTipTriggerCount++;
-        antiTipMutex.give();
+            gyroY = antiTipPacket.gyroY;
+            lastAntiTipPacket = pros::millis();
+            antiTipMutex.give();
+        }
     }
 }
 
@@ -240,38 +242,36 @@ void opcontrol()
     unsigned long lastSent = pros::millis();
 
     unsigned long lastJiggleTime = 0;
-    bool jiggleForwards;
+    bool jiggleForwards = true;
 
     while(true)
     {
         int antiTipSpeedChange = 0;
 
         // Check if there's a new anti-tip packet for us to cry about
-        if(!antiTipDisabled)
+        antiTipMutex.take(5);
+        if(lastAntiTipPacket != 0 && gyroY != 0)
         {
-            antiTipMutex.take(5);
-            if(lastAntiTipPacket != 0 && gyroY != 0)
+            if(pros::millis() - lastAntiTipPacket < 500)
             {
-                if(pros::millis() - lastAntiTipPacket < 500)
-                {
-                    gyroY = 127;
-                    antiTipSpeedChange = -1 * gyroY;
+                gyroY = 127;
+                antiTipSpeedChange = -1 * gyroY;
 
-                    displayController.setLine(0, "Antitip: " + std::to_string(antiTipTriggerCount));
-                }
-                else if(gyroY > 0)
-                {
-                    gyroY -= 1.2;
-                    antiTipSpeedChange = -1 * gyroY;
+                displayController.setLine(0, "Antitip: " + std::to_string(antiTipTriggerCount));
+            }
+            else if(gyroY > 0)
+            {
+                gyroY -= 1.2;
+                antiTipSpeedChange = -1 * gyroY;
 
-                    if(gyroY < 0)
-                    {
-                        gyroY == 0;
-                    }
+                if(gyroY <= 0)
+                {
+                    gyroY == 0;
+                    antiTipTriggerCount++;
                 }
             }
-            antiTipMutex.give();
         }
+        antiTipMutex.give();
 
         if(!tankMode)
         {
@@ -369,7 +369,7 @@ void opcontrol()
                 antiTipDisabled = !antiTipDisabled;
                 if(antiTipDisabled)
                 {
-                    displayController.setLine(1, "ANTITIP DISABLED");
+                    displayController.setLine(1, "ANTITIP OFF");
                 }
                 else
                 {
