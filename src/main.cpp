@@ -32,6 +32,9 @@ size_t cobsBufferIndex;
 
 float gyroY = 0.0;
 unsigned long lastAntiTipPacket = 0;
+unsigned int antiTipTriggerCount = 0;
+pros::Mutex antiTipMutex;
+bool antiTipDisabled = false;
 
 #define SERIALPORT 19
 
@@ -56,11 +59,14 @@ void onPacketReceived(const uint8_t* buffer, size_t size)
     }
     else if(header.type == ANTI_TIP)
     {
+        antiTipMutex.take(20);
         AntiTipPacket antiTipPacket;
         memcpy(&antiTipPacket, buffer + sizeof(PacketHeader), sizeof(AntiTipPacket));
 
         gyroY = antiTipPacket.gyroY;
         lastAntiTipPacket = pros::millis();
+        antiTipTriggerCount++;
+        antiTipMutex.give();
     }
 }
 
@@ -81,18 +87,21 @@ void checkSerialTask(void* unused)
 
             if(data == 0)
             {
+                // If the data ends in a 0 byte, this indicates the end of the packet
+                // Decode the COBS packet into another buffer and call the packet callback
                 size_t numDecoded = COBS::decode(cobsBuffer, cobsBufferIndex, cobsDecodedBuffer);
                 onPacketReceived(cobsDecodedBuffer, numDecoded);
-
                 cobsBufferIndex = 0;
             }
             else
             {
+                // Add the data to the cobs buffer to be decoded at the end of the packet
                 //TODO implement overflow checks
                 cobsBuffer[cobsBufferIndex++] = data;
             }
         }
 
+        // Print debugging data
         if(nRead > 0)
         {
             pros::lcd::print(0, "Got data! l: %d, bi: %d", nRead, cobsBufferIndex);
@@ -103,7 +112,7 @@ void checkSerialTask(void* unused)
             std::stringstream ss;
             ss << std::hex;
 
-            for (int i = 0; i < nRead; i++)
+            for(int i = 0; i < nRead; i++)
             {
                 uint8_t digit = buffer[i];
 				data += std::to_string(digit);
@@ -191,11 +200,11 @@ void autonomous()
     }
     else if(autoRedBig.get_value())
     {
-        runAutoBigFast(true);
+        runSpicyAuton(true);
     }
     else if(autoBlueBig.get_value())
     {
-        runAutoBigFast(false);
+        runSpicyAuton(false);
     }
     /*else if(autoSafe.get_value())
     {
@@ -236,26 +245,32 @@ void opcontrol()
     while(true)
     {
         int antiTipSpeedChange = 0;
-        int packetTime = 500;
 
-        if(lastAntiTipPacket != 0 && gyroY != 0)
+        // Check if there's a new anti-tip packet for us to cry about
+        if(!antiTipDisabled)
         {
-            if(pros::millis() - lastAntiTipPacket < packetTime)
+            antiTipMutex.take(5);
+            if(lastAntiTipPacket != 0 && gyroY != 0)
             {
-                gyroY = 127;
-                antiTipSpeedChange = -1 * gyroY;
-                displayController.setLine(0, std::to_string(antiTipSpeedChange));
-            }
-            else if(gyroY > 0)
-            {
-                gyroY -= 1.2;
-                antiTipSpeedChange = -1 * gyroY;
-
-                if(gyroY < 0)
+                if(pros::millis() - lastAntiTipPacket < 500)
                 {
-                    gyroY == 0;
+                    gyroY = 127;
+                    antiTipSpeedChange = -1 * gyroY;
+
+                    displayController.setLine(0, "Antitip: " + std::to_string(antiTipTriggerCount));
+                }
+                else if(gyroY > 0)
+                {
+                    gyroY -= 1.2;
+                    antiTipSpeedChange = -1 * gyroY;
+
+                    if(gyroY < 0)
+                    {
+                        gyroY == 0;
+                    }
                 }
             }
+            antiTipMutex.give();
         }
 
         if(!tankMode)
@@ -344,7 +359,23 @@ void opcontrol()
 
         if(master.get_digital_new_press(DIGITAL_Y))
         {
-            flipTray();
+            if(master.get_digital(DIGITAL_LEFT) || master.get_digital(DIGITAL_RIGHT))
+            {
+                flipTray();
+            }
+            else
+            {
+                displayController.rumble("-");
+                antiTipDisabled = !antiTipDisabled;
+                if(antiTipDisabled)
+                {
+                    displayController.setLine(1, "ANTITIP DISABLED");
+                }
+                else
+                {
+                    displayController.clearLine(1);
+                }
+            }
         }
 
         if(master.get_digital(TRAY_OUT))
@@ -532,13 +563,13 @@ void opcontrol()
         }
         else if(autoRedBig.get_value())
         {
-            pros::lcd::print(4, "Auton red big");
-            displayController.setLine(2, "Auton red big");
+            pros::lcd::print(4, "Auton red spicy");
+            displayController.setLine(2, "Auton red spicy");
         }
         else if(autoBlueBig.get_value())
         {
-            pros::lcd::print(4, "Auton blue big");
-            displayController.setLine(2, "Auton blue big");
+            pros::lcd::print(4, "Auton blue spicy");
+            displayController.setLine(2, "Auton blue spicy");
         }
         else
         {
@@ -546,10 +577,6 @@ void opcontrol()
             displayController.setLine(2, "NO AUTON");
         }
 
-        pros::lcd::print(5, "Left Arm Pos: %f", leftArmMotor.get_position());
-        pros::lcd::print(6, "Right Arm Pos: %f", rightArmMotor.get_position());
-        pros::lcd::print(7, "Tray Pos (b): %f", trayMotorBack.get_position());
-
         pros::delay(10);
     }
-}//2.13.20
+}
