@@ -174,14 +174,14 @@ void runSpicyAuton(bool red)
     leftIntake.move_velocity(150);
     rightIntake.move_velocity(-150);
     chassis->setMaxVelocity(80);
-    chassis->moveDistance(3.5_ft);
+    chassis->moveDistance(3.2_ft);
     leftIntake.move_velocity(0);
     rightIntake.move_velocity(0);
     chassis->setMaxVelocity(200);
 
     // Move backwards in an "S" to get second row
     profileController->generatePath({
-        {3.2_ft, 1.9_ft * sign, 0_deg},
+        {2.9_ft, 1.9_ft * sign, 0_deg},
         {0_ft, 0_ft, 0_deg}},
         "Row2Prep" // Profile name
     );
@@ -211,7 +211,7 @@ void runSpicyAuton(bool red)
     chassis->turnAngle(90_deg * sign);
     profileController->generatePath({
         {0_ft, 0_ft, 0_deg},
-        {1.55_ft, -1.30_ft * sign, red ? -65_deg : 75_deg}},
+        {1.55_ft, -1.30_ft * sign, red ? -65_deg : 71_deg}},
         "GoToGoal"
     );
     profileController->setTarget("GoToGoal");

@@ -59,7 +59,7 @@ void onPacketReceived(const uint8_t* buffer, size_t size)
     }
     else if(header.type == ANTI_TIP)
     {
-        if(!antiTipDisabled)
+        if(!antiTipDisabled && trayMotorFront.get_position() > -700)
         {
             antiTipMutex.take(20);
             AntiTipPacket antiTipPacket;
@@ -425,11 +425,18 @@ void opcontrol()
             }
             else
             {
-                // Move the tray quickly if A is pressed, slowly if Y is pressed, and regular speed if neither is pressed
-                //TODO clean up this logic
-                trayMotorBack.move_velocity(master.get_digital(DIGITAL_A) ? 50 : 200);
-                trayMotorFront.move_velocity(master.get_digital(DIGITAL_A) ? 50 : 200);
-                trayWasMoving = true;
+                if(trayMotorFront.get_position() > (TRAY_HIGHEST / 2))
+                {
+                    trayWasMoving = false;
+                    setTrayPosition(0, 200);
+                }
+                else
+                {
+                    // Move the tray quickly if A is pressed and regular speed if not
+                    trayMotorBack.move_velocity(master.get_digital(DIGITAL_A) ? 50 : 200);
+                    trayMotorFront.move_velocity(master.get_digital(DIGITAL_A) ? 50 : 200);
+                    trayWasMoving = true;
+                }
             }
         }
         else if(trayWasMoving)
