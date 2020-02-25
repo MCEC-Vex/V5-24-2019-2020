@@ -124,9 +124,9 @@ void AbstractController::checkController()
         {
             //TODO callback with previous state and new state
             this->prevControllerState[i - 2] = value;
-            this->state[i].isNew = true;
-            this->state[i].modified = pros::millis();
-            this->state[i].value = value;
+            this->state[i - 2].isNew = true;
+            this->state[i - 2].modified = pros::millis();
+            this->state[i - 2].value = value;
         }
     }
 }

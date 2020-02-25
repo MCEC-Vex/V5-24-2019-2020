@@ -24,9 +24,9 @@ enum PacketType : uint8_t
 
 enum UltrasonicGroup : uint8_t
 {
-    LEFT,
-    RIGHT,
-    BACK
+    ULTRASONIC_LEFT,
+    ULTRASONIC_RIGHT,
+    ULTRASONIC_BACK
 };
 
 enum ControllerInput : uint8_t
