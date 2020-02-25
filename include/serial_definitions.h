@@ -18,7 +18,15 @@ enum PacketType : uint8_t
     PACK_PING,
     PONG,
     ANTI_TIP,
-    CONTROL
+    CONTROL,
+    ULTRASONIC_SETPOS
+};
+
+enum UltrasonicGroup : uint8_t
+{
+    LEFT,
+    RIGHT,
+    BACK
 };
 
 enum ControllerInput : uint8_t
@@ -61,6 +69,12 @@ struct AntiTipPacket
 struct PrintDemoPacket
 {
     uint8_t line;
+};
+
+struct UltrasonicPosPacket
+{
+    UltrasonicGroup group;
+    uint8_t position;
 };
 
 struct ControlPacket
