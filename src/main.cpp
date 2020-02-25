@@ -70,6 +70,13 @@ void onPacketReceived(const uint8_t* buffer, size_t size)
             antiTipMutex.give();
         }
     }
+    else if(header.type == CONTROL)
+    {
+        ControlPacket controlPacket;
+        memcpy(&controlPacket, buffer + sizeof(PacketHeader), sizeof(ControlPacket));
+
+        abstractController.setValue(controlPacket.input, controlPacket.value);
+    }
 }
 
 void checkSerialTask(void* unused)

@@ -3,29 +3,9 @@
 
 #include <stdint.h>
 #include "../api.h"
+#include "../serial_definitions.h"
 
 #define CONTROLLER_VALUE_COUNT 16
-
-enum ControllerInput : uint8_t
-{
-    STICK_LEFT_X,
-    STICK_LEFT_Y,
-    STICK_RIGHT_X,
-    STICK_RIGHT_Y,
-
-    BUTTON_L1,
-    BUTTON_L2,
-    BUTTON_R1,
-    BUTTON_R2,
-    BUTTON_UP,
-    BUTTON_DOWN,
-    BUTTON_LEFT,
-    BUTTON_RIGHT,
-    BUTTON_X,
-    BUTTON_B,
-    BUTTON_Y,
-    BUTTON_A
-};
 
 struct InputState
 {
