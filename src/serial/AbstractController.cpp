@@ -123,7 +123,7 @@ void AbstractController::checkController()
         if(value != this->prevControllerState[i - 2])
         {
             //TODO callback with previous state and new state
-            this->prevControllerState[i] = value;
+            this->prevControllerState[i - 2] = value;
             this->state[i].isNew = true;
             this->state[i].modified = pros::millis();
             this->state[i].value = value;
