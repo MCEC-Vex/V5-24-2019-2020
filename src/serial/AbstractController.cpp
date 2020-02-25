@@ -117,10 +117,10 @@ void AbstractController::checkController()
     }
 
     // Digital values. Offset at 2??
-    for(int i = 4 + 2; i < 16 + 2; i++)
+    for(int i = (4 + 2); i < (16 + 2); i++)
     {
         int8_t value = this->controller->get_digital((pros::controller_digital_e_t) i);
-        if(value != this->prevControllerState[i])
+        if(value != this->prevControllerState[i - 2])
         {
             //TODO callback with previous state and new state
             this->prevControllerState[i] = value;
