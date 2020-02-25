@@ -1,9 +1,0 @@
-#ifndef MCEC_V5_COMBINED_CONTROLLER_H
-#define MCEC_V5_COMBINED_CONTROLLER_H
-
-class CombinedController
-{
-    
-};
-
-#endif //MCEC_V5_COMBINED_CONTROLLER_H
