@@ -8,23 +8,23 @@
 
 enum ControllerInput : uint8_t
 {
-    ANALOG_LEFT_X,
-    ANALOG_LEFT_Y,
-    ANALOG_RIGHT_X,
-    ANALOG_RIGHT_Y,
+    STICK_LEFT_X,
+    STICK_LEFT_Y,
+    STICK_RIGHT_X,
+    STICK_RIGHT_Y,
 
-    DIGITAL_L1,
-    DIGITAL_L2,
-    DIGITAL_R1,
-    DIGITAL_R2,
-    DIGITAL_UP,
-    DIGITAL_DOWN,
-    DIGITAL_LEFT,
-    DIGITAL_RIGHT,
-    DIGITAL_X,
-    DIGITAL_B,
-    DIGITAL_Y,
-    DIGITAL_A
+    BUTTON_L1,
+    BUTTON_L2,
+    BUTTON_R1,
+    BUTTON_R2,
+    BUTTON_UP,
+    BUTTON_DOWN,
+    BUTTON_LEFT,
+    BUTTON_RIGHT,
+    BUTTON_X,
+    BUTTON_B,
+    BUTTON_Y,
+    BUTTON_A
 };
 
 struct InputState

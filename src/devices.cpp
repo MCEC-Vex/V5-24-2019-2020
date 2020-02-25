@@ -38,6 +38,7 @@ okapi::MedianFilter<5> rearUltrasonicFilter;*/
 
 pros::Controller master(pros::E_CONTROLLER_MASTER);
 
+AbstractController abstractController(&master);
 DisplayController displayController(master);
 
 std::shared_ptr<okapi::ChassisController> chassis = okapi::ChassisControllerBuilder()

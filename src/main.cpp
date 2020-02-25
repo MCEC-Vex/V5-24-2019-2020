@@ -246,6 +246,8 @@ void opcontrol()
 
     while(true)
     {
+        abstractController.checkController();
+
         int antiTipSpeedChange = 0;
 
         // Check if there's a new anti-tip packet for us to cry about
@@ -276,15 +278,15 @@ void opcontrol()
         if(!tankMode)
         {
             // Arcade-style driving controls
-            int forwardPower = master.get_analog(ANALOG_LEFT_Y) + antiTipSpeedChange;
-            int turningPower = master.get_analog(ANALOG_RIGHT_X);
+            int forwardPower = abstractController.getAnalog(FORWARD_POWER) + antiTipSpeedChange;
+            int turningPower = abstractController.getAnalog(TURNING_POWER);
             if(antiTipSpeedChange != 0)
             {
                 turningPower = 0;
             }
 
             // Make drive significantly slower when tray buttons are held
-            if(master.get_digital(TRAY_OUT) || master.get_digital(TRAY_IN))
+            if(abstractController.getDigital(TRAY_OUT) || abstractController.getDigital(TRAY_IN))
             {
                 forwardPower /= 4;
                 turningPower /= 4;
@@ -322,11 +324,11 @@ void opcontrol()
         }
         else
         {
-            int leftPower = master.get_analog(ANALOG_LEFT_Y) + antiTipSpeedChange;
-            int rightPower = master.get_analog(ANALOG_RIGHT_Y) + antiTipSpeedChange;
+            int leftPower = abstractController.getAnalog(STICK_LEFT_Y) + antiTipSpeedChange;
+            int rightPower = abstractController.getAnalog(STICK_RIGHT_Y) + antiTipSpeedChange;
 
             // Make drive significantly slower when tray buttons are held
-            if(master.get_digital(TRAY_OUT) || master.get_digital(TRAY_IN))
+            if(abstractController.getDigital(TRAY_OUT) || abstractController.getDigital(TRAY_IN))
             {
                 leftPower /= 4;
                 rightPower /= 4;
@@ -338,11 +340,12 @@ void opcontrol()
             rightBottomMotor.move(rightPower * -1);
         }
 
-        if(master.get_digital_new_press(DIGITAL_X))
+        if(abstractController.getDigitalNewPress(BUTTON_X))
         {
             if(disableMenu.get_value())
             {
-                if(master.get_digital(DIGITAL_LEFT) || master.get_digital(DIGITAL_RIGHT))
+                // During competition mode, only open the menu if either the right or left buttons are being held
+                if(abstractController.getDigital(BUTTON_LEFT) || abstractController.getDigital(BUTTON_RIGHT))
                 {
                     displayTesting();
                 }
@@ -357,9 +360,9 @@ void opcontrol()
             }   
         }
 
-        if(master.get_digital_new_press(DIGITAL_Y))
+        if(abstractController.getDigitalNewPress(BUTTON_Y))
         {
-            if(master.get_digital(DIGITAL_LEFT) || master.get_digital(DIGITAL_RIGHT))
+            if(abstractController.getDigital(BUTTON_LEFT) || abstractController.getDigital(BUTTON_RIGHT))
             {
                 flipTray();
             }
@@ -378,7 +381,7 @@ void opcontrol()
             }
         }
 
-        if(master.get_digital(TRAY_OUT))
+        if(abstractController.getDigital(TRAY_OUT))
         {
             if(trayMotorBack.get_position() <= TRAY_HIGHEST)
             {
@@ -391,7 +394,7 @@ void opcontrol()
             {
                 int speed = -80;
                 // Flick the tray when "A" is being held to deploy the tray
-                if(master.get_digital(DIGITAL_A))
+                if(abstractController.getDigital(BUTTON_A))
                 {
                     speed = -50;
                 }
@@ -411,7 +414,7 @@ void opcontrol()
                 trayWasMoving = true;
             }
         }
-        else if(master.get_digital(TRAY_IN))
+        else if(abstractController.getDigital(TRAY_IN))
         {
             //TODO add failsafe in case tray position reporting fails
             //     For example: holding "a" bypasses tray soft restrictions
@@ -433,8 +436,8 @@ void opcontrol()
                 else
                 {
                     // Move the tray quickly if A is pressed and regular speed if not
-                    trayMotorBack.move_velocity(master.get_digital(DIGITAL_A) ? 50 : 200);
-                    trayMotorFront.move_velocity(master.get_digital(DIGITAL_A) ? 50 : 200);
+                    trayMotorBack.move_velocity(abstractController.getDigital(BUTTON_A) ? 50 : 200);
+                    trayMotorFront.move_velocity(abstractController.getDigital(BUTTON_A) ? 50 : 200);
                     trayWasMoving = true;
                 }
             }
@@ -446,7 +449,7 @@ void opcontrol()
             trayWasMoving = false;
         }
 
-        if(master.get_digital(ARMS_UP))
+        if(abstractController.getDigital(ARMS_UP))
         {
             if(leftArmMotor.get_position() >= ARMS_HIGHEST)
             {
@@ -473,7 +476,7 @@ void opcontrol()
                 checkTrayArmsPos();
             }
         }
-        else if(master.get_digital(ARMS_DOWN))
+        else if(abstractController.getDigital(ARMS_DOWN))
         {
             if(leftArmMotor.get_position() <= ARMS_LOWEST)
             {
@@ -499,11 +502,11 @@ void opcontrol()
             rightArmMotor.move_velocity(0);
         }
 
-        if(master.get_digital(ROLLER_OUTTAKE))
+        if(abstractController.getDigital(ROLLER_OUTTAKE))
         {
             // Move intake out
             // Move slowly if A is pressed
-            if(!master.get_digital(DIGITAL_A))
+            if(!abstractController.getDigital(BUTTON_A))
             {
                 //leftIntake.move(-127);
                 //rightIntake.move(127);
@@ -516,11 +519,11 @@ void opcontrol()
             }
             intakesWereMoving = true;
         }
-        else if(master.get_digital(ROLLER_INTAKE))
+        else if(abstractController.getDigital(ROLLER_INTAKE))
         {
             // Move intake in
             // Move slowly if A is pressed
-            if(!master.get_digital(DIGITAL_A))
+            if(!abstractController.getDigital(BUTTON_A))
             {
                 // Deny intake if arms are up
                 if(leftArmMotor.get_position() > 750)
@@ -547,7 +550,7 @@ void opcontrol()
         }
 
         // Back up the robot while spinning the intake out
-        if(master.get_digital(BACKWARDS_OUT))
+        if(abstractController.getDigital(BACKWARDS_OUT))
         {
             leftTopMotor.move(-50);
             leftBottomMotor.move(-50);

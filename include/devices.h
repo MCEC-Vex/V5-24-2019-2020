@@ -4,6 +4,8 @@
 #include "api.h"
 #include "okapi/api.hpp"
 #include "displayLib/DisplayController.h"
+#include "serial/AbstractController.h"
+
 using namespace okapi::literals;
 
 // Motors are numbered from left to right
@@ -43,6 +45,7 @@ extern okapi::MedianFilter<5> backUltrasonicFilter;
 extern okapi::MedianFilter<5> rearUltrasonicFilter;*/
 
 extern pros::Controller master;
+extern AbstractController abstractController;
 
 extern DisplayController displayController;
 
