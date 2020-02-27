@@ -10,7 +10,7 @@ void runAutoSmall(bool red)
     // Move forward and intake cube stack
     chassis->setMaxVelocity(25);
     leftIntake.move_velocity(100);
-    rightIntake.move_velocity(-100);
+    rightIntake.move_velocity(100);
     chassis->moveDistance(2.3_ft);
     leftIntake.move_velocity(0);
     rightIntake.move_velocity(0);
@@ -22,7 +22,7 @@ void runAutoSmall(bool red)
 
     // Slightly outtake cubes
     leftIntake.move_velocity(-50);
-    rightIntake.move_velocity(50);
+    rightIntake.move_velocity(-50);
     pros::delay(400);
     leftIntake.move_velocity(0);
     rightIntake.move_velocity(-0);
@@ -59,7 +59,7 @@ void runAutoBigFast(bool red)
 
     //move forward and intake "2nd row"
     leftIntake.move_velocity(AUTON_BIG_INTAKE_SPEED_FAST);
-    rightIntake.move_velocity(AUTON_BIG_INTAKE_SPEED_FAST * -1);
+    rightIntake.move_velocity(AUTON_BIG_INTAKE_SPEED_FAST);
 
     chassis->moveDistance(1.7_ft);
     /*chassis->setMaxVelocity(20);
@@ -99,7 +99,7 @@ void runAutoBigFast(bool red)
     // Move forward and intake cube stack... copied from runAutoSmall
 
     leftIntake.move_velocity(AUTON_BIG_INTAKE_SPEED_FAST);
-    rightIntake.move_velocity(AUTON_BIG_INTAKE_SPEED_FAST * -1);
+    rightIntake.move_velocity(AUTON_BIG_INTAKE_SPEED_FAST);
 
     chassis->setMaxVelocity(70);
     chassis->moveDistance(2.8_ft);
@@ -134,7 +134,7 @@ void runAutoBigFast(bool red)
     pros::delay(400);
     // Slightly outtake cubes
     leftIntake.move_velocity(-40);
-    rightIntake.move_velocity(40);
+    rightIntake.move_velocity(-40);
     pros::delay(200);
     leftIntake.move_velocity(0);
     rightIntake.move_velocity(0);
@@ -172,7 +172,7 @@ void runSpicyAuton(bool red)
 
     // Move forward to collect the cubes from the first row
     leftIntake.move_velocity(150);
-    rightIntake.move_velocity(-150);
+    rightIntake.move_velocity(150);
     chassis->setMaxVelocity(80);
     chassis->moveDistance(3.2_ft);
     leftIntake.move_velocity(0);
@@ -190,7 +190,7 @@ void runSpicyAuton(bool red)
 
     // Get second row of cubes
     leftIntake.move_velocity(150);
-    rightIntake.move_velocity(-150);
+    rightIntake.move_velocity(150);
     profileController->generatePath({
         {0_ft, 0_ft, 0_deg},
         {1.65_ft, 0_ft, 0_deg}},
@@ -204,9 +204,9 @@ void runSpicyAuton(bool red)
 
     // Turn 90 degrees and go to the goal
     // Move up tray
-    setTrayPosition(-800, 30);
+    setTrayPosition(800, 30);
     leftIntake.move_relative(-90, 20);
-    rightIntake.move_relative(90, 20);
+    rightIntake.move_relative(-90, 20);
 
     chassis->turnAngle(90_deg * sign);
     profileController->generatePath({
@@ -218,7 +218,7 @@ void runSpicyAuton(bool red)
     profileController->waitUntilSettled();
 
     // Deposit cubes
-    setTrayPosition(-1500, 40);
+    setTrayPosition(1500, 40);
     moveMotors(chassis, 0.52_ft, 25, 1000);
     moveTrayToHighest();
     moveMotors(chassis, 0.1_ft, 10, 1000);
@@ -231,8 +231,8 @@ void runSpicyAuton(bool red)
     pros::delay(50);
     leftTopMotor.move_relative(-1500, 80);
     leftBottomMotor.move_relative(-1500, 80);
-    rightTopMotor.move_relative(1500, 80);
-    rightBottomMotor.move_relative(1500, 80);
+    rightTopMotor.move_relative(-1500, 80);
+    rightBottomMotor.move_relative(-1500, 80);
 
     pros::delay(3000);
     leftIntake.move(0);

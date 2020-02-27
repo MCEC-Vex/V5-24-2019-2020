@@ -298,7 +298,7 @@ void opcontrol()
                 forwardPower /= 4;
                 turningPower /= 4;
 
-                if(pros::millis() - lastJiggleTime > 300 && trayMotorBack.get_position() < (TRAY_HIGHEST + 300)
+                if(pros::millis() - lastJiggleTime > 300 && trayMotorBack.get_position() > (TRAY_HIGHEST - 300)
                     && forwardPower < 0)
                 {
                     lastJiggleTime = pros::millis();
@@ -308,12 +308,12 @@ void opcontrol()
                     if(jiggleForwards)
                     {
                         leftIntake.move(80);
-                        rightIntake.move(-80);
+                        rightIntake.move(80);
                     }
                     else
                     {
                         leftIntake.move(-80);
-                        rightIntake.move(80);
+                        rightIntake.move(-80);
                     }
                 }
                 
@@ -326,8 +326,8 @@ void opcontrol()
 
             leftTopMotor.move(forwardPower + turningPower);
             leftBottomMotor.move(forwardPower + turningPower);
-            rightTopMotor.move((forwardPower - turningPower) * -1);
-            rightBottomMotor.move((forwardPower - turningPower) * -1);
+            rightTopMotor.move(forwardPower - turningPower);
+            rightBottomMotor.move(forwardPower - turningPower);
         }
         else
         {
@@ -343,8 +343,8 @@ void opcontrol()
 
             leftTopMotor.move(leftPower);
             leftBottomMotor.move(leftPower);
-            rightTopMotor.move(rightPower * -1);
-            rightBottomMotor.move(rightPower * -1);
+            rightTopMotor.move(rightPower);
+            rightBottomMotor.move(rightPower);
         }
 
         if(abstractController.getDigitalNewPress(BUTTON_X))
@@ -369,6 +369,8 @@ void opcontrol()
 
         if(abstractController.getDigitalNewPress(BUTTON_Y))
         {
+            // If left/right is being pressed at the same time, flip the tray (for driver skills)
+            // Otherwise, toggle anti-tip
             if(abstractController.getDigital(BUTTON_LEFT) || abstractController.getDigital(BUTTON_RIGHT))
             {
                 flipTray();
@@ -390,7 +392,7 @@ void opcontrol()
 
         if(abstractController.getDigital(TRAY_OUT))
         {
-            if(trayMotorBack.get_position() <= TRAY_HIGHEST)
+            if(trayMotorBack.get_position() >= TRAY_HIGHEST)
             {
                 // Refuse to move the tray above its lowest safe point
                 displayController.rumble(".");
@@ -399,20 +401,20 @@ void opcontrol()
             }
             else
             {
-                int speed = -80;
+                int speed = 80;
                 // Flick the tray when "A" is being held to deploy the tray
                 if(abstractController.getDigital(BUTTON_A))
                 {
-                    speed = -50;
+                    speed = 50;
                 }
-                else if(trayMotorFront.get_position() < -1500)
+                else if(trayMotorFront.get_position() > 1500)
                 {
                     // Reduces tray speed as it reaches the apex
                     // Calculates "segments" from the current position to the max position
                     // Then, divide 60 by the number of segments and multiply that by an
                     // equation that is (number of segments) at minimum and 0 at maximum
-                    float segments = abs(TRAY_HIGHEST) - 1500;
-                    speed = -20 - ((60.0 / segments) * (segments - abs(trayMotorFront.get_position() + 1500)));
+                    float segments = TRAY_HIGHEST - 1500;
+                    speed = 20 + ((60.0 / segments) * (segments - abs(trayMotorFront.get_position() - 1500)));
                 }
 
                 trayMotorBack.move_velocity(speed);
@@ -425,7 +427,7 @@ void opcontrol()
         {
             //TODO add failsafe in case tray position reporting fails
             //     For example: holding "a" bypasses tray soft restrictions
-            if(trayMotorBack.get_position() >= TRAY_LOWEST)
+            if(trayMotorBack.get_position() <= TRAY_LOWEST)
             {
                 // Refuse to move the tray below its lowest safe point
                 displayController.rumble(".");
@@ -435,7 +437,7 @@ void opcontrol()
             }
             else
             {
-                if(trayMotorFront.get_position() > (TRAY_HIGHEST / 2))
+                if(trayMotorFront.get_position() < (TRAY_HIGHEST / 2))
                 {
                     trayWasMoving = false;
                     setTrayPosition(0, 200);
@@ -443,8 +445,8 @@ void opcontrol()
                 else
                 {
                     // Move the tray quickly if A is pressed and regular speed if not
-                    trayMotorBack.move_velocity(abstractController.getDigital(BUTTON_A) ? 50 : 200);
-                    trayMotorFront.move_velocity(abstractController.getDigital(BUTTON_A) ? 50 : 200);
+                    trayMotorBack.move_velocity(abstractController.getDigital(BUTTON_A) ? -50 : -200);
+                    trayMotorFront.move_velocity(abstractController.getDigital(BUTTON_A) ? -50 : -200);
                     trayWasMoving = true;
                 }
             }
@@ -468,15 +470,14 @@ void opcontrol()
             else
             {
                 // Move the arms up
-                // Slow speed is 80
-                if(leftArmMotor.get_position() < 100 && trayMotorFront.get_position() > -60)
+                if(leftArmMotor.get_position() < 100 && trayMotorFront.get_position() < 60)
                 {
-                    setTrayPosition(-100, 200);
+                    setTrayPosition(100, 200);
                 }
                 else
                 {
                     leftArmMotor.move_velocity(ARMS_SPEED);
-                    rightArmMotor.move_velocity(ARMS_SPEED * -1);
+                    rightArmMotor.move_velocity(ARMS_SPEED);
                 }
 
                 armsWereMoving = true;
@@ -496,7 +497,7 @@ void opcontrol()
             {
                 // Move the arms down
                 leftArmMotor.move_velocity(ARMS_SPEED * -1);
-                rightArmMotor.move_velocity(ARMS_SPEED);
+                rightArmMotor.move_velocity(ARMS_SPEED * -1);
 
                 armsWereMoving = true;
                 checkTrayArmsPos();
@@ -513,16 +514,15 @@ void opcontrol()
         {
             // Move intake out
             // Move slowly if A is pressed
-            if(!abstractController.getDigital(BUTTON_A))
+            if(abstractController.getDigital(BUTTON_A))
             {
-                //leftIntake.move(-127);
-                //rightIntake.move(127);
-                moveIntakeAtSharedSpeed(-200);
+                leftIntake.move_velocity(-100);
+                rightIntake.move_velocity(-100);
             }
             else
             {
-                leftIntake.move_velocity(-100);
-                rightIntake.move_velocity(100);
+                leftIntake.move_velocity(-200);
+                rightIntake.move_velocity(-200);
             }
             intakesWereMoving = true;
         }
@@ -530,7 +530,12 @@ void opcontrol()
         {
             // Move intake in
             // Move slowly if A is pressed
-            if(!abstractController.getDigital(BUTTON_A))
+            if(abstractController.getDigital(BUTTON_A))
+            {
+                leftIntake.move_velocity(100);
+                rightIntake.move_velocity(100);
+            }
+            else
             {
                 // Deny intake if arms are up
                 if(leftArmMotor.get_position() > 750)
@@ -541,11 +546,6 @@ void opcontrol()
                 {
                     moveIntakeAtSharedSpeed(200);
                 }
-            }
-            else
-            {
-                leftIntake.move_velocity(100);
-                rightIntake.move_velocity(-100);
             }
             intakesWereMoving = true;
         }
@@ -561,11 +561,11 @@ void opcontrol()
         {
             leftTopMotor.move(-50);
             leftBottomMotor.move(-50);
-            rightTopMotor.move(50);
-            rightBottomMotor.move(50);
+            rightTopMotor.move(-50);
+            rightBottomMotor.move(-50);
 
             leftIntake.move(-80);
-            rightIntake.move(80);
+            rightIntake.move(-80);
         }
 
         if(autoRedSmall.get_value())

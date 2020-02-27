@@ -6,8 +6,6 @@ pros::Motor leftBottomMotor(2);
 pros::Motor rightTopMotor(3);
 pros::Motor rightBottomMotor(4);
 
-//pros::Motor centerWheel(15);
-
 pros::Motor leftIntake(17);
 pros::Motor rightIntake(16);
 
@@ -17,24 +15,11 @@ pros::Motor rightArmMotor(9);
 pros::Motor trayMotorBack(13);
 pros::Motor trayMotorFront(14);
 
-//pros::Motor tipMotorLeft(17);
-//pros::Motor tipMotorRight(18);
-
 pros::ADIPort autoRedSmall(1);
 pros::ADIPort autoRedBig(2);
 pros::ADIPort autoBlueSmall(3);
 pros::ADIPort autoBlueBig(4);
 pros::ADIPort disableMenu(8);
-//pros::ADIPort tipSensor(1);
-//pros::ADIPort autoSafe(5);
-//pros::ADIPort autoTesting(6);
-/*pros::ADIUltrasonic frontUltrasonic(7, 8);
-pros::ADIUltrasonic backUltrasonic(5, 6);
-pros::ADIUltrasonic rearUltrasonic(3, 4);
-okapi::MedianFilter<5> frontUltrasonicFilter;
-okapi::MedianFilter<5> backUltrasonicFilter;
-okapi::MedianFilter<5> rearUltrasonicFilter;*/
-
 
 pros::Controller master(pros::E_CONTROLLER_MASTER);
 
@@ -52,7 +37,7 @@ std::shared_ptr<okapi::AsyncMotionProfileController> profileController = okapi::
     .withOutput(chassis)
     .buildMotionProfileController();
 
-    std::shared_ptr<okapi::AsyncMotionProfileController> profileControllerFast = okapi::AsyncMotionProfileControllerBuilder()
+std::shared_ptr<okapi::AsyncMotionProfileController> profileControllerFast = okapi::AsyncMotionProfileControllerBuilder()
     .withLimits({0.8, 1.5, 7.5})
     .withOutput(chassis)
     .buildMotionProfileController();

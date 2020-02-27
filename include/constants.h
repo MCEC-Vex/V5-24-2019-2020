@@ -3,13 +3,8 @@
 
 // Motor positions
 //TODO document the process for obtaining these values
-#define LEFT_ARM_LOW_SAFE 216
-#define RIGHT_ARM_LOW_SAFE -211
 #define TRAY_LOWEST 0
-#define TRAY_HIGHEST -3250
-#define TRAY_ARM_SAFE -750
-#define ARM_TOWER_LOW_LEFT 1500
-#define ARM_TOWER_HIGH_LEFT 1910
+#define TRAY_HIGHEST 3250
 
 // Arm software limits for bot safety
 #define ARMS_LOWEST 0
