@@ -1,19 +1,19 @@
 #include "devices.h"
 
-// Bad ports: 5,6,21,12,15,11
-pros::Motor leftTopMotor(1);
-pros::Motor leftBottomMotor(2);
-pros::Motor rightTopMotor(3);
-pros::Motor rightBottomMotor(4);
+// Bad ports: 5,6,21,12,11
+pros::Motor leftTopMotor(8);
+pros::Motor leftBottomMotor(9);
+pros::Motor rightTopMotor(7);
+pros::Motor rightBottomMotor(10);
 
 pros::Motor leftIntake(17);
 pros::Motor rightIntake(16);
 
-pros::Motor leftArmMotor(8);
-pros::Motor rightArmMotor(9);
+pros::Motor leftArmMotor(14);
+pros::Motor rightArmMotor(13);
 
-pros::Motor trayMotorBack(13);
-pros::Motor trayMotorFront(14);
+pros::Motor trayMotorBack(3);
+pros::Motor trayMotorFront(4);
 
 pros::ADIPort autoRedSmall(1);
 pros::ADIPort autoRedBig(2);
@@ -28,7 +28,7 @@ DisplayController displayController(master);
 
 std::shared_ptr<okapi::ChassisController> chassis = okapi::ChassisControllerBuilder()
         // Left side is 1,2 right side is -3,-4 (negative indicates reversed)
-        .withMotors({1, 2}, {-3, -4})
+        .withMotors({8, 9}, {-7, -10})
         .withDimensions(okapi::AbstractMotor::gearset::green, {{4_in, 9.5_in}, okapi::imev5GreenTPR})
         .build();
 

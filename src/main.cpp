@@ -407,14 +407,14 @@ void opcontrol()
                 {
                     speed = 50;
                 }
-                else if(trayMotorFront.get_position() > 1500)
+                else if(trayMotorFront.get_position() > (TRAY_HIGHEST / 2))
                 {
                     // Reduces tray speed as it reaches the apex
                     // Calculates "segments" from the current position to the max position
                     // Then, divide 60 by the number of segments and multiply that by an
                     // equation that is (number of segments) at minimum and 0 at maximum
-                    float segments = TRAY_HIGHEST - 1500;
-                    speed = 20 + ((60.0 / segments) * (segments - abs(trayMotorFront.get_position() - 1500)));
+                    float segments = TRAY_HIGHEST / 2;
+                    speed = 20 + ((60.0 / segments) * (segments - abs(trayMotorFront.get_position() - (TRAY_HIGHEST / 2))));
                 }
 
                 trayMotorBack.move_velocity(speed);

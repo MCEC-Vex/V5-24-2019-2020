@@ -8,12 +8,8 @@ void setupMotors()
     rightTopMotor.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
     rightBottomMotor.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
 
-
     trayMotorBack.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
     trayMotorFront.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
-
-    trayMotorBack.set_reversed(true);
-    trayMotorFront.set_reversed(true);
 
     leftArmMotor.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
     rightArmMotor.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
@@ -24,9 +20,6 @@ void setupMotors()
     // Right side forward is positive
     rightTopMotor.set_reversed(true);
     rightBottomMotor.set_reversed(true);
-    // Tray going out is positive
-    trayMotorBack.set_reversed(true);
-    trayMotorFront.set_reversed(true);
     // Right arm going up is positive
     rightArmMotor.set_reversed(true);
     // Right intake intaking is positive
@@ -91,7 +84,7 @@ void checkTrayArmsPos()
     {
         return;
     }
-
+    
     if(leftArmMotor.get_position() < 150)
     {
         setTrayPosition(TRAY_LOWEST + 70, TRAY_SHIFT_SPEED);
@@ -100,7 +93,7 @@ void checkTrayArmsPos()
     {
         setTrayPosition(TRAY_LOWEST + 200, TRAY_SHIFT_SPEED);
     }
-    else if(leftArmMotor.get_position() < 650)
+    else if(leftArmMotor.get_position() < 500)
     {
         setTrayPosition(TRAY_LOWEST + 350, TRAY_SHIFT_SPEED);
     }
