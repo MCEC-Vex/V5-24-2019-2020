@@ -248,9 +248,6 @@ void opcontrol()
 
     unsigned long lastSent = pros::millis();
 
-    unsigned long lastJiggleTime = 0;
-    bool jiggleForwards = true;
-
     while(true)
     {
         abstractController.checkController();
@@ -296,32 +293,7 @@ void opcontrol()
             if(abstractController.getDigital(TRAY_OUT) || abstractController.getDigital(TRAY_IN))
             {
                 forwardPower /= 4;
-                turningPower /= 4;
-
-                if(pros::millis() - lastJiggleTime > 300 && trayMotorBack.get_position() > (TRAY_HIGHEST - 300)
-                    && forwardPower < 0)
-                {
-                    lastJiggleTime = pros::millis();
-
-                    jiggleForwards = !jiggleForwards;
-
-                    if(jiggleForwards)
-                    {
-                        leftIntake.move(80);
-                        rightIntake.move(80);
-                    }
-                    else
-                    {
-                        leftIntake.move(-80);
-                        rightIntake.move(-80);
-                    }
-                }
-                
-            }
-            else if(pros::millis() - lastJiggleTime > 100)
-            {
-                leftIntake.move(0);
-                rightIntake.move(0);
+                turningPower /= 4;                
             }
 
             leftTopMotor.move(forwardPower + turningPower);
@@ -420,6 +392,9 @@ void opcontrol()
                 trayMotorBack.move_velocity(speed);
                 trayMotorFront.move_velocity(speed);
 
+                leftArmMotor.move(-100);
+                rightArmMotor.move(-100);
+
                 trayWasMoving = true;
             }
         }
@@ -455,6 +430,10 @@ void opcontrol()
         {
             trayMotorBack.move_velocity(0);
             trayMotorFront.move_velocity(0);
+
+            leftArmMotor.move(0);
+            rightArmMotor.move(0);
+
             trayWasMoving = false;
         }
 
