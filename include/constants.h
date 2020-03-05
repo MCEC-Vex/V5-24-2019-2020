@@ -4,7 +4,7 @@
 // Motor positions
 //TODO document the process for obtaining these values
 #define TRAY_LOWEST 0
-#define TRAY_HIGHEST 2200
+#define TRAY_HIGHEST 2250
 
 // Arm software limits for bot safety
 #define ARMS_LOWEST 0

@@ -116,7 +116,7 @@ void moveTrayToHighest()
     leftIntake.move(-30);
     rightIntake.move(-30);
 
-    while(trayMotorFront.get_position() > TRAY_HIGHEST)
+    while(trayMotorFront.get_position() < TRAY_HIGHEST)
     {
         int speed = 80;
         if(trayMotorFront.get_position() > 1500)

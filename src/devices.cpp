@@ -31,7 +31,7 @@ DisplayController displayController(master);
 
 std::shared_ptr<okapi::ChassisController> chassis = okapi::ChassisControllerBuilder()
         // Left side is 1,2 right side is -3,-4 (negative indicates reversed)
-        .withMotors({8, 9}, {-7, -10})
+        .withMotors({8, 9}, {7, 10})
         .withDimensions(okapi::AbstractMotor::gearset::green, {{4_in, 9.5_in}, okapi::imev5GreenTPR})
         .build();
 
