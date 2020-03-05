@@ -1,6 +1,6 @@
 #include "devices.h"
 
-// Bad ports: 5,6,21,12,11
+// Bad ports: 5,6,21,12,11,19
 pros::Motor leftTopMotor(8);
 pros::Motor leftBottomMotor(9);
 pros::Motor rightTopMotor(7);
@@ -14,6 +14,9 @@ pros::Motor rightArmMotor(13);
 
 pros::Motor trayMotorBack(3);
 pros::Motor trayMotorFront(4);
+
+pros::Motor leftAntiTip(18);
+pros::Motor rightAntiTip(15);
 
 pros::ADIPort autoRedSmall(1);
 pros::ADIPort autoRedBig(2);
@@ -43,3 +46,4 @@ std::shared_ptr<okapi::AsyncMotionProfileController> profileControllerFast = oka
     .buildMotionProfileController();
 
 bool tankMode = false;
+bool antiTipEnabled = false;

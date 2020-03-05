@@ -34,7 +34,7 @@ float gyroY = 0.0;
 unsigned long lastAntiTipPacket = 0;
 unsigned int antiTipTriggerCount = 1;
 pros::Mutex antiTipMutex;
-bool antiTipDisabled = false;
+bool arduinoAntiTipDisabled = false;
 
 #define SERIALPORT 19
 
@@ -59,7 +59,7 @@ void onPacketReceived(const uint8_t* buffer, size_t size)
     }
     else if(header.type == ANTI_TIP)
     {
-        if(!antiTipDisabled && trayMotorFront.get_position() > -700)
+        if(!arduinoAntiTipDisabled && trayMotorFront.get_position() > -700)
         {
             antiTipMutex.take(20);
             AntiTipPacket antiTipPacket;
@@ -349,16 +349,45 @@ void opcontrol()
             }
             else
             {
-                displayController.rumble("-");
-                antiTipDisabled = !antiTipDisabled;
-                if(antiTipDisabled)
+                antiTipEnabled = !antiTipEnabled;
+                if(antiTipEnabled)
                 {
-                    displayController.setLine(1, "ANTITIP OFF");
+                    // If "A" is being held at the same time, go full power on the antitip motors
+                    // *Just* in case there's a situation where we need the power
+                    if(abstractController.getDigital(BUTTON_A))
+                    {
+                        leftAntiTip.move(127);
+                        rightAntiTip.move(127);
+                        displayController.setLine(1, "BEEF OUT");
+                    }
+                    else
+                    {
+                        leftAntiTip.move_absolute(ANTI_TIP_LOW_POS, 200);
+                        rightAntiTip.move_absolute(ANTI_TIP_LOW_POS, 200);
+                        displayController.setLine(1, "Antitip out");
+                    }
                 }
                 else
                 {
-                    displayController.clearLine(1);
+                    leftAntiTip.move_absolute(0, 200);
+                    rightAntiTip.move_absolute(0, 200);
+                    displayController.setLine(1, "Antitip in");
                 }
+            }
+        }
+
+        if(antiTipEnabled == false && (leftAntiTip.get_position() < 50 || rightAntiTip.get_position() < 50))
+        {
+            leftAntiTip.move(-40);
+            rightAntiTip.move(-40);
+
+            if(leftAntiTip.get_position() < 0)
+            {
+                leftAntiTip.tare_position();
+            }
+            if(rightAntiTip.get_position() < 0)
+            {
+                rightAntiTip.tare_position();
             }
         }
 
@@ -392,8 +421,8 @@ void opcontrol()
                 trayMotorBack.move_velocity(speed);
                 trayMotorFront.move_velocity(speed);
 
-                leftArmMotor.move(-100);
-                rightArmMotor.move(-100);
+                //leftArmMotor.move(-100);
+                //rightArmMotor.move(-100);
 
                 trayWasMoving = true;
             }

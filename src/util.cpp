@@ -24,6 +24,8 @@ void setupMotors()
     rightArmMotor.set_reversed(true);
     // Right intake intaking is positive
     rightIntake.set_reversed(true);
+    // Right antitip going out is positive
+    rightAntiTip.set_reversed(true);
 }
 
 void flipTray()

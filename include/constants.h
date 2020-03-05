@@ -4,7 +4,7 @@
 // Motor positions
 //TODO document the process for obtaining these values
 #define TRAY_LOWEST 0
-#define TRAY_HIGHEST 2174
+#define TRAY_HIGHEST 2200
 
 // Arm software limits for bot safety
 #define ARMS_LOWEST 0
@@ -17,6 +17,8 @@
 
 #define ANTI_TIP_DECEL_TIME 5000.0
 #define ANTI_TIP_SCALE 3.5
+
+#define ANTI_TIP_LOW_POS 1400
 
 // Control definitions
 #define FORWARD_POWER STICK_LEFT_Y
