@@ -18,7 +18,7 @@
 #define ANTI_TIP_DECEL_TIME 5000.0
 #define ANTI_TIP_SCALE 3.5
 
-#define ANTI_TIP_LOW_POS 1400
+#define ANTI_TIP_LOW_POS 1350
 
 // Control definitions
 #define FORWARD_POWER STICK_LEFT_Y

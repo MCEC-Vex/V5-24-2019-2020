@@ -369,8 +369,8 @@ void opcontrol()
                 }
                 else
                 {
-                    leftAntiTip.move_absolute(0, 200);
-                    rightAntiTip.move_absolute(0, 200);
+                    leftAntiTip.move_absolute(50, 200);
+                    rightAntiTip.move_absolute(50, 200);
                     displayController.setLine(1, "Antitip in");
                 }
             }
@@ -378,14 +378,14 @@ void opcontrol()
 
         if(antiTipEnabled == false && (leftAntiTip.get_position() < 50 || rightAntiTip.get_position() < 50))
         {
-            leftAntiTip.move(-40);
-            rightAntiTip.move(-40);
+            leftAntiTip.move(leftAntiTip.get_position() < 50 ? -10 : -25);
+            rightAntiTip.move(rightAntiTip.get_position() < 50 ? -10 : -25);
 
-            if(leftAntiTip.get_position() < 0)
+            if(leftAntiTip.get_position() < -5)
             {
                 leftAntiTip.tare_position();
             }
-            if(rightAntiTip.get_position() < 0)
+            if(rightAntiTip.get_position() < -5)
             {
                 rightAntiTip.tare_position();
             }
