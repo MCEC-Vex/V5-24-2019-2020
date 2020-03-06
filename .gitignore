@@ -16,3 +16,6 @@ compile_commands.json
 
 # CLion
 .idea
+
+# VSCode
+.vscode/c_cpp_properties.json
