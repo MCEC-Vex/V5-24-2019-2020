@@ -29,6 +29,7 @@ extern pros::ADIPort autoRedSmall;
 extern pros::ADIPort autoRedBig;
 extern pros::ADIPort autoBlueSmall;
 extern pros::ADIPort autoBlueBig;
+extern pros::ADIPort disableBrake;
 extern pros::ADIPort disableMenu;
 
 extern pros::Controller master;
@@ -39,6 +40,7 @@ extern DisplayController displayController;
 extern std::shared_ptr<okapi::ChassisController> chassis;
 extern std::shared_ptr<okapi::AsyncMotionProfileController> profileController;
 extern std::shared_ptr<okapi::AsyncMotionProfileController> profileControllerFast;
+extern std::shared_ptr<okapi::AsyncMotionProfileController> profileControllerChonky;
 
 extern bool tankMode;
 extern bool antiTipEnabled;

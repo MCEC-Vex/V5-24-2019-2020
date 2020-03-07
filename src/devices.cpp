@@ -22,6 +22,7 @@ pros::ADIPort autoRedSmall(1);
 pros::ADIPort autoRedBig(2);
 pros::ADIPort autoBlueSmall(3);
 pros::ADIPort autoBlueBig(4);
+pros::ADIPort disableBrake(7);
 pros::ADIPort disableMenu(8);
 
 pros::Controller master(pros::E_CONTROLLER_MASTER);
@@ -42,6 +43,11 @@ std::shared_ptr<okapi::AsyncMotionProfileController> profileController = okapi::
 
 std::shared_ptr<okapi::AsyncMotionProfileController> profileControllerFast = okapi::AsyncMotionProfileControllerBuilder()
     .withLimits({0.8, 1.5, 7.5})
+    .withOutput(chassis)
+    .buildMotionProfileController();
+
+std::shared_ptr<okapi::AsyncMotionProfileController> profileControllerChonky = okapi::AsyncMotionProfileControllerBuilder()
+    .withLimits({0.2, 0.4, 2.0})
     .withOutput(chassis)
     .buildMotionProfileController();
 

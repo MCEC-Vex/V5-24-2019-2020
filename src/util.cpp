@@ -30,12 +30,12 @@ void setupMotors()
 
 void flipTray()
 {
-    leftIntake.move(127);
-    rightIntake.move(127);
+    leftIntake.move(-127);
+    rightIntake.move(-127);
 
     // Move the arms up and use the pre-made tray movement function to adjust the tray in response
-    leftArmMotor.move_absolute(500, 200);
-    rightArmMotor.move_absolute(500, 200);
+    leftArmMotor.move_absolute(1500, 200);
+    rightArmMotor.move_absolute(1500, 200);
     for(int i = 0; i < 100; i++)
     {
         checkTrayArmsPosOld();
@@ -215,4 +215,18 @@ void moveChassisDistance(std::shared_ptr<okapi::ChassisController> chassis,
     rightBottomMotor.move_relative(dPosRight, velocity);
 
     waitUntilMotorWithin(leftTopMotor, dPosLeft, 15, 10000);
+}
+
+void deployAntiTip()
+{
+    antiTipEnabled = true;
+    leftAntiTip.move_absolute(ANTI_TIP_LOW_POS, 200);
+    rightAntiTip.move_absolute(ANTI_TIP_LOW_POS, 200);
+}
+
+void retractAntiTip()
+{
+    antiTipEnabled = false;
+    leftAntiTip.move_absolute(50, 200);
+    rightAntiTip.move_absolute(50, 200);
 }

@@ -87,4 +87,8 @@ void tareChassis();
 void moveChassisDistance(std::shared_ptr<okapi::ChassisController> chassis,
     okapi::QLength leftDistance, okapi::QLength rightDistance, int velocity);
 
+void deployAntiTip();
+
+void retractAntiTip();
+
 #endif //MCEC_V5_UTIL_H

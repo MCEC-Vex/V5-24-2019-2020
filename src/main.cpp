@@ -5,9 +5,41 @@
  */
 void displayTimerTask(void* unused)
 {
+    bool wasPressed = false;
+
     while(true)
     {
         displayController.sendNext();
+
+        if(disableBrake.get_value())
+        {
+            if(!wasPressed)
+            {
+                leftTopMotor.set_brake_mode(pros::E_MOTOR_BRAKE_COAST);
+                leftBottomMotor.set_brake_mode(pros::E_MOTOR_BRAKE_COAST);
+                rightTopMotor.set_brake_mode(pros::E_MOTOR_BRAKE_COAST);
+                rightBottomMotor.set_brake_mode(pros::E_MOTOR_BRAKE_COAST);
+                wasPressed = true;
+            }
+        }
+        else
+        {
+            if(wasPressed)
+            {
+                leftTopMotor.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
+                leftBottomMotor.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
+                rightTopMotor.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
+                rightBottomMotor.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
+
+                leftTopMotor.move_velocity(0);
+                leftBottomMotor.move_velocity(0);
+                rightTopMotor.move_velocity(0);
+                rightBottomMotor.move_velocity(0);
+
+                wasPressed = false;
+            }
+        }
+
         pros::delay(51);
     }
 }
@@ -153,6 +185,7 @@ void initialize()
     pros::lcd::initialize();
     setupMotors();
     pros::Task displayTask(displayTimerTask, (void*)"", TASK_PRIORITY_DEFAULT, TASK_STACK_DEPTH_DEFAULT);
+    //pros::Task disableBrakeTask(disableBrakeTask, (void*)"", TASK_PRIORITY_MIN, TASK_STACK_DEPTH_DEFAULT);
 
     // Start serial on desired port
     vexGenericSerialEnable(SERIALPORT - 1, 0);
@@ -362,15 +395,13 @@ void opcontrol()
                     }
                     else
                     {
-                        leftAntiTip.move_absolute(ANTI_TIP_LOW_POS, 200);
-                        rightAntiTip.move_absolute(ANTI_TIP_LOW_POS, 200);
+                        deployAntiTip();
                         displayController.setLine(1, "Antitip out");
                     }
                 }
                 else
                 {
-                    leftAntiTip.move_absolute(50, 200);
-                    rightAntiTip.move_absolute(50, 200);
+                    retractAntiTip();
                     displayController.setLine(1, "Antitip in");
                 }
             }
