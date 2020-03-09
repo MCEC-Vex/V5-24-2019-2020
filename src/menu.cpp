@@ -172,15 +172,45 @@ void openAutoMenu(DisplayCore* core)
         core->waitForPop();
     }, "Spicy blue", core);
 
-    MenuAction menu[6] = {
-        smallRed,
-        smallBlue,
-        redFast,
-        blueFast,
+    MenuAction mildRed([](DisplayCore* core)
+    {
+        core->popScreen();
+
+        unsigned long startTime = pros::millis();
+        runMildAuton(true);
+        unsigned long timeTaken = pros::millis() - startTime;
+
+        std::string tempDisplay[2];
+        tempDisplay[0] = "Time taken:";
+        tempDisplay[1] = std::to_string(timeTaken);
+        TextDisplayScreen timeTakenText(core, tempDisplay, 2);
+        core->pushScreen(&timeTakenText);
+        core->waitForPop();
+    }, "Mild red", core);
+
+    MenuAction mildBlue([](DisplayCore* core)
+    {
+        core->popScreen();
+
+        unsigned long startTime = pros::millis();
+        runMildAuton(false);
+        unsigned long timeTaken = pros::millis() - startTime;
+
+        std::string tempDisplay[2];
+        tempDisplay[0] = "Time taken:";
+        tempDisplay[1] = std::to_string(timeTaken);
+        TextDisplayScreen timeTakenText(core, tempDisplay, 2);
+        core->pushScreen(&timeTakenText);
+        core->waitForPop();
+    }, "Mild blue", core);
+
+    MenuAction menu[4] = {
+        mildRed,
+        mildBlue,
         spicyRed,
         spicyBlue
     };
-    MenuScreen screen(core, menu, 6);
+    MenuScreen screen(core, menu, 4);
 
     core->pushScreen(&screen);
     core->waitForPop();

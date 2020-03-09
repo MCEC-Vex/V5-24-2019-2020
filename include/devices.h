@@ -44,5 +44,6 @@ extern std::shared_ptr<okapi::AsyncMotionProfileController> profileControllerCho
 
 extern bool tankMode;
 extern bool antiTipEnabled;
+extern bool armsBrake;
 
 #endif //MCEC_V5_DEVICES_H

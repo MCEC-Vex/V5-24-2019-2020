@@ -11,8 +11,8 @@ void setupMotors()
     trayMotorBack.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
     trayMotorFront.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
 
-    leftArmMotor.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
-    rightArmMotor.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
+    //leftArmMotor.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
+    //rightArmMotor.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
 
     leftIntake.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
     rightIntake.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
@@ -34,8 +34,8 @@ void flipTray()
     rightIntake.move(-127);
 
     // Move the arms up and use the pre-made tray movement function to adjust the tray in response
-    leftArmMotor.move_absolute(1500, 200);
-    rightArmMotor.move_absolute(1500, 200);
+    leftArmMotor.move_absolute(2500, 200);
+    rightArmMotor.move_absolute(2500, 200);
     for(int i = 0; i < 100; i++)
     {
         checkTrayArmsPosOld();
@@ -53,6 +53,11 @@ void flipTray()
 
     leftIntake.move(0);
     rightIntake.move(0);
+    trayMotorBack.move_absolute(0, 200);
+    trayMotorFront.move_absolute(0, 200);
+
+    leftArmMotor.tare_position();
+    rightArmMotor.tare_position();
 }
 
 void checkTrayArmsPosOld()
@@ -84,7 +89,22 @@ void checkTrayArmsPos()
 {
     if(leftArmMotor.get_position() < 20)
     {
+        if(armsBrake)
+        {
+            armsBrake = false;
+            leftArmMotor.set_brake_mode(pros::E_MOTOR_BRAKE_COAST);
+            rightArmMotor.set_brake_mode(pros::E_MOTOR_BRAKE_COAST);
+        }
         return;
+    }
+    else
+    {
+        if(!armsBrake)
+        {
+            armsBrake = true;
+            leftArmMotor.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
+            rightArmMotor.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
+        }
     }
     
     if(leftArmMotor.get_position() < 150)

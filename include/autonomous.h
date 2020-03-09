@@ -37,6 +37,8 @@ void runAutoBigFast(bool red);
  */
 void runSpicyAuton(bool red);
 
+void runMildAuton(bool red);
+
 /**
  * Run asymmetry tests for forwards + backwards
  * 

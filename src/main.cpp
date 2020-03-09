@@ -519,6 +519,13 @@ void opcontrol()
                     rightArmMotor.move_velocity(ARMS_SPEED);
                 }
 
+                if(!antiTipEnabled)
+                {
+                    antiTipEnabled = true;
+                    leftAntiTip.move_absolute(200, 200);
+                    rightAntiTip.move_absolute(200, 200);
+                }
+
                 armsWereMoving = true;
                 checkTrayArmsPos();
             }
@@ -577,7 +584,7 @@ void opcontrol()
             else
             {
                 // Deny intake if arms are up
-                if(leftArmMotor.get_position() > 750)
+                if(leftArmMotor.get_position() > 750 && leftArmMotor.get_position() < (ARMS_HIGHEST + 1000))
                 {
                     moveIntakeAtSharedSpeed(-200);
                 }

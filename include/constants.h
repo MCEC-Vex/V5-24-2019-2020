@@ -8,7 +8,7 @@
 
 // Arm software limits for bot safety
 #define ARMS_LOWEST 0
-#define ARMS_HIGHEST 1770 // Sea shanties
+#define ARMS_HIGHEST 2000
 #define ARMS_SPEED 100
 
 #define TRAY_SHIFT_SPEED 200

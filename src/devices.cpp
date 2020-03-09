@@ -53,3 +53,4 @@ std::shared_ptr<okapi::AsyncMotionProfileController> profileControllerChonky = o
 
 bool tankMode = false;
 bool antiTipEnabled = false;
+bool armsBrake = false;
