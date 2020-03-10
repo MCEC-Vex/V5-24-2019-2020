@@ -9,8 +9,11 @@ void displayTimerTask(void* unused)
 
     while(true)
     {
+        // Sends the next line to the controller
         displayController.sendNext();
 
+        // Switch from brake mode to coast mode when a button is pressed
+        // Helps with moving the bot during auton practice
         if(disableBrake.get_value())
         {
             if(!wasPressed)
@@ -30,7 +33,7 @@ void displayTimerTask(void* unused)
                 leftBottomMotor.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
                 rightTopMotor.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
                 rightBottomMotor.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
-
+                pros::delay(10);
                 leftTopMotor.move_velocity(0);
                 leftBottomMotor.move_velocity(0);
                 rightTopMotor.move_velocity(0);
@@ -68,7 +71,7 @@ unsigned int antiTipTriggerCount = 1;
 pros::Mutex antiTipMutex;
 bool arduinoAntiTipDisabled = false;
 
-#define SERIALPORT 19
+#define SERIALPORT 1
 
 void onPacketReceived(const uint8_t* buffer, size_t size)
 {
@@ -185,7 +188,6 @@ void initialize()
     pros::lcd::initialize();
     setupMotors();
     pros::Task displayTask(displayTimerTask, (void*)"", TASK_PRIORITY_DEFAULT, TASK_STACK_DEPTH_DEFAULT);
-    //pros::Task disableBrakeTask(disableBrakeTask, (void*)"", TASK_PRIORITY_MIN, TASK_STACK_DEPTH_DEFAULT);
 
     // Start serial on desired port
     vexGenericSerialEnable(SERIALPORT - 1, 0);
@@ -231,14 +233,14 @@ void competition_initialize()
  */
 void autonomous()
 {
-    //runAutoSmall(false);
+    // Run autonomous depending on jumper clip placement
     if(autoRedSmall.get_value())
     {
-        runAutoSmall(true);
+        runMildAuton(true);
     }
     else if(autoBlueSmall.get_value())
     {
-        runAutoSmall(false);
+        runMildAuton(false);
     }
     else if(autoRedBig.get_value())
     {
@@ -248,11 +250,6 @@ void autonomous()
     {
         runSpicyAuton(false);
     }
-    /*else if(autoSafe.get_value())
-    {
-        chassis->setMaxVelocity(75);
-        chassis->moveDistance(3_ft);
-    }*/
 }
 
 /**
@@ -283,6 +280,7 @@ void opcontrol()
 
     while(true)
     {
+        // Poll the controller for changes
         abstractController.checkController();
 
         int antiTipSpeedChange = 0;
@@ -407,11 +405,14 @@ void opcontrol()
             }
         }
 
+        // Move the anti-tips inwards at a small voltage
         if(antiTipEnabled == false && (leftAntiTip.get_position() < 50 || rightAntiTip.get_position() < 50))
         {
-            leftAntiTip.move(leftAntiTip.get_position() < 50 ? -10 : -25);
-            rightAntiTip.move(rightAntiTip.get_position() < 50 ? -10 : -25);
+            leftAntiTip.move(leftAntiTip.get_position() < 50 ? -10 : -35);
+            rightAntiTip.move(rightAntiTip.get_position() < 50 ? -10 : -35);
 
+            // Auto-tare if this is the highest the anti-tips have been
+            // Automagically accounts for gear clicking messing up encoders
             if(leftAntiTip.get_position() < -5)
             {
                 leftAntiTip.tare_position();
@@ -452,9 +453,6 @@ void opcontrol()
                 trayMotorBack.move_velocity(speed);
                 trayMotorFront.move_velocity(speed);
 
-                //leftArmMotor.move(-100);
-                //rightArmMotor.move(-100);
-
                 trayWasMoving = true;
             }
         }
@@ -472,6 +470,7 @@ void opcontrol()
             }
             else
             {
+                // If moving the tray down and it's more than halfway, move it the rest of the way down
                 if(trayMotorFront.get_position() < (TRAY_HIGHEST / 2))
                 {
                     trayWasMoving = false;
@@ -491,9 +490,6 @@ void opcontrol()
             trayMotorBack.move_velocity(0);
             trayMotorFront.move_velocity(0);
 
-            leftArmMotor.move(0);
-            rightArmMotor.move(0);
-
             trayWasMoving = false;
         }
 
@@ -501,7 +497,7 @@ void opcontrol()
         {
             if(leftArmMotor.get_position() >= ARMS_HIGHEST)
             {
-                // Refuse to move the tray above its lowest safe point
+                // Refuse to move the arms above their highest safe point
                 displayController.rumble(".");
                 leftArmMotor.move_velocity(0);
                 rightArmMotor.move_velocity(0);
@@ -534,7 +530,7 @@ void opcontrol()
         {
             if(leftArmMotor.get_position() <= ARMS_LOWEST)
             {
-                // Refuse to move the tray above its lowest safe point
+                // Refuse to move the arms below their lowest safe point
                 displayController.rumble(".");
                 leftArmMotor.move_velocity(0);
                 rightArmMotor.move_velocity(0);
@@ -559,7 +555,7 @@ void opcontrol()
         if(abstractController.getDigital(ROLLER_OUTTAKE))
         {
             // Move intake out
-            // Move slowly if A is pressed
+            // Move slowly if A is pressed (for towers)
             if(abstractController.getDigital(BUTTON_A))
             {
                 leftIntake.move_velocity(-100);
@@ -612,8 +608,10 @@ void opcontrol()
 
             leftIntake.move(-80);
             rightIntake.move(-80);
+            intakesWereMoving = true;
         }
 
+        // Print the currently selected auton
         if(autoRedSmall.get_value())
         {
             pros::lcd::print(4, "Auton red small");

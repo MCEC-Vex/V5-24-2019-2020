@@ -41,11 +41,6 @@ std::shared_ptr<okapi::AsyncMotionProfileController> profileController = okapi::
     .withOutput(chassis)
     .buildMotionProfileController();
 
-std::shared_ptr<okapi::AsyncMotionProfileController> profileControllerFast = okapi::AsyncMotionProfileControllerBuilder()
-    .withLimits({0.8, 1.5, 7.5})
-    .withOutput(chassis)
-    .buildMotionProfileController();
-
 std::shared_ptr<okapi::AsyncMotionProfileController> profileControllerChonky = okapi::AsyncMotionProfileControllerBuilder()
     .withLimits({0.2, 0.4, 2.0})
     .withOutput(chassis)

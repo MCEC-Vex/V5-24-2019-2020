@@ -11,11 +11,13 @@ void setupMotors()
     trayMotorBack.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
     trayMotorFront.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
 
-    //leftArmMotor.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
-    //rightArmMotor.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
-
     leftIntake.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
     rightIntake.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
+
+    // Set arm motors to coast by default
+    // They're adjusted to hold mode when they go up
+    leftArmMotor.set_brake_mode(pros::E_MOTOR_BRAKE_COAST);
+    rightArmMotor.set_brake_mode(pros::E_MOTOR_BRAKE_COAST);
 
     // Right side forward is positive
     rightTopMotor.set_reversed(true);
@@ -154,12 +156,6 @@ void moveTrayToHighest()
 
     leftIntake.move(0);
     rightIntake.move(0);
-}
-
-int getUltrasonicDifference()
-{
-    //return frontUltrasonic.get_value() - backUltrasonic.get_value();
-    return 0;
 }
 
 double convertToEncoderUnits(std::shared_ptr<okapi::ChassisController> chassis, okapi::QLength distance)
